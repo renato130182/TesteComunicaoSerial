@@ -5,17 +5,6 @@
  */
 package systeminfoorangepi;
 
-
-import Control.HardwareInfo;
-import Control.JavaInfo;
-import Control.MemoryInfo;
-import Control.NetworkConnection;
-import Control.OperatingSystemInfo;
-import Control.PlataforInfo;
-import com.pi4j.platform.PlatformAlreadyAssignedException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  *
  * @author renato.soares
@@ -27,6 +16,6 @@ public class SystemInfoOrangePi {
      */
     public static void main(String[] args)   {
        
-    }
+    }    
     
 }
