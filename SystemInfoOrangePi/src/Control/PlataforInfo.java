@@ -17,14 +17,10 @@ public class PlataforInfo {
     private String name;
     private String plataformId;
 
-    public PlataforInfo(){       
-        try {
-            PlatformManager.setPlatform(Platform.ORANGEPI);
-            name=PlatformManager.getPlatform().getLabel();
-            plataformId=PlatformManager.getPlatform().getId();
-        } catch (PlatformAlreadyAssignedException ex) {
-            ex.printStackTrace();
-        }              
+    public PlataforInfo() throws PlatformAlreadyAssignedException{       
+        PlatformManager.setPlatform(Platform.ORANGEPI);
+        name=PlatformManager.getPlatform().getLabel();
+        plataformId=PlatformManager.getPlatform().getId();              
     }
 
     public String getName() {

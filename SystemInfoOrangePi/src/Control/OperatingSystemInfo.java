@@ -5,6 +5,9 @@
  */
 package Control;
 
+import com.pi4j.platform.Platform;
+import com.pi4j.platform.PlatformAlreadyAssignedException;
+import com.pi4j.platform.PlatformManager;
 import com.pi4j.system.SystemInfo;
 import java.io.IOException;
 import java.text.ParseException;
@@ -19,25 +22,19 @@ public class OperatingSystemInfo {
     private String name;
     private String osVersion;
     private String osArchitecture;
-    private String osFirmwareDate;
-    private String osFirmwareBuild;
 
     public OperatingSystemInfo(){
         try {
-            //PlatformManager.setPlatform(Platform.ORANGEPI);            
+            try {            
+                PlatformManager.setPlatform(Platform.ORANGEPI);
+            } catch (PlatformAlreadyAssignedException ex) {
+                Logger.getLogger(OperatingSystemInfo.class.getName()).log(Level.SEVERE, null, ex);
+            }
             name=SystemInfo.getOsName();
             osVersion=SystemInfo.getOsVersion();
-            osArchitecture=SystemInfo.getOsArch();
-            osFirmwareDate=SystemInfo.getOsFirmwareDate();
-            osFirmwareBuild=SystemInfo.getOsFirmwareBuild();            
-        } catch (IOException ex) {
-            Logger.getLogger(MemoryInfo.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(MemoryInfo.class.getName()).log(Level.SEVERE, null, ex);
+            osArchitecture=SystemInfo.getOsArch();        
         } catch (UnsupportedOperationException ex) {
             Logger.getLogger(MemoryInfo.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ParseException ex) {
-            Logger.getLogger(OperatingSystemInfo.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -53,11 +50,4 @@ public class OperatingSystemInfo {
         return osArchitecture;
     }
 
-    public String getOsFirmwareDate() {
-        return osFirmwareDate;
-    }
-
-    public String getOsFirmwareBuild() {
-        return osFirmwareBuild;
-    }
 }

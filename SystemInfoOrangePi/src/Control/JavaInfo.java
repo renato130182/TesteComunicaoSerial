@@ -8,7 +8,7 @@ package Control;
 import com.pi4j.system.SystemInfo;
 
 /**
- *
+ * Multiplataforma
  * @author renato.soares
  */
 public class JavaInfo {

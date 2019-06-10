@@ -5,13 +5,16 @@
  */
 package Control;
 
+import com.pi4j.platform.Platform;
+import com.pi4j.platform.PlatformAlreadyAssignedException;
+import com.pi4j.platform.PlatformManager;
 import com.pi4j.system.SystemInfo;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Apenas para OrangePi 
  * @author renato.soares
  */
 public class MemoryInfo {
@@ -24,7 +27,11 @@ public class MemoryInfo {
     
     public MemoryInfo() {
         try {
-            //PlatformManager.setPlatform(Platform.ORANGEPI);            
+            try {            
+                PlatformManager.setPlatform(Platform.ORANGEPI);
+            } catch (PlatformAlreadyAssignedException ex) {
+                Logger.getLogger(MemoryInfo.class.getName()).log(Level.SEVERE, null, ex);
+            }
             totalMemory=SystemInfo.getMemoryTotal();
             usedMemory=SystemInfo.getMemoryUsed();
             freeMemory=SystemInfo.getMemoryFree();

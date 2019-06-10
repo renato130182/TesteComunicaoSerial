@@ -5,14 +5,16 @@
  */
 package Control;
 
+import com.pi4j.platform.Platform;
 import com.pi4j.platform.PlatformAlreadyAssignedException;
+import com.pi4j.platform.PlatformManager;
 import com.pi4j.system.SystemInfo;
 import com.pi4j.system.SystemInfo.BoardType;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 /**
- *
+ * Apenas para OrangePi
  * @author renato.soares
  */
 public class HardwareInfo {
@@ -20,9 +22,7 @@ public class HardwareInfo {
     private String cpuRevision;
     private String cpuArchitecture;
     private String cpuPart;
-    private Float cpuTemperature;
-    private Float cpuVoltage;
-    private String cpuModelName;
+    private float cpuTemperature;
     private String processor;
     private String hardware;
     private String hardwareRevision;
@@ -31,15 +31,15 @@ public class HardwareInfo {
     
     
     public HardwareInfo() throws PlatformAlreadyAssignedException{
-            //PlatformManager.setPlatform(Platform.ORANGEPI);
+            
         try {
+            PlatformManager.setPlatform(Platform.ORANGEPI);
+            
             serialNumber=SystemInfo.getSerial();
             cpuRevision=SystemInfo.getCpuRevision();
             cpuArchitecture=SystemInfo.getCpuArchitecture();
             cpuPart=SystemInfo.getCpuPart();
             cpuTemperature=SystemInfo.getCpuTemperature();
-            cpuVoltage=SystemInfo.getCpuVoltage();
-            cpuModelName=SystemInfo.getModelName();
             processor=SystemInfo.getProcessor();
             hardware=SystemInfo.getHardware();
             hardwareRevision=SystemInfo.getRevision();
@@ -74,14 +74,6 @@ public class HardwareInfo {
 
     public Float getCpuTemperature() {
         return cpuTemperature;
-    }
-
-    public Float getCpuVoltage() {
-        return cpuVoltage;
-    }
-
-    public String getCpuModelName() {
-        return cpuModelName;
     }
 
     public String getProcessor() {

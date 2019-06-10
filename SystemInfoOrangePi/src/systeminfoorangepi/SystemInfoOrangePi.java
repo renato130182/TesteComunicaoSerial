@@ -6,7 +6,12 @@
 package systeminfoorangepi;
 
 
+import Control.HardwareInfo;
+import Control.JavaInfo;
+import Control.MemoryInfo;
 import Control.NetworkConnection;
+import Control.OperatingSystemInfo;
+import Control.PlataforInfo;
 import com.pi4j.platform.PlatformAlreadyAssignedException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,13 +25,8 @@ public class SystemInfoOrangePi {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args)  {
-        try {
-            NetworkConnection conn = new NetworkConnection();
-        } catch (PlatformAlreadyAssignedException ex) {
-            Logger.getLogger(SystemInfoOrangePi.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
+    public static void main(String[] args)   {
+       
     }
     
 }
