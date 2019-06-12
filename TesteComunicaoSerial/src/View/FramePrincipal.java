@@ -7,10 +7,12 @@ package View;
 
 
 
+import Control.HardwareInfo;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import Serial.*;
+import com.pi4j.platform.PlatformAlreadyAssignedException;
 /**
  *
  * @author renato.soares
@@ -18,15 +20,39 @@ import Serial.*;
 public class FramePrincipal extends javax.swing.JFrame implements ActionListener{
    SerialTxRx serialPorts = new SerialTxRx();
    SerialTxRx conn;
+   HardwareInfo hard;
    Protocolo.NazkomUDC1_default nazkomUdc1Default = new Protocolo.NazkomUDC1_default();
    Protocolo.NazcomUDC1_falhas nazkomUdc1Falhas = new Protocolo.NazcomUDC1_falhas();
+   double temp=20.0;
     /**
      * Creates new form FramePrincipal
      */
-    public FramePrincipal() {                            
-        initComponents();        
-        CarregaPortasDisponiveis();    
-                        
+    public FramePrincipal() {
+        try {
+            initComponents();        
+            CarregaPortasDisponiveis();   
+            hard = new HardwareInfo();            
+            hard.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    //System.out.println("temperatura: " + e.getActionCommand());
+                    temp = (double)hard.getCpuTemperature()/1000;
+                    System.out.println("temp: " + temp); 
+                    AtualizaMostradorTemp();
+                }
+            });
+        } catch (PlatformAlreadyAssignedException e) {
+            e.printStackTrace();
+        }                                         
+    }
+    
+    private void AtualizaMostradorTemp(){
+        try {
+            radial1SquareTemp.setValueAnimated(temp);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
     }
         
     private void CarregaPortasDisponiveis(){
@@ -83,6 +109,8 @@ public class FramePrincipal extends javax.swing.JFrame implements ActionListener
         jScrollPane2 = new javax.swing.JScrollPane();
         txtInformacao = new javax.swing.JTextArea();
         jLabel12 = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        radial1SquareTemp = new eu.hansolo.steelseries.gauges.Radial1Square();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Teste de comunicação serial");
@@ -272,6 +300,39 @@ public class FramePrincipal extends javax.swing.JFrame implements ActionListener
         jLabel12.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel12.setText("Informação tratada com protocolo:");
 
+        jPanel2.setName(""); // NOI18N
+
+        radial1SquareTemp.setThreshold(35.0);
+        radial1SquareTemp.setThresholdVisible(true);
+        radial1SquareTemp.setTitle("Temperatura.");
+        radial1SquareTemp.setUnitString("Cº");
+
+        javax.swing.GroupLayout radial1SquareTempLayout = new javax.swing.GroupLayout(radial1SquareTemp);
+        radial1SquareTemp.setLayout(radial1SquareTempLayout);
+        radial1SquareTempLayout.setHorizontalGroup(
+            radial1SquareTempLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 200, Short.MAX_VALUE)
+        );
+        radial1SquareTempLayout.setVerticalGroup(
+            radial1SquareTempLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 200, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(radial1SquareTemp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(radial1SquareTemp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 147, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -289,25 +350,30 @@ public class FramePrincipal extends javax.swing.JFrame implements ActionListener
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(jLabel10, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cmbProtocolo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(27, 27, 27)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cmbProtocolo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -415,27 +481,34 @@ public class FramePrincipal extends javax.swing.JFrame implements ActionListener
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lblStatusConexao;
+    eu.hansolo.steelseries.gauges.Radial1Square radial1SquareTemp;
     private javax.swing.JTextArea txtInformacao;
     private javax.swing.JTextPane txtPaneDadosSerial;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        System.out.println("Dados Serial : "+e.getActionCommand());
-        txtPaneDadosSerial.setText(e.getActionCommand());
-        switch (cmbProtocolo.getSelectedIndex()){
-            case 0:                
-                    ProtocoloNazcomUDC1Default(e.getActionCommand());
+        
+        if(true){
+            System.out.println("Dados Serial : "+e.getActionCommand());
+            txtPaneDadosSerial.setText(e.getActionCommand());
+            switch (cmbProtocolo.getSelectedIndex()){
+                case 0:                
+                        ProtocoloNazcomUDC1Default(e.getActionCommand());
+                        break;
+                case 1:
+                        ProtocoloNazcomUDC1Falha(e.getActionCommand());
+                        break;
+                default:
                     break;
-            case 1:
-                    ProtocoloNazcomUDC1Falha(e.getActionCommand());
-                    break;
-            default:
-                break;
-        }
+            }
+        }else{
+            System.out.println("Tempretarura CPU: "+e.getActionCommand());
+        }    
     }
     private void ProtocoloNazcomUDC1Default(String dadosRecebidos){
         nazkomUdc1Default.setLeituraSerial(dadosRecebidos);                
@@ -468,4 +541,6 @@ public class FramePrincipal extends javax.swing.JFrame implements ActionListener
                 "CTL da Amostragem: " + nazkomUdc1Falhas.getCtl()
                 );
     }
+    
+    
 }

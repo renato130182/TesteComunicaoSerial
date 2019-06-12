@@ -10,7 +10,13 @@ import com.pi4j.platform.PlatformAlreadyAssignedException;
 import com.pi4j.platform.PlatformManager;
 import com.pi4j.system.SystemInfo;
 import com.pi4j.system.SystemInfo.BoardType;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 /**
@@ -28,7 +34,13 @@ public class HardwareInfo {
     private String hardwareRevision;
     private boolean hardFloatAbi;
     private BoardType boardType;
+    private int intervaloTemperatura=1000;
     
+    private List<ActionListener> listeners = new ArrayList<ActionListener>(0);
+    Timer timer = new Timer();
+    public void addActionListener(ActionListener listener) {
+		this.listeners.add(listener);
+	}
     
     public HardwareInfo() throws PlatformAlreadyAssignedException{
             
@@ -52,7 +64,12 @@ public class HardwareInfo {
         } catch (UnsupportedOperationException ex) {
             Logger.getLogger(HardwareInfo.class.getName()).log(Level.SEVERE, null, ex);
         }
-            
+        timer.scheduleAtFixedRate(new TimerTask() {
+        @Override
+        public void run() {
+            MonitorTemperatura();
+        }
+    }, intervaloTemperatura, intervaloTemperatura);    
      
     }
 
@@ -94,5 +111,25 @@ public class HardwareInfo {
 
     public BoardType getBoardType() {
         return boardType;
-    }    
+    }
+    
+    public void MonitorTemperatura(){
+        try {
+            cpuTemperature=SystemInfo.getCpuTemperature();
+        } catch (IOException | InterruptedException | NumberFormatException | UnsupportedOperationException ex) {
+            Logger.getLogger(HardwareInfo.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        listeners.forEach((listener) -> {
+            listener.actionPerformed(new ActionEvent(this,2,Float.toString(cpuTemperature)));
+        });
+    }
+    
+    public int getIntervaloTemperatura() {
+        return intervaloTemperatura;
+    }
+
+    public void setIntervaloTemperatura(int intervaloTemperatura) {
+        this.intervaloTemperatura = intervaloTemperatura;
+    }
+    
 }
