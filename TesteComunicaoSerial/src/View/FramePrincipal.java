@@ -23,6 +23,7 @@ public class FramePrincipal extends javax.swing.JFrame implements ActionListener
    HardwareInfo hard;
    Protocolo.NazkomUDC1_default nazkomUdc1Default = new Protocolo.NazkomUDC1_default();
    Protocolo.NazcomUDC1_falhas nazkomUdc1Falhas = new Protocolo.NazcomUDC1_falhas();
+   Protocolo.Zumbach_USYS10 zumbachUsys10 = new Protocolo.Zumbach_USYS10();
    double temp=20.0;
     /**
      * Creates new form FramePrincipal
@@ -48,7 +49,7 @@ public class FramePrincipal extends javax.swing.JFrame implements ActionListener
     
     private void AtualizaMostradorTemp(){
         try {
-            radial1SquareTemp.setValueAnimated(temp);
+            radial4LcdTemp.setValueAnimated(temp);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -110,7 +111,7 @@ public class FramePrincipal extends javax.swing.JFrame implements ActionListener
         txtInformacao = new javax.swing.JTextArea();
         jLabel12 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
-        radial1SquareTemp = new eu.hansolo.steelseries.gauges.Radial1Square();
+        radial4LcdTemp = new eu.hansolo.steelseries.gauges.Radial4Lcd();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Teste de comunicação serial");
@@ -285,7 +286,7 @@ public class FramePrincipal extends javax.swing.JFrame implements ActionListener
         jLabel11.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel11.setText("Protocolo:");
 
-        cmbProtocolo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Nazkon UDC1 - Default", "Nazkon UDC1 -  Falhas" }));
+        cmbProtocolo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Nazkon UDC1 - Default", "Nazkon UDC1 -  Falhas", "Zumbach USYS10" }));
         cmbProtocolo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cmbProtocoloActionPerformed(evt);
@@ -300,37 +301,31 @@ public class FramePrincipal extends javax.swing.JFrame implements ActionListener
         jLabel12.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel12.setText("Informação tratada com protocolo:");
 
+        jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel2.setName(""); // NOI18N
 
-        radial1SquareTemp.setThreshold(35.0);
-        radial1SquareTemp.setThresholdVisible(true);
-        radial1SquareTemp.setTitle("Temperatura.");
-        radial1SquareTemp.setUnitString("Cº");
-
-        javax.swing.GroupLayout radial1SquareTempLayout = new javax.swing.GroupLayout(radial1SquareTemp);
-        radial1SquareTemp.setLayout(radial1SquareTempLayout);
-        radial1SquareTempLayout.setHorizontalGroup(
-            radial1SquareTempLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 200, Short.MAX_VALUE)
-        );
-        radial1SquareTempLayout.setVerticalGroup(
-            radial1SquareTempLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 200, Short.MAX_VALUE)
-        );
+        radial4LcdTemp.setLcdDecimals(1);
+        radial4LcdTemp.setMaxMeasuredValueVisible(true);
+        radial4LcdTemp.setThreshold(35.0);
+        radial4LcdTemp.setThresholdVisible(true);
+        radial4LcdTemp.setTitle("Temp.");
+        radial4LcdTemp.setUnitString("Cº");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(radial1SquareTemp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addContainerGap()
+                .addComponent(radial4LcdTemp, javax.swing.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(radial1SquareTemp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 147, Short.MAX_VALUE))
+                .addContainerGap()
+                .addComponent(radial4LcdTemp, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -341,17 +336,18 @@ public class FramePrincipal extends javax.swing.JFrame implements ActionListener
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel12)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                            .addComponent(jLabel11)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addComponent(cmbProtocolo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jLabel10, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jScrollPane2)
+                            .addComponent(jScrollPane1)
+                            .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel11)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(cmbProtocolo, javax.swing.GroupLayout.PREFERRED_SIZE, 532, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(10, 10, 10)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -359,21 +355,21 @@ public class FramePrincipal extends javax.swing.JFrame implements ActionListener
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(27, 27, 27)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(cmbProtocolo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -485,7 +481,7 @@ public class FramePrincipal extends javax.swing.JFrame implements ActionListener
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lblStatusConexao;
-    eu.hansolo.steelseries.gauges.Radial1Square radial1SquareTemp;
+    private eu.hansolo.steelseries.gauges.Radial4Lcd radial4LcdTemp;
     private javax.swing.JTextArea txtInformacao;
     private javax.swing.JTextPane txtPaneDadosSerial;
     // End of variables declaration//GEN-END:variables
@@ -503,6 +499,9 @@ public class FramePrincipal extends javax.swing.JFrame implements ActionListener
                 case 1:
                         ProtocoloNazcomUDC1Falha(e.getActionCommand());
                         break;
+                case 2:
+                        ProtocoloZumbach_USYS10(e.getActionCommand());
+                        break; 
                 default:
                     break;
             }
@@ -541,6 +540,20 @@ public class FramePrincipal extends javax.swing.JFrame implements ActionListener
                 "CTL da Amostragem: " + nazkomUdc1Falhas.getCtl()
                 );
     }
-    
+    private void ProtocoloZumbach_USYS10(String dadosRecebidos){
+        zumbachUsys10.setLeituraSerial(dadosRecebidos);                
+        txtInformacao.setText("Order Number: " + zumbachUsys10.getOrderNumber() + "\t" +
+                "Product Number: " + zumbachUsys10.getProductNumber() + "\t" +
+                "Period Number: " + zumbachUsys10.getPeriodNumber()+  "\n" +    
+                "Produced Length: " + zumbachUsys10.getProducedLenght()+ "\t" +                                
+                "Events : " + zumbachUsys10.getEvents()+  "\n" +
+                "Average: " + zumbachUsys10.getAverage()+ "\t" +
+                "Maximum: " + zumbachUsys10.getMaximum()+ "\n" +                        
+                "Minimum: " + zumbachUsys10.getMinimum()+  "\t" +
+                "Standard Deviation: " + zumbachUsys10.getStandardDeviation()+  "\t" +                                
+                "Max-Min Range: " + zumbachUsys10.getMaxMinRange()+  "\n" +
+                "CpK: " + zumbachUsys10.getCpk()+  "\t"                 
+                ); 
+    }
     
 }
