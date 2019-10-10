@@ -6,77 +6,80 @@ import java.util.Date;
 public class Micrometro {
 
     private int metragem;
-
     private Time micrometroHora;
-
     private Date micrometroData;
-
-    private Object Produto;
-
+    private Produto produto;
     private float diametroMedio;
-
     private float desvio;
-
     private float diametroMaximo;
-
     private float diametroMinimo;
 
-    public Micrometro(Object Produto) {
+    public Micrometro() {
     }
 
     public int getMetragem() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return metragem;
     }
 
-    public int setMetragem(int metragem) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setMetragem(int metragem) {
+        this.metragem = metragem;
     }
 
     public Time getMicrometroHora() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return micrometroHora;
     }
 
-    public Time setMicrometroHora(Time micrometroHora) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setMicrometroHora(Time micrometroHora) {
+        this.micrometroHora = micrometroHora;
     }
 
     public Date getMicrometroData() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return micrometroData;
     }
 
-    public Date setMicrometroData(Date micrometroData) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setMicrometroData(Date micrometroData) {
+        this.micrometroData = micrometroData;
     }
+
+    public Produto getProduto() {
+        return produto;
+    }
+
+    public void setProduto(Produto produto) {
+        this.produto = produto;
+    }
+
 
     public float getDiametroMedio() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return diametroMedio;
     }
 
-    public float setDiametroMedio(float diametroMedio) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setDiametroMedio(float diametroMedio) {
+        this.diametroMedio = diametroMedio;
     }
 
     public float getDesvio() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return desvio;
     }
 
-    public float setDesvio(float desvio) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setDesvio(float desvio) {
+        this.desvio = desvio;
     }
 
     public float getDiametroMaximo() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return diametroMaximo;
     }
 
-    public float setDiametroMaximo(float diametroMaximo) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setDiametroMaximo(float diametroMaximo) {
+        this.diametroMaximo = diametroMaximo;
     }
 
     public float getDiametroMinimo() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return diametroMinimo;
     }
 
-    public float setDiametroMinimo(float diametroMinimo) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setDiametroMinimo(float diametroMinimo) {
+        this.diametroMinimo = diametroMinimo;
     }
+
 }

@@ -2,20 +2,33 @@ package model;
 
 public class ParadasMaquina extends Paradas {
 
-    private Object Paradas;
-
-    private Object Maquina;
-
+    private Paradas paradas;
+    private Maquina maquina;
     private int codigoParadaMaquina;
 
-    public ParadasMaquina(Object Paradas, Object Maquina) {
+    public Paradas getParadas() {
+        return paradas;
     }
+
+    public void setParadas(Paradas paradas) {
+        this.paradas = paradas;
+    }
+
+    public Maquina getMaquina() {
+        return maquina;
+    }
+
+    public void setMaquina(Maquina maquina) {
+        this.maquina = maquina;
+    }
+
 
     public int getCodigoParadaMaquina() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return codigoParadaMaquina;
     }
 
-    public int setCodigoParadaMaquina(int codigoParadaMaquina) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setCodigoParadaMaquina(int codigoParadaMaquina) {
+        this.codigoParadaMaquina = codigoParadaMaquina;
     }
+
 }

@@ -156,4 +156,24 @@ public class DadosDefaultDAO {
         }
         return false;
     }
+    
+    public boolean atualizarMaquinaMonitor(String serial,String maquina){
+    ConexaoDatabase db = new ConexaoDatabase();
+        if(db.isInfoDB()){
+            try {
+                sql = "update bd_sistema_monitor.tb_maquina_monitor set "
+                        + "codigo_maquina_monitor = ? where serial_maquina_monitor = ?;";
+                Connection conec = db.getConnection();
+                PreparedStatement st = conec.prepareStatement(sql);
+                st.setString(1,maquina);
+                st.setString(2,serial);
+                st.executeUpdate();         
+                return true;
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, ex.getMessage(),"Erro ao atualizar dados",JOptionPane.ERROR_MESSAGE);
+                Logger.getLogger(DadosDefaultDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return false;
+    }
 }

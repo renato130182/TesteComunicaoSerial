@@ -4,51 +4,55 @@ import controller.InterfaceProduto;
 
 public class Produto implements InterfaceProduto {
 
-    private int codigo;
-
+    private String codigo;
     private String descricao;
-
     private float diametroMaximo;
-
     private float diametroMinimo;
 
-    public Produto(int codigo) {
+    public Produto() {
     }
 
-    public int getCodigo() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public Produto(String codigo, String descricao) {
+        this.codigo = codigo;
+        this.descricao = descricao;
+    }
+    
+    public String getCodigo() {
+        return codigo;
     }
 
-    public int setCodigo(int codigo) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
     }
 
     public String getDescricao() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return descricao;
     }
 
-    public String setDescricao(String descricao) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
     }
 
     public float getDiametroMaximo() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return diametroMaximo;
     }
 
-    public float setDiametroMaximo(float diametroMaximo) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setDiametroMaximo(float diametroMaximo) {
+        this.diametroMaximo = diametroMaximo;
     }
 
     public float getDiametroMinimo() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return diametroMinimo;
     }
 
-    public float setDiametroMinimo(float diametroMinimo) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setDiametroMinimo(float diametroMinimo) {
+        this.diametroMinimo = diametroMinimo;
     }
 
     @Override
     public void buscaDadosProduto() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    
 }

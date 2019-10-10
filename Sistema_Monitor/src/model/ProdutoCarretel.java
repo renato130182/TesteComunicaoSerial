@@ -2,30 +2,48 @@ package model;
 
 public class ProdutoCarretel {
 
-    private Object Produto;
-
-    private Object Carretel;
-
+    private Produto produto;
+    private Carretel carretel;
     private int metragemPadrao;
-
     private int metragemMaxima;
 
-    public ProdutoCarretel(Object Produto, Object Carretel) {
+    public ProdutoCarretel() {
     }
+
+    public Produto getProduto() {
+        return produto;
+    }
+
+    public void setProduto(Produto produto) {
+        this.produto = produto;
+    }
+
+    public Carretel getCarretel() {
+        return carretel;
+    }
+
+    public void setCarretel(Carretel carretel) {
+        this.carretel = carretel;
+    }
+
+   
 
     public int getMetragemPadrao() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return metragemPadrao;
     }
 
-    public int setMetragemPadrao(int metragemPadrao) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setMetragemPadrao(int metragemPadrao) {
+        this.metragemPadrao = metragemPadrao;
     }
 
     public int getMetragemMaxima() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return metragemMaxima;
     }
 
-    public int setMetragemMaxima(int metragemMaxima) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setMetragemMaxima(int metragemMaxima) {
+        this.metragemMaxima = metragemMaxima;
     }
+
+    
+    
 }

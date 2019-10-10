@@ -10,13 +10,21 @@ import com.pi4j.system.SystemInfo;
 import controller.Login;
 import dao.DadosDefaultDAO;
 import dao.MaquinaDAO;
+import dao.ProgramacaoMaquinaDAO;
 import java.awt.CardLayout;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 import model.DadosConexao;
 import model.Maquina;
+import model.ProdutoCarretel;
+import model.ProdutoMaquina;
+import model.ProgramacaoMaquina;
 import model.Usuario;
 
 /**
@@ -29,6 +37,8 @@ public class JFPrincipal extends javax.swing.JFrame {
     Login login = new Login();
     Maquina maquina = new Maquina();
     MaquinaDAO maqDao =  new MaquinaDAO();
+    ProdutoMaquina prodmaq = new ProdutoMaquina();
+    ProdutoCarretel prodCar = new ProdutoCarretel();
     /**
      * Creates new form JFPrincipal
      */
@@ -48,7 +58,9 @@ public class JFPrincipal extends javax.swing.JFrame {
             bloquearMenu();            
             DadosDefaultDAO dados = new DadosDefaultDAO();
             codMaquina = dados.buscaCodigoMaquina(identificador);
-            
+            if(codMaquina!=null){                
+                maquina = maqDao.buscarDadosMaquina(codMaquina);
+            }
             
         } catch (UnsupportedOperationException | IOException | InterruptedException ex) {
             Logger.getLogger(JFPrincipal.class.getName()).log(Level.SEVERE, null, ex);
@@ -73,6 +85,11 @@ public class JFPrincipal extends javax.swing.JFrame {
         jbLogin = new javax.swing.JButton();
         jPLogo = new javax.swing.JPanel();
         jpProgramacao = new javax.swing.JPanel();
+        jLabel21 = new javax.swing.JLabel();
+        jSeparator4 = new javax.swing.JSeparator();
+        jLabel22 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTableProgramacao = new javax.swing.JTable();
         jpParadas = new javax.swing.JPanel();
         jpProducao = new javax.swing.JPanel();
         jpConfigDefault = new javax.swing.JPanel();
@@ -125,6 +142,7 @@ public class JFPrincipal extends javax.swing.JFrame {
         jMenuItemProducao = new javax.swing.JMenuItem();
         menuConfiguracoes = new javax.swing.JMenu();
         jMenuConfigDefault = new javax.swing.JMenuItem();
+        jMenuTrocarMaquina = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Sistema Condumig");
@@ -192,22 +210,77 @@ public class JFPrincipal extends javax.swing.JFrame {
                 .addComponent(jbLogin)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 268, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(143, Short.MAX_VALUE))
+                .addContainerGap(337, Short.MAX_VALUE))
         );
 
         jpRoot.add(jpLogin, "jpLogin");
 
-        jpProgramacao.setBackground(new java.awt.Color(204, 204, 255));
+        jpProgramacao.setBackground(new java.awt.Color(204, 255, 255));
+
+        jLabel21.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel21.setText("Acompanhamento de Programação");
+
+        jLabel22.setText("Itens programados:");
+
+        jTableProgramacao.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jTableProgramacao.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
+            },
+            new String [] {
+                "Codigo Item", "Descrição", "Lote", "Quantidade", "Metragem prog.", "Data "
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jTableProgramacao.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
+        jScrollPane1.setViewportView(jTableProgramacao);
 
         javax.swing.GroupLayout jpProgramacaoLayout = new javax.swing.GroupLayout(jpProgramacao);
         jpProgramacao.setLayout(jpProgramacaoLayout);
         jpProgramacaoLayout.setHorizontalGroup(
             jpProgramacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 835, Short.MAX_VALUE)
+            .addGroup(jpProgramacaoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jpProgramacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jpProgramacaoLayout.createSequentialGroup()
+                        .addComponent(jLabel21)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpProgramacaoLayout.createSequentialGroup()
+                        .addGroup(jpProgramacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 742, Short.MAX_VALUE)
+                            .addComponent(jSeparator4, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel22, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap())))
         );
         jpProgramacaoLayout.setVerticalGroup(
             jpProgramacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 520, Short.MAX_VALUE)
+            .addGroup(jpProgramacaoLayout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(jLabel21)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel22)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         jpRoot.add(jpProgramacao, "jpProgramacao");
@@ -222,7 +295,7 @@ public class JFPrincipal extends javax.swing.JFrame {
         );
         jpParadasLayout.setVerticalGroup(
             jpParadasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 520, Short.MAX_VALUE)
+            .addGap(0, 714, Short.MAX_VALUE)
         );
 
         jpRoot.add(jpParadas, "jpParadas");
@@ -237,7 +310,7 @@ public class JFPrincipal extends javax.swing.JFrame {
         );
         jpProducaoLayout.setVerticalGroup(
             jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 520, Short.MAX_VALUE)
+            .addGap(0, 714, Short.MAX_VALUE)
         );
 
         jpRoot.add(jpProducao, "jpProducao");
@@ -498,7 +571,7 @@ public class JFPrincipal extends javax.swing.JFrame {
 
         menuProgramacao.setText("Programação");
 
-        jMenuItemProgramacao.setText("Programação");
+        jMenuItemProgramacao.setText("Acompanhamento de programação");
         jMenuItemProgramacao.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItemProgramacaoActionPerformed(evt);
@@ -542,6 +615,14 @@ public class JFPrincipal extends javax.swing.JFrame {
         });
         menuConfiguracoes.add(jMenuConfigDefault);
 
+        jMenuTrocarMaquina.setText("Trocar maquina");
+        jMenuTrocarMaquina.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuTrocarMaquinaActionPerformed(evt);
+            }
+        });
+        menuConfiguracoes.add(jMenuTrocarMaquina);
+
         menuPrincipal.add(menuConfiguracoes);
 
         setJMenuBar(menuPrincipal);
@@ -550,7 +631,9 @@ public class JFPrincipal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItemProgramacaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemProgramacaoActionPerformed
-        // TODO add your handling code here:
+        // TODO add your handling code here:       
+        limparJTable(jTableProgramacao);
+        buscarProgramacaoMaquina();
         CardLayout card = (CardLayout) jpRoot.getLayout();
         card.show(jpRoot,"jpProgramacao");
     }//GEN-LAST:event_jMenuItemProgramacaoActionPerformed
@@ -671,6 +754,13 @@ public class JFPrincipal extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jMenuItemDesligarActionPerformed
 
+    private void jMenuTrocarMaquinaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuTrocarMaquinaActionPerformed
+        // TODO add your handling code here:
+        JFCadastroMonitor cad = new JFCadastroMonitor();
+        cad.setEdit(true);
+        cad.setVisible(true);
+    }//GEN-LAST:event_jMenuTrocarMaquinaActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -783,6 +873,8 @@ public class JFPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel21;
+    private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -797,10 +889,14 @@ public class JFPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItemProducao;
     private javax.swing.JMenuItem jMenuItemProgramacao;
     private javax.swing.JMenuItem jMenuItemSair;
+    private javax.swing.JMenuItem jMenuTrocarMaquina;
     private javax.swing.JPanel jPLogo;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
+    private javax.swing.JSeparator jSeparator4;
+    private javax.swing.JTable jTableProgramacao;
     private javax.swing.JButton jbCriarArquivosDefault;
     private javax.swing.JButton jbLogin;
     private javax.swing.JPanel jpConfigDefault;
@@ -846,4 +942,23 @@ public class JFPrincipal extends javax.swing.JFrame {
         jtfUser.setText("");
         jpfPassword.setText("");
     }
-}
+   
+    private void limparJTable(JTable tabela ){
+        DefaultTableModel tblRemove = (DefaultTableModel)tabela.getModel();
+        while(tblRemove.getRowCount()>0){                        
+            tblRemove.removeRow(0);                 
+        }
+    }
+        
+    private void buscarProgramacaoMaquina() {   
+        DefaultTableModel modelo = (DefaultTableModel)jTableProgramacao.getModel();
+        ProgramacaoMaquinaDAO prog =  new ProgramacaoMaquinaDAO();
+        List<ProgramacaoMaquina> lista =  new ArrayList<ProgramacaoMaquina>();
+        lista = prog.buscaProgramacaoMaquina(codMaquina);
+        for(int i=0;i<lista.size();i++){
+            modelo.addRow(new Object[]{lista.get(i).getProduto().getCodigo(),
+                lista.get(i).getProduto().getDescricao(),lista.get(i).getLoteproducao(),
+                lista.get(i).getQuantidadeProgramada(),lista.get(i).getMetragemProgramada(),lista.get(i).getDataProgramada()});
+        }
+    }
+}                                 

@@ -2,20 +2,40 @@ package model;
 
 public class ProdutoMaquina {
 
-    private Object Produto;
-
-    private Object Maquina;
-
+    private Produto produto;
+    private Maquina maquina;
     private int velocidade;
 
-    public ProdutoMaquina(Object Produto, Object Maquina) {
+    public Produto getProduto() {
+        return produto;
     }
+
+    public void setProduto(Produto produto) {
+        this.produto = produto;
+    }
+
+    public Maquina getMaquina() {
+        return maquina;
+    }
+
+    public void setMaquina(Maquina maquina) {
+        this.maquina = maquina;
+    }
+
+
 
     public int getVelocidade() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return velocidade;
     }
 
-    public int setVelocidade(int velocidade) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setVelocidade(int velocidade) {
+        this.velocidade = velocidade;
     }
+
+    public ProdutoMaquina() {
+        
+    }
+    
+    
+
 }

@@ -5,37 +5,39 @@ import controller.InterfaceParadas;
 public class Paradas implements InterfaceParadas {
 
     private int codigo;
-
     private String descricao;
-
     private String abreviacao;
 
-    public int getCodigo() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public Paradas() {
     }
 
-    public int setCodigo(int codigo) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public int getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(int codigo) {
+        this.codigo = codigo;
     }
 
     public String getDescricao() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return descricao;
     }
 
-    public String setDescricao(String descricao) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
     }
 
     public String getAbreviacao() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return abreviacao;
     }
 
-    public String setAbreviacao(String abreviacao) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setAbreviacao(String abreviacao) {
+        this.abreviacao = abreviacao;
     }
 
     @Override
     public int buscaDadosParada(int codigo) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
 }

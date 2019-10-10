@@ -20,7 +20,7 @@ import javax.swing.JOptionPane;
  */
 public class JFCadastroMonitor extends javax.swing.JFrame {
     DadosDefaultDAO df = new DadosDefaultDAO();
-            
+    private boolean edit=false;        
     /**
      * Creates new form JFCadastroMonitor
      */
@@ -38,6 +38,10 @@ public class JFCadastroMonitor extends javax.swing.JFrame {
             Logger.getLogger(JFCadastroMonitor.class.getName()).log(Level.SEVERE, null, ex);
         }
         
+    }
+
+    public void setEdit(boolean edit) {
+        this.edit = edit;
     }
 
     /**
@@ -133,8 +137,14 @@ public class JFCadastroMonitor extends javax.swing.JFrame {
 
     private void jbRegistrarMonitorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbRegistrarMonitorActionPerformed
         // TODO add your handling code here:
-        if(df.cadastrarMaquinaMonitor(jlSerial.getText(),jcbListaMaquinas.getSelectedItem().toString())){
-            JOptionPane.showMessageDialog(rootPane,"Cadastro realizado com sucesso!!","Cadastro",JOptionPane.INFORMATION_MESSAGE);            
+        if(!edit){
+            if(df.cadastrarMaquinaMonitor(jlSerial.getText(),jcbListaMaquinas.getSelectedItem().toString())){
+                JOptionPane.showMessageDialog(rootPane,"Cadastro realizado com sucesso!!","Cadastro",JOptionPane.INFORMATION_MESSAGE);            
+            }
+        }else{            
+            if(df.atualizarMaquinaMonitor(jlSerial.getText(),jcbListaMaquinas.getSelectedItem().toString())){
+                JOptionPane.showMessageDialog(rootPane,"Atualização realizada com sucesso!!","Cadastro",JOptionPane.INFORMATION_MESSAGE);            
+            }
         }
         
     }//GEN-LAST:event_jbRegistrarMonitorActionPerformed

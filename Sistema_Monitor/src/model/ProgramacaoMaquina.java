@@ -3,59 +3,89 @@ package model;
 public class ProgramacaoMaquina {
 
     private long metragemTotalProgramada;
-
     private String loteproducao;
-
     private int quantidadeProgramada;
-
     private int quantidadeProduzida;
-
     private long metragemProgramada;
+    private String dataProgramada;
+    private Produto produto;
+    private ProdutoMaquina produtoMaquina;
+    private ProdutoCarretel produtoCarretel;
 
-    private Object ProdutoMaquina;
+    public ProgramacaoMaquina() {
+    }
 
-    private Object ProdutoCarretel;
+    public String getDataProgramada() {
+        return dataProgramada;
+    }
 
-    public ProgramacaoMaquina(Object ProdutoMaquina, Object ProdutoCarretel) {
+    public void setDataProgramada(String dataProgramada) {
+        this.dataProgramada = dataProgramada;
+    }
+
+    public Produto getProduto() {
+        return produto;
+    }
+
+    public void setProduto(Produto produto) {
+        this.produto = produto;
     }
 
     public long getMetragemTotalProgramada() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return metragemTotalProgramada;
     }
 
-    public long setMetragemTotalProgramada(long metragemTotalProgramada) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setMetragemTotalProgramada(long metragemTotalProgramada) {
+        this.metragemTotalProgramada = metragemTotalProgramada;
     }
 
     public String getLoteproducao() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return loteproducao;
     }
 
-    public String setLoteproducao(String loteproducao) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setLoteproducao(String loteproducao) {
+        this.loteproducao = loteproducao;
     }
 
     public int getQuantidadeProgramada() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return quantidadeProgramada;
     }
 
-    public int setQuantidadeProgramada(int quantidadeProgramada) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setQuantidadeProgramada(int quantidadeProgramada) {
+        this.quantidadeProgramada = quantidadeProgramada;
     }
 
     public int getQuantidadeProduzida() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return quantidadeProduzida;
     }
 
-    public int setQuantidadeProduzida(int quantidadeProduzida) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setQuantidadeProduzida(int quantidadeProduzida) {
+        this.quantidadeProduzida = quantidadeProduzida;
     }
 
     public long getMetragemProgramada() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return metragemProgramada;
     }
 
-    public long setMetragemProgramada(long metragemProgramada) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setMetragemProgramada(long metragemProgramada) {
+        this.metragemProgramada = metragemProgramada;
     }
+
+    public ProdutoMaquina getProdutoMaquina() {
+        return produtoMaquina;
+    }
+
+    public void setProdutoMaquina(ProdutoMaquina produtoMaquina) {
+        this.produtoMaquina = produtoMaquina;
+    }
+
+    public ProdutoCarretel getProdutoCarretel() {
+        return produtoCarretel;
+    }
+
+    public void setProdutoCarretel(ProdutoCarretel produtoCarretel) {
+        this.produtoCarretel = produtoCarretel;
+    }
+ 
+    
 }
