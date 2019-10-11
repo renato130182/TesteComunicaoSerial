@@ -9,8 +9,7 @@ public class ProgramacaoMaquina {
     private long metragemProgramada;
     private String dataProgramada;
     private Produto produto;
-    private ProdutoMaquina produtoMaquina;
-    private ProdutoCarretel produtoCarretel;
+
 
     public ProgramacaoMaquina() {
     }
@@ -70,22 +69,4 @@ public class ProgramacaoMaquina {
     public void setMetragemProgramada(long metragemProgramada) {
         this.metragemProgramada = metragemProgramada;
     }
-
-    public ProdutoMaquina getProdutoMaquina() {
-        return produtoMaquina;
-    }
-
-    public void setProdutoMaquina(ProdutoMaquina produtoMaquina) {
-        this.produtoMaquina = produtoMaquina;
-    }
-
-    public ProdutoCarretel getProdutoCarretel() {
-        return produtoCarretel;
-    }
-
-    public void setProdutoCarretel(ProdutoCarretel produtoCarretel) {
-        this.produtoCarretel = produtoCarretel;
-    }
- 
-    
 }

@@ -8,6 +8,15 @@ public class Produto implements InterfaceProduto {
     private String descricao;
     private float diametroMaximo;
     private float diametroMinimo;
+    private float diametroNominal;
+
+    public float getDiametroNominal() {
+        return diametroNominal;
+    }
+
+    public void setDiametroNominal(float diametroNominal) {
+        this.diametroNominal = diametroNominal;
+    }
 
     public Produto() {
     }

@@ -12,12 +12,10 @@
     </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/renato/Documents/GitHub/NetBeansProjects/Sistema_Monitor/src/model/ProdutoCarretel.java</file>
-            <file>file:/C:/Users/renato/Documents/GitHub/NetBeansProjects/Sistema_Monitor/src/controller/ControllerProgramacao.java</file>
             <file>file:/C:/Users/renato/Documents/GitHub/NetBeansProjects/Sistema_Monitor/src/view/JFPrincipal.java</file>
-            <file>file:/C:/Users/renato/Documents/GitHub/NetBeansProjects/Sistema_Monitor/src/model/ProgramacaoMaquina.java</file>
-            <file>file:/C:/Users/renato/Documents/GitHub/NetBeansProjects/Sistema_Monitor/src/dao/LoginDAO.java</file>
-            <file>file:/C:/Users/renato/Documents/GitHub/NetBeansProjects/Sistema_Monitor/src/model/ProdutoMaquina.java</file>
+            <file>file:/C:/Users/renato/Documents/GitHub/NetBeansProjects/Sistema_Monitor/src/model/Produto.java</file>
+            <file>file:/C:/Users/renato/Documents/GitHub/NetBeansProjects/Sistema_Monitor/src/dao/ProgramacaoMaquinaDAO.java</file>
+            <file>file:/C:/Users/renato/Documents/GitHub/NetBeansProjects/Sistema_Monitor/src/dao/ConexaoDatabase.java</file>
         </group>
     </open-files>
 </project-private>

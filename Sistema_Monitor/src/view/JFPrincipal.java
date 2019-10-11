@@ -10,6 +10,7 @@ import com.pi4j.system.SystemInfo;
 import controller.Login;
 import dao.DadosDefaultDAO;
 import dao.MaquinaDAO;
+import dao.ProducaoDAO;
 import dao.ProgramacaoMaquinaDAO;
 import java.awt.CardLayout;
 import java.io.IOException;
@@ -22,6 +23,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import model.DadosConexao;
 import model.Maquina;
+import model.Producao;
 import model.ProdutoCarretel;
 import model.ProdutoMaquina;
 import model.ProgramacaoMaquina;
@@ -76,6 +78,15 @@ public class JFPrincipal extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        androidToolkitHandler1 = new org.pushingpixels.trident.android.AndroidToolkitHandler();
+        androidPropertyInterpolators1 = new org.pushingpixels.trident.android.AndroidPropertyInterpolators();
+        compass1 = new eu.hansolo.steelseries.gauges.Compass();
+        aWTPropertyInterpolators1 = new org.pushingpixels.trident.swing.AWTPropertyInterpolators();
+        clock1 = new eu.hansolo.steelseries.gauges.Clock();
+        altimeter1 = new eu.hansolo.steelseries.gauges.Altimeter();
+        compass2 = new eu.hansolo.steelseries.gauges.Compass();
+        corePropertyInterpolators1 = new org.pushingpixels.trident.interpolator.CorePropertyInterpolators();
+        digitalRadial1 = new eu.hansolo.steelseries.gauges.DigitalRadial();
         jpRoot = new javax.swing.JPanel();
         jpLogin = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -92,6 +103,38 @@ public class JFPrincipal extends javax.swing.JFrame {
         jTableProgramacao = new javax.swing.JTable();
         jpParadas = new javax.swing.JPanel();
         jpProducao = new javax.swing.JPanel();
+        jLabel23 = new javax.swing.JLabel();
+        jSeparator5 = new javax.swing.JSeparator();
+        jLabel24 = new javax.swing.JLabel();
+        jLabel25 = new javax.swing.JLabel();
+        jLabelProducaoCodItem = new javax.swing.JLabel();
+        jLabel26 = new javax.swing.JLabel();
+        jLabelProducaoDescricaoItem = new javax.swing.JLabel();
+        jLabel27 = new javax.swing.JLabel();
+        jLabelProducaoQtdProg = new javax.swing.JLabel();
+        jLabel28 = new javax.swing.JLabel();
+        jLabelProducaoQtdProd = new javax.swing.JLabel();
+        jLabel29 = new javax.swing.JLabel();
+        jLabelProducaoOF = new javax.swing.JLabel();
+        jLabelProducaoMetTotalProg = new javax.swing.JLabel();
+        jLabel30 = new javax.swing.JLabel();
+        jLabelProducaoMetTotalProd = new javax.swing.JLabel();
+        jLabel31 = new javax.swing.JLabel();
+        jLabelProducaoMetCarretel = new javax.swing.JLabel();
+        jLabel32 = new javax.swing.JLabel();
+        jLabelProducaoDMinimo = new javax.swing.JLabel();
+        jLabel33 = new javax.swing.JLabel();
+        jLabelProducaoDnominal = new javax.swing.JLabel();
+        jLabel34 = new javax.swing.JLabel();
+        jLabelProducaoDMaximo = new javax.swing.JLabel();
+        jLabel35 = new javax.swing.JLabel();
+        jLabelProducaoVelIdeal = new javax.swing.JLabel();
+        jSeparator6 = new javax.swing.JSeparator();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTableProducaoArrebentamentos = new javax.swing.JTable();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTableProducaoParadas = new javax.swing.JTable();
+        jSeparator7 = new javax.swing.JSeparator();
         jpConfigDefault = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
@@ -189,7 +232,7 @@ public class JFPrincipal extends javax.swing.JFrame {
                         .addGroup(jpLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jtfUser)
                             .addComponent(jpfPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE))))
-                .addContainerGap(556, Short.MAX_VALUE))
+                .addContainerGap(633, Short.MAX_VALUE))
             .addGroup(jpLoginLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPLogo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -251,6 +294,10 @@ public class JFPrincipal extends javax.swing.JFrame {
         });
         jTableProgramacao.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
         jScrollPane1.setViewportView(jTableProgramacao);
+        if (jTableProgramacao.getColumnModel().getColumnCount() > 0) {
+            jTableProgramacao.getColumnModel().getColumn(4).setHeaderValue("Metragem prog.");
+            jTableProgramacao.getColumnModel().getColumn(5).setHeaderValue("Data ");
+        }
 
         javax.swing.GroupLayout jpProgramacaoLayout = new javax.swing.GroupLayout(jpProgramacao);
         jpProgramacao.setLayout(jpProgramacaoLayout);
@@ -264,7 +311,7 @@ public class JFPrincipal extends javax.swing.JFrame {
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpProgramacaoLayout.createSequentialGroup()
                         .addGroup(jpProgramacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 742, Short.MAX_VALUE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 892, Short.MAX_VALUE)
                             .addComponent(jSeparator4, javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel22, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addContainerGap())))
@@ -291,7 +338,7 @@ public class JFPrincipal extends javax.swing.JFrame {
         jpParadas.setLayout(jpParadasLayout);
         jpParadasLayout.setHorizontalGroup(
             jpParadasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 835, Short.MAX_VALUE)
+            .addGap(0, 912, Short.MAX_VALUE)
         );
         jpParadasLayout.setVerticalGroup(
             jpParadasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -300,17 +347,258 @@ public class JFPrincipal extends javax.swing.JFrame {
 
         jpRoot.add(jpParadas, "jpParadas");
 
-        jpProducao.setBackground(new java.awt.Color(255, 255, 204));
+        jpProducao.setBackground(new java.awt.Color(204, 255, 255));
+
+        jLabel23.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel23.setText("Aconpanhamento de produção:");
+
+        jLabel24.setText("Informações da ordem de fabricação:");
+
+        jLabel25.setText("Codigo do Item:");
+
+        jLabelProducaoCodItem.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelProducaoCodItem.setText("400500000000");
+
+        jLabel26.setText("Desccrição: ");
+
+        jLabelProducaoDescricaoItem.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelProducaoDescricaoItem.setText("jLabelProducaoDescriçãoItem");
+
+        jLabel27.setText("Quantidade programada:");
+
+        jLabelProducaoQtdProg.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelProducaoQtdProg.setText("00");
+
+        jLabel28.setText("Quantidade produzida:");
+
+        jLabelProducaoQtdProd.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelProducaoQtdProd.setText("00");
+
+        jLabel29.setText("Metragem total programada :");
+
+        jLabelProducaoOF.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelProducaoOF.setText("000000");
+
+        jLabelProducaoMetTotalProg.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelProducaoMetTotalProg.setText("0000000");
+        jLabelProducaoMetTotalProg.setToolTipText("");
+
+        jLabel30.setText("Metragem total produzida:");
+
+        jLabelProducaoMetTotalProd.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelProducaoMetTotalProd.setText("0000000");
+
+        jLabel31.setText("Metragem por carretel:");
+
+        jLabelProducaoMetCarretel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelProducaoMetCarretel.setText("000000");
+        jLabelProducaoMetCarretel.setToolTipText("");
+
+        jLabel32.setText("Diametro minimo:");
+
+        jLabelProducaoDMinimo.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelProducaoDMinimo.setText("0.00");
+
+        jLabel33.setText("Diametro nominal:");
+
+        jLabelProducaoDnominal.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelProducaoDnominal.setText("0.00");
+
+        jLabel34.setText("Diametro máximo:");
+
+        jLabelProducaoDMaximo.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelProducaoDMaximo.setText("0.00");
+
+        jLabel35.setText("Velocidade de produção ideal:");
+
+        jLabelProducaoVelIdeal.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelProducaoVelIdeal.setText("000");
+
+        jScrollPane2.setBackground(new java.awt.Color(204, 255, 255));
+        jScrollPane2.setBorder(javax.swing.BorderFactory.createTitledBorder("Arrebentamentos carretel de entrada:"));
+
+        jTableProducaoArrebentamentos.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null}
+            },
+            new String [] {
+                "Numero", "Metragem"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane2.setViewportView(jTableProducaoArrebentamentos);
+        if (jTableProducaoArrebentamentos.getColumnModel().getColumnCount() > 0) {
+            jTableProducaoArrebentamentos.getColumnModel().getColumn(0).setResizable(false);
+            jTableProducaoArrebentamentos.getColumnModel().getColumn(1).setResizable(false);
+        }
+
+        jScrollPane3.setBackground(new java.awt.Color(204, 255, 255));
+        jScrollPane3.setBorder(javax.swing.BorderFactory.createTitledBorder("Paradas durante a produção:"));
+
+        jTableProducaoParadas.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null}
+            },
+            new String [] {
+                "Numero", "Cod. Parada", "Tempo", "Descricao"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.Object.class, java.lang.Object.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane3.setViewportView(jTableProducaoParadas);
+        if (jTableProducaoParadas.getColumnModel().getColumnCount() > 0) {
+            jTableProducaoParadas.getColumnModel().getColumn(0).setResizable(false);
+            jTableProducaoParadas.getColumnModel().getColumn(0).setPreferredWidth(1);
+            jTableProducaoParadas.getColumnModel().getColumn(1).setResizable(false);
+            jTableProducaoParadas.getColumnModel().getColumn(1).setPreferredWidth(1);
+            jTableProducaoParadas.getColumnModel().getColumn(2).setResizable(false);
+            jTableProducaoParadas.getColumnModel().getColumn(2).setPreferredWidth(1);
+            jTableProducaoParadas.getColumnModel().getColumn(3).setResizable(false);
+        }
 
         javax.swing.GroupLayout jpProducaoLayout = new javax.swing.GroupLayout(jpProducao);
         jpProducao.setLayout(jpProducaoLayout);
         jpProducaoLayout.setHorizontalGroup(
             jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 835, Short.MAX_VALUE)
+            .addGroup(jpProducaoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jSeparator7, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jSeparator5, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jSeparator6, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jpProducaoLayout.createSequentialGroup()
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane3))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jpProducaoLayout.createSequentialGroup()
+                        .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel23, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jpProducaoLayout.createSequentialGroup()
+                                .addComponent(jLabel24)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabelProducaoOF))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jpProducaoLayout.createSequentialGroup()
+                                .addComponent(jLabel25)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabelProducaoCodItem)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel26)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabelProducaoDescricaoItem))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jpProducaoLayout.createSequentialGroup()
+                                .addComponent(jLabel32)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabelProducaoDMinimo)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel33)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabelProducaoDnominal)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel34)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabelProducaoDMaximo)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel35)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabelProducaoVelIdeal))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jpProducaoLayout.createSequentialGroup()
+                                .addComponent(jLabel27)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabelProducaoQtdProg)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel28)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabelProducaoQtdProd)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel29)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabelProducaoMetTotalProg)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel30)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabelProducaoMetTotalProd)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel31)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabelProducaoMetCarretel, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         jpProducaoLayout.setVerticalGroup(
             jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 714, Short.MAX_VALUE)
+            .addGroup(jpProducaoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel23)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabelProducaoOF))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel27)
+                    .addComponent(jLabelProducaoQtdProg)
+                    .addComponent(jLabel28)
+                    .addComponent(jLabelProducaoQtdProd)
+                    .addComponent(jLabel29)
+                    .addComponent(jLabelProducaoMetTotalProg)
+                    .addComponent(jLabel30)
+                    .addComponent(jLabelProducaoMetTotalProd)
+                    .addComponent(jLabel31)
+                    .addComponent(jLabelProducaoMetCarretel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel25)
+                    .addComponent(jLabelProducaoCodItem)
+                    .addComponent(jLabel26)
+                    .addComponent(jLabelProducaoDescricaoItem))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel32)
+                    .addComponent(jLabelProducaoDMinimo)
+                    .addComponent(jLabel33)
+                    .addComponent(jLabelProducaoDnominal)
+                    .addComponent(jLabel34)
+                    .addComponent(jLabelProducaoDMaximo)
+                    .addComponent(jLabel35)
+                    .addComponent(jLabelProducaoVelIdeal))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSeparator6, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSeparator7, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(258, Short.MAX_VALUE))
         );
 
         jpRoot.add(jpProducao, "jpProducao");
@@ -442,7 +730,7 @@ public class JFPrincipal extends javax.swing.JFrame {
                                 .addGroup(jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jpConfigDefaultLayout.createSequentialGroup()
                                         .addComponent(jtfDriverProducao, javax.swing.GroupLayout.PREFERRED_SIZE, 705, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(0, 8, Short.MAX_VALUE))
+                                        .addGap(0, 85, Short.MAX_VALUE))
                                     .addComponent(jtfServidorProducao)
                                     .addComponent(jtfUrlProducao)
                                     .addComponent(jtfBDProducao)
@@ -631,17 +919,14 @@ public class JFPrincipal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItemProgramacaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemProgramacaoActionPerformed
-        // TODO add your handling code here:       
-        limparJTable(jTableProgramacao);
-        buscarProgramacaoMaquina();
-        CardLayout card = (CardLayout) jpRoot.getLayout();
-        card.show(jpRoot,"jpProgramacao");
+        // TODO add your handling code here:    
+        abrirTelaProgramacao();
+        
     }//GEN-LAST:event_jMenuItemProgramacaoActionPerformed
 
     private void jMenuItemLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemLoginActionPerformed
         // TODO add your handling code here:
-        CardLayout card = (CardLayout) jpRoot.getLayout();
-        card.show(jpRoot,"jpLogin");
+        abrirTelaLogin();
     }//GEN-LAST:event_jMenuItemLoginActionPerformed
 
     private void jMenuItemParadasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemParadasActionPerformed
@@ -652,8 +937,7 @@ public class JFPrincipal extends javax.swing.JFrame {
 
     private void jMenuItemProducaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemProducaoActionPerformed
         // TODO add your handling code here:
-        CardLayout card = (CardLayout) jpRoot.getLayout();
-        card.show(jpRoot,"jpProducao");
+        abrirTelaProducao();        
     }//GEN-LAST:event_jMenuItemProducaoActionPerformed
 
     private void jbLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbLoginActionPerformed
@@ -668,9 +952,8 @@ public class JFPrincipal extends javax.swing.JFrame {
             habilitarMenu();
             System.out.println("Logado com " + login.getNome()
                 + " e nivel de permissão: " + login.getNivel()); 
-            limparTelaLogin();
-            CardLayout card = (CardLayout) jpRoot.getLayout();
-            card.show(jpRoot,"jpProducao");
+            abrirTelaProducao();
+            
         }else{
             JOptionPane.showMessageDialog(null, "Usuario ou Senha invalidos","Login",JOptionPane.ERROR_MESSAGE);            
         }
@@ -737,12 +1020,8 @@ public class JFPrincipal extends javax.swing.JFrame {
 
     private void jMenuItemSairActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSairActionPerformed
         // TODO add your handling code here:
-        login.setUsuario("");
-        login.setNome("");
-        login.setNivel("");
-        login.setSenha("");
-        limparTelaLogin();
-        bloquearMenu();
+        abrirTelaLogin();
+        
     }//GEN-LAST:event_jMenuItemSairActionPerformed
 
     private void jMenuItemDesligarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemDesligarActionPerformed
@@ -860,6 +1139,15 @@ public class JFPrincipal extends javax.swing.JFrame {
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private org.pushingpixels.trident.swing.AWTPropertyInterpolators aWTPropertyInterpolators1;
+    private eu.hansolo.steelseries.gauges.Altimeter altimeter1;
+    private org.pushingpixels.trident.android.AndroidPropertyInterpolators androidPropertyInterpolators1;
+    private org.pushingpixels.trident.android.AndroidToolkitHandler androidToolkitHandler1;
+    private eu.hansolo.steelseries.gauges.Clock clock1;
+    private eu.hansolo.steelseries.gauges.Compass compass1;
+    private eu.hansolo.steelseries.gauges.Compass compass2;
+    private org.pushingpixels.trident.interpolator.CorePropertyInterpolators corePropertyInterpolators1;
+    private eu.hansolo.steelseries.gauges.DigitalRadial digitalRadial1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -875,13 +1163,38 @@ public class JFPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
+    private javax.swing.JLabel jLabel23;
+    private javax.swing.JLabel jLabel24;
+    private javax.swing.JLabel jLabel25;
+    private javax.swing.JLabel jLabel26;
+    private javax.swing.JLabel jLabel27;
+    private javax.swing.JLabel jLabel28;
+    private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel30;
+    private javax.swing.JLabel jLabel31;
+    private javax.swing.JLabel jLabel32;
+    private javax.swing.JLabel jLabel33;
+    private javax.swing.JLabel jLabel34;
+    private javax.swing.JLabel jLabel35;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JLabel jLabelProducaoCodItem;
+    private javax.swing.JLabel jLabelProducaoDMaximo;
+    private javax.swing.JLabel jLabelProducaoDMinimo;
+    private javax.swing.JLabel jLabelProducaoDescricaoItem;
+    private javax.swing.JLabel jLabelProducaoDnominal;
+    private javax.swing.JLabel jLabelProducaoMetCarretel;
+    private javax.swing.JLabel jLabelProducaoMetTotalProd;
+    private javax.swing.JLabel jLabelProducaoMetTotalProg;
+    private javax.swing.JLabel jLabelProducaoOF;
+    private javax.swing.JLabel jLabelProducaoQtdProd;
+    private javax.swing.JLabel jLabelProducaoQtdProg;
+    private javax.swing.JLabel jLabelProducaoVelIdeal;
     private javax.swing.JMenuItem jMenuConfigDefault;
     private javax.swing.JMenuItem jMenuItemDesligar;
     private javax.swing.JMenuItem jMenuItemLogin;
@@ -892,10 +1205,17 @@ public class JFPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuTrocarMaquina;
     private javax.swing.JPanel jPLogo;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
+    private javax.swing.JSeparator jSeparator5;
+    private javax.swing.JSeparator jSeparator6;
+    private javax.swing.JSeparator jSeparator7;
+    private javax.swing.JTable jTableProducaoArrebentamentos;
+    private javax.swing.JTable jTableProducaoParadas;
     private javax.swing.JTable jTableProgramacao;
     private javax.swing.JButton jbCriarArquivosDefault;
     private javax.swing.JButton jbLogin;
@@ -960,5 +1280,43 @@ public class JFPrincipal extends javax.swing.JFrame {
                 lista.get(i).getProduto().getDescricao(),lista.get(i).getLoteproducao(),
                 lista.get(i).getQuantidadeProgramada(),lista.get(i).getMetragemProgramada(),lista.get(i).getDataProgramada()});
         }
+    }
+    
+    private void buscarInformaçoesProducao(){
+        Producao prod = new Producao();
+        ProducaoDAO dao = new ProducaoDAO();
+        prod = dao.buscaItemProducao(codMaquina);
+        if(prod != null){
+            //to be continued....
+            
+        }else{
+            JOptionPane.showMessageDialog(rootPane,"Maquina sem producao, por favor realise a montagem","Maquina sem producao",JOptionPane.OK_OPTION);
+            abrirTelaProgramacao();
+        }
+    }
+
+    private void abrirTelaProgramacao() {
+        limparJTable(jTableProgramacao);
+        buscarProgramacaoMaquina();
+        CardLayout card = (CardLayout) jpRoot.getLayout();
+        card.show(jpRoot,"jpProgramacao");
+    }
+
+    private void abrirTelaProducao() {
+        limparJTable(jTableProducaoArrebentamentos);
+        limparJTable(jTableProducaoParadas);        
+        CardLayout card = (CardLayout) jpRoot.getLayout();
+        card.show(jpRoot,"jpProducao");
+    }
+
+    private void abrirTelaLogin() {
+        login.setUsuario("");
+        login.setNome("");
+        login.setNivel("");
+        login.setSenha("");
+        if(false) limparTelaLogin(); //apenas para teste, passar para true em producao
+        bloquearMenu();
+        CardLayout card = (CardLayout) jpRoot.getLayout();
+        card.show(jpRoot,"jpLogin");
     }
 }                                 
