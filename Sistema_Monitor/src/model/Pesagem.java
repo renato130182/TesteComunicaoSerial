@@ -1,17 +1,25 @@
 package model;
 
 public class Pesagem {
-    private long codigo;
+    private String codigo;
     private String observacao;
-
+    private Long metragemOperador;
     public Pesagem() {
     }
 
-    public long getCodigo() {
+    public Long getMetragemOperador() {
+        return metragemOperador;
+    }
+
+    public void setMetragemOperador(Long metragemOperador) {
+        this.metragemOperador = metragemOperador;
+    }
+
+    public String getCodigo() {
         return codigo;
     }
 
-    public void setCodigo(long codigo) {
+    public void setCodigo(String codigo) {
         this.codigo = codigo;
     }
 

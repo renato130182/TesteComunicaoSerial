@@ -50,4 +50,28 @@ public class LoginDAO{
         }
         db.desconectar();
     }    
+    
+    public void validarCodeLogin(Usuario us){
+        sql = "SELECT nome,tipo FROM condumigproducao.usuario where coderfid = ?;";
+        ConexaoDatabase db = new ConexaoDatabase();
+        if(db.isInfoDB()){
+            Connection conec = db.getConnection();
+            try {
+                PreparedStatement st = conec.prepareStatement(sql);
+                st.setString(1, us.getCode());             
+                ResultSet res = st.executeQuery();
+                if(res.next()){
+                    us.setNome(res.getString("nome"));
+                    us.setNivel(res.getString("tipo"));
+                    this.logado = true;
+                }else{
+                    this.logado = false;
+                }                    
+            } catch (SQLException ex) {
+                Logger.getLogger(LoginDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        }
+        db.desconectar();
+    }
 }

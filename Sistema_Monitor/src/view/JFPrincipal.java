@@ -7,12 +7,17 @@ package view;
 
 
 import com.pi4j.system.SystemInfo;
+import controller.ControllerProducao;
 import controller.Login;
 import dao.DadosDefaultDAO;
 import dao.MaquinaDAO;
+import dao.PesagemDAO;
 import dao.ProducaoDAO;
+import dao.ProdutoMaquinaDAO;
 import dao.ProgramacaoMaquinaDAO;
 import java.awt.CardLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,24 +28,30 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import model.DadosConexao;
 import model.Maquina;
+import model.Pesagem;
 import model.Producao;
 import model.ProdutoCarretel;
 import model.ProdutoMaquina;
 import model.ProgramacaoMaquina;
 import model.Usuario;
+import Serial.*;
+import controller.ControllerConfigSerialPort;
+import javax.swing.JPopupMenu;
 
 /**
  *
  * @author renato.soares
  */
-public class JFPrincipal extends javax.swing.JFrame {
+public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
+    private static final String SERIAL_RFID = "rfidserial";
     private  static String identificador;
     private static String codMaquina;
     Login login = new Login();
     Maquina maquina = new Maquina();
     MaquinaDAO maqDao =  new MaquinaDAO();
     ProdutoMaquina prodmaq = new ProdutoMaquina();
-    ProdutoCarretel prodCar = new ProdutoCarretel();
+    ProdutoCarretel prodCar = new ProdutoCarretel();    
+    SerialTxRx comRFID ;
     /**
      * Creates new form JFPrincipal
      */
@@ -63,6 +74,7 @@ public class JFPrincipal extends javax.swing.JFrame {
             if(codMaquina!=null){                
                 maquina = maqDao.buscarDadosMaquina(codMaquina);
             }
+            abrirTelaLogin();
             
         } catch (UnsupportedOperationException | IOException | InterruptedException ex) {
             Logger.getLogger(JFPrincipal.class.getName()).log(Level.SEVERE, null, ex);
@@ -186,6 +198,7 @@ public class JFPrincipal extends javax.swing.JFrame {
         menuConfiguracoes = new javax.swing.JMenu();
         jMenuConfigDefault = new javax.swing.JMenuItem();
         jMenuTrocarMaquina = new javax.swing.JMenuItem();
+        jMenuConfigSerialRFID = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Sistema Condumig");
@@ -350,7 +363,7 @@ public class JFPrincipal extends javax.swing.JFrame {
         jpProducao.setBackground(new java.awt.Color(204, 255, 255));
 
         jLabel23.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel23.setText("Aconpanhamento de produção:");
+        jLabel23.setText("Acompanhamento de produção:");
 
         jLabel24.setText("Informações da ordem de fabricação:");
 
@@ -440,6 +453,8 @@ public class JFPrincipal extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        jTableProducaoArrebentamentos.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_NEXT_COLUMN);
+        jTableProducaoArrebentamentos.setCellSelectionEnabled(true);
         jScrollPane2.setViewportView(jTableProducaoArrebentamentos);
         if (jTableProducaoArrebentamentos.getColumnModel().getColumnCount() > 0) {
             jTableProducaoArrebentamentos.getColumnModel().getColumn(0).setResizable(false);
@@ -911,6 +926,14 @@ public class JFPrincipal extends javax.swing.JFrame {
         });
         menuConfiguracoes.add(jMenuTrocarMaquina);
 
+        jMenuConfigSerialRFID.setText("Serial RFID");
+        jMenuConfigSerialRFID.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuConfigSerialRFIDActionPerformed(evt);
+            }
+        });
+        menuConfiguracoes.add(jMenuConfigSerialRFID);
+
         menuPrincipal.add(menuConfiguracoes);
 
         setJMenuBar(menuPrincipal);
@@ -948,12 +971,7 @@ public class JFPrincipal extends javax.swing.JFrame {
         login.setSenha(jpfPassword.getText());
         //System.out.println("Psw: " + login.getSenha());
         if(login.logar(login)){
-            if(!login.getNome().trim().equals("")) bloquearMenu();
-            habilitarMenu();
-            System.out.println("Logado com " + login.getNome()
-                + " e nivel de permissão: " + login.getNivel()); 
-            abrirTelaProducao();
-            
+            Usuariologado();
         }else{
             JOptionPane.showMessageDialog(null, "Usuario ou Senha invalidos","Login",JOptionPane.ERROR_MESSAGE);            
         }
@@ -1019,9 +1037,8 @@ public class JFPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_jbCriarArquivosDefaultActionPerformed
 
     private void jMenuItemSairActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSairActionPerformed
-        // TODO add your handling code here:
-        abrirTelaLogin();
-        
+        // TODO add your handling code here:       
+        abrirTelaLogin();                
     }//GEN-LAST:event_jMenuItemSairActionPerformed
 
     private void jMenuItemDesligarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemDesligarActionPerformed
@@ -1039,6 +1056,13 @@ public class JFPrincipal extends javax.swing.JFrame {
         cad.setEdit(true);
         cad.setVisible(true);
     }//GEN-LAST:event_jMenuTrocarMaquinaActionPerformed
+
+    private void jMenuConfigSerialRFIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuConfigSerialRFIDActionPerformed
+        // TODO add your handling code here:
+        JFConfigSerialRFID cfg = new JFConfigSerialRFID();
+        cfg.setConfigName(SERIAL_RFID);
+        cfg.setVisible(true);
+    }//GEN-LAST:event_jMenuConfigSerialRFIDActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1127,12 +1151,15 @@ public class JFPrincipal extends javax.swing.JFrame {
         menuProgramacao.setEnabled(false );
         menuConfiguracoes.setEnabled(false);
         jMenuItemSair.setEnabled(false);
+        jMenuItemLogin.setEnabled(true);
     }
-    private void habilitarMenu() {    
+    private void habilitarMenu() {
+        
         menuParadas.setEnabled(true);
         menuProducao.setEnabled(true);
         menuProgramacao.setEnabled(true);
         jMenuItemSair.setEnabled(true);
+        jMenuItemLogin.setEnabled(false);
         if(login.getNivel().equals("0")){
             menuConfiguracoes.setEnabled(true);
         }
@@ -1196,6 +1223,7 @@ public class JFPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel jLabelProducaoQtdProg;
     private javax.swing.JLabel jLabelProducaoVelIdeal;
     private javax.swing.JMenuItem jMenuConfigDefault;
+    private javax.swing.JMenuItem jMenuConfigSerialRFID;
     private javax.swing.JMenuItem jMenuItemDesligar;
     private javax.swing.JMenuItem jMenuItemLogin;
     private javax.swing.JMenuItem jMenuItemParadas;
@@ -1284,13 +1312,37 @@ public class JFPrincipal extends javax.swing.JFrame {
     
     private void buscarInformaçoesProducao(){
         Producao prod = new Producao();
-        ProducaoDAO dao = new ProducaoDAO();
-        prod = dao.buscaItemProducao(codMaquina);
+        ProducaoDAO daoProd = new ProducaoDAO();
+        prod = daoProd.buscaItemProducao(codMaquina);
         if(prod != null){
-            //to be continued....
-            
+            ProgramacaoMaquina prog = new ProgramacaoMaquina();
+            ProgramacaoMaquinaDAO daoProg = new ProgramacaoMaquinaDAO();
+            prog = daoProg.buscaProgramacaoLoteItem(prod.getLoteProducao(),prod.getItemProducao());
+            if(prog != null){
+                jLabelProducaoCodItem.setText(prod.getItemProducao());
+                jLabelProducaoOF.setText(prod.getLoteProducao());
+                jLabelProducaoDescricaoItem.setText(prog.getProduto().getDescricao());
+                jLabelProducaoQtdProg.setText(Integer.toString(prog.getQuantidadeProgramada()));
+                jLabelProducaoQtdProd.setText(Integer.toString(prog.getQuantidadeProduzida()));
+                jLabelProducaoMetTotalProg.setText(String.valueOf(prog.getMetragemTotalProgramada()));
+                jLabelProducaoMetCarretel.setText(String.valueOf(prog.getMetragemProgramada()));
+                jLabelProducaoDMinimo.setText(String.valueOf(prog.getProduto().getDiametroMinimo()));
+                jLabelProducaoDnominal.setText(String.valueOf(prog.getProduto().getDiametroNominal()));
+                jLabelProducaoDMaximo.setText(String.valueOf(prog.getProduto().getDiametroMaximo()));
+                jLabelProducaoMetTotalProd.setText(String.valueOf(daoProd.BuscaMetragemProduzida(prod.getLoteProducao(),prod.getItemProducao())));
+                ProdutoMaquina prodMaq = new ProdutoMaquina();
+                ProdutoMaquinaDAO daoProdMaq = new ProdutoMaquinaDAO();
+                prodMaq = daoProdMaq.buscaVelocidadeProdutoMaquina(prod.getItemProducao(), codMaquina);
+                jLabelProducaoVelIdeal.setText(String.valueOf(prodMaq.getVelocidade())+ " " + prodMaq.getUnidade());
+                buscarRegistrosObservacaoPesagem();
+            }else{
+                JOptionPane.showMessageDialog(rootPane,"Falha ao busrcar dados da programação do item em produção, "
+                        + "Por favor informe ao setor de Produção","Falha ao buscar dados",JOptionPane.ERROR_MESSAGE);
+                abrirTelaProgramacao();
+            }
         }else{
-            JOptionPane.showMessageDialog(rootPane,"Maquina sem producao, por favor realise a montagem","Maquina sem producao",JOptionPane.OK_OPTION);
+            JOptionPane.showMessageDialog(rootPane,"Maquina sem producao, por favor realise a montagem",
+                    "Maquina sem producao",JOptionPane.OK_OPTION);
             abrirTelaProgramacao();
         }
     }
@@ -1305,18 +1357,81 @@ public class JFPrincipal extends javax.swing.JFrame {
     private void abrirTelaProducao() {
         limparJTable(jTableProducaoArrebentamentos);
         limparJTable(jTableProducaoParadas);        
+        buscarInformaçoesProducao();
         CardLayout card = (CardLayout) jpRoot.getLayout();
         card.show(jpRoot,"jpProducao");
     }
 
     private void abrirTelaLogin() {
+        if(comRFID==null) comRFID = new SerialTxRx();
         login.setUsuario("");
         login.setNome("");
         login.setNivel("");
         login.setSenha("");
-        if(false) limparTelaLogin(); //apenas para teste, passar para true em producao
+        login.setCode("");
+        if(true) limparTelaLogin(); //apenas para teste, passar para true em producao
         bloquearMenu();
+        parametrizarSerial(SERIAL_RFID);
+        if(comRFID.iniciaSerial()){
+            System.out.println("serial RFID iniciada");
+            comRFID.addActionListener(this);
+        }            
         CardLayout card = (CardLayout) jpRoot.getLayout();
         card.show(jpRoot,"jpLogin");
     }
+    private void parametrizarSerial(String configName ){
+        ControllerConfigSerialPort cfg = new ControllerConfigSerialPort();
+        if(configName.equals(SERIAL_RFID)){
+            if(comRFID!=null){               
+               comRFID = cfg.configurarPortaSerial(configName);
+               if(comRFID != null){
+                   System.out.println("Serial comfigurada com sucesso!! " + comRFID.getSerialPortName());
+               }else{
+                   System.out.println("Falha ao configurar porta serial");
+               }                    
+           }
+        }
+    }
+    private void buscarRegistrosObservacaoPesagem() {
+        List<Pesagem> lista = new ArrayList<Pesagem>();
+        PesagemDAO daoPes = new PesagemDAO();
+        ControllerProducao ctr = new ControllerProducao();
+        lista = daoPes.buscapesagensMontagem(codMaquina);
+        if(lista != null){
+            DefaultTableModel modelo = (DefaultTableModel)jTableProducaoArrebentamentos.getModel();
+            for(int i=0;i<lista.size();i++){
+                ctr.AddicionarMetragensObservacao(lista.get(i).getObservacao(),lista.get(i).getMetragemOperador());
+            }
+            List<Long> metrosAlerta = ctr.getListaMetragemObservacao();
+            for (int i=0;i<metrosAlerta.size();i++){
+                modelo.addRow(new Object[]{String.valueOf(i+1),metrosAlerta.get(i).toString()});
+            }
+        }        
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String code="";
+        if(!login.getCode().equals(e.getActionCommand())){
+            System.out.println("Evento: " + e.getActionCommand());        
+            if(!login.getCode().trim().equals("")){
+                code = login.getCode();
+            }
+            login.setCode(e.getActionCommand());              
+            if(login.logarCode(login)){
+                Usuariologado();            
+            }else{
+                login.setCode(code);
+                JOptionPane.showMessageDialog(null, "Codigo de Identificação não vinculado","Codigo invalido",JOptionPane.ERROR_MESSAGE);
+            }        
+        }
+    }
+
+    private void Usuariologado() {
+        if(!login.getNome().trim().equals("")) bloquearMenu();
+            habilitarMenu();
+            System.out.println("Logado com " + login.getNome()
+                + " e nivel de permissão: " + login.getNivel()); 
+            abrirTelaProducao();           
+        }
 }                                 

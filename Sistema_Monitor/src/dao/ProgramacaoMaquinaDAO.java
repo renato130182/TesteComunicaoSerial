@@ -54,4 +54,39 @@ public class ProgramacaoMaquinaDAO {
         }
         return null;
     }
+    public ProgramacaoMaquina buscaProgramacaoLoteItem (String lote, String item){
+        ConexaoDatabase db = new ConexaoDatabase();
+        try {            
+            if(db.equals(db)){
+                sql = "select prog.quantloteprogramado, prog.quantloteproduzido, prog.metragemprogramada, "
+                        + "it.descricao,itc.minimo, itc.nominal,itc.maximo from condumigproducao.programacaomaquina "
+                        + "prog inner join condumigproducao.item it on it.codigo = prog.codigoitem "
+                        + "inner join condumigproducao .itemitemcontrole itc on itc.codigoitem = it.codigo "
+                        + "where prog.loteproducao = ? and prog.codigoitem = ? and itc. "
+                        + "codigoitemcontrole = 1 and itc.situacao = 1 order by itc.codigo desc;";
+                    java.sql.Connection conec = db.getConnection();
+                    PreparedStatement st = conec.prepareStatement(sql);
+                    st.setString(1, lote);
+                    st.setString(2, item);
+                    ResultSet res = st.executeQuery();
+                    if(res.next()){
+                       ProgramacaoMaquina prog = new ProgramacaoMaquina();
+                       prog.setLoteproducao(lote);
+                       
+                       prog.setMetragemProgramada(res.getInt("metragemprogramada"));
+                       prog.setQuantidadeProgramada(res.getInt("quantloteprogramado"));
+                       prog.setQuantidadeProduzida(res.getInt("quantloteproduzido"));
+                       prog.setMetragemTotalProgramada(res.getInt("metragemprogramada")*res.getInt("quantloteprogramado"));                       
+                       prog.setProduto(new Produto(item,res.getString("descricao"),res.getFloat("minimo"),
+                               res.getFloat("nominal"),res.getFloat("maximo")));
+                       db.desconectar();
+                       return prog;
+                    }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ProgramacaoMaquinaDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        db.desconectar();
+        return null;
+    }
 }

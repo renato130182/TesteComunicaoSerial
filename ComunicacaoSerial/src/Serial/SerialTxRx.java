@@ -86,6 +86,7 @@ public class SerialTxRx implements SerialPortEventListener{
             
             return true;
         } catch (PortInUseException | UnsupportedCommOperationException | TooManyListenersException e) {
+            System.out.println(e.getMessage());
             return false;
         }
     }
@@ -100,7 +101,7 @@ public class SerialTxRx implements SerialPortEventListener{
     public synchronized boolean close(){
         try {            
             if(serialPort != null){
-                //serialPort.removeEventListener();
+                
                 serialPort.close(); 
                 serialPort.removeEventListener();
                 
@@ -121,7 +122,7 @@ public class SerialTxRx implements SerialPortEventListener{
                         input = new BufferedReader(new InputStreamReader(serialPort.getInputStream()));
                     }                    
                     dadosSerial = input.readLine();
-                    //System.out.println(dadosSerial); 
+                    System.out.println(dadosSerial); 
                     //Sinalizar evento na porta serial
                     if(!dadosSerial.isEmpty())dadosRecebidos();
                     input=null;

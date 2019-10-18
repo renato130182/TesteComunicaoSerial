@@ -12,7 +12,7 @@ package model;
 public class Producao {
     private  String loteProducao;
     private String itemProducao;
-
+    private String metragemProduzida;
     public Producao() {
     }
 
@@ -30,6 +30,14 @@ public class Producao {
 
     public void setItemProducao(String itemProducao) {
         this.itemProducao = itemProducao;
+    }
+
+    public String getMetragemProduzida() {
+        return metragemProduzida;
+    }
+
+    public void setMetragemProduzida(String metragemProduzida) {
+        this.metragemProduzida = metragemProduzida;
     }
     
     

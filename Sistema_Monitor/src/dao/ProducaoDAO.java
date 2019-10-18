@@ -8,6 +8,7 @@ package dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import model.Producao;
 
 /**
@@ -16,10 +17,11 @@ import model.Producao;
  */
 public class ProducaoDAO {
     private String sql;
+    
     public Producao buscaItemProducao(String codMaquina){
+        ConexaoDatabase db = new ConexaoDatabase();
         Producao prod = new Producao();
-        try {
-            ConexaoDatabase db = new ConexaoDatabase();
+        try {            
             if(db.isInfoDB()){
                 sql ="SELECT codigoitemprod,loteproducao FROM condumigproducao.reservamaquina where codigomaquina = ?;";
                 Connection conec = db.getConnection();
@@ -29,14 +31,39 @@ public class ProducaoDAO {
                 if(res.next()){
                     prod.setItemProducao(res.getString("codigoitemprod"));
                     prod.setLoteProducao(res.getString("loteproducao"));
-                    return prod;
+                    db.desconectar();
+                    return prod;                    
                 }else{
                     System.out.println("Não ha item em produção.");
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.err.println("Falha ao buscar item em producao" + e.getMessage());
         }
+        db.desconectar();
+        return null;
+    }
+    
+    public Long BuscaMetragemProduzida (String lote, String item){
+        Long metragem;
+        ConexaoDatabase db = new ConexaoDatabase();
+        try {
+            sql = "SELECT sum(metragemoperador) as met FROM condumigproducao.pesagem "
+                    + "where loteproduzido = ? and codigoitem = ?;";
+            Connection conec = db.getConnection();
+            PreparedStatement st = conec.prepareStatement(sql);
+            st.setString(1, lote);
+            st.setString(2, item);
+            ResultSet res = st.executeQuery();
+            if(res.next()){
+                metragem = res.getLong("met");
+                db.desconectar();
+                return metragem;
+            }
+        } catch (SQLException e) {
+            System.err.println("Falha ao buscar item em producao" + e.getMessage());
+        }
+        db.desconectar();
         return null;
     }
 }

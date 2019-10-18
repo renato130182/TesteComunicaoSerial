@@ -31,17 +31,19 @@ public class FramePrincipal extends javax.swing.JFrame implements ActionListener
     public FramePrincipal() {
         try {
             initComponents();        
-            CarregaPortasDisponiveis();   
-            hard = new HardwareInfo();            
-            hard.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    //System.out.println("temperatura: " + e.getActionCommand());
-                    temp = (double)hard.getCpuTemperature()/1000;
-                    System.out.println("temp: " + temp); 
-                    AtualizaMostradorTemp();
-                }
-            });
+            CarregaPortasDisponiveis();
+            if(System.getProperty("os.name").equals("Linux")){
+                hard = new HardwareInfo();            
+                hard.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        //System.out.println("temperatura: " + e.getActionCommand());
+                        temp = (double)hard.getCpuTemperature()/1000;
+                        System.out.println("temp: " + temp); 
+                        AtualizaMostradorTemp();
+                    }
+                });
+            }
         } catch (PlatformAlreadyAssignedException e) {
             e.printStackTrace();
         }                                         

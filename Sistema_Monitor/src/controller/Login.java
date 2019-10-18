@@ -30,6 +30,12 @@ public class Login extends Usuario{
         return log.isLogado();       
     }
     
+    public boolean  logarCode(Usuario us){
+        LoginDAO log = new LoginDAO();
+        log.validarCodeLogin(us);
+        return log.isLogado();       
+    }
+    
     private boolean buscaDadosDafault(){
         try {           
             //System.out.println("busncando dados default");

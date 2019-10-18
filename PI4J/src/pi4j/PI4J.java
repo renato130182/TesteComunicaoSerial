@@ -12,7 +12,6 @@ import com.pi4j.platform.PlatformAlreadyAssignedException;
 import com.pi4j.platform.PlatformManager;
 import com.pi4j.util.CommandArgumentParser;
 import com.pi4j.util.Console;
-
 /*
  *
  * @author renato.soares
@@ -21,6 +20,7 @@ public class PI4J {
 
     /**
      * @param args the command line arguments
+     * @throws java.lang.InterruptedException
      */
     public static void main(String[] args)  throws InterruptedException, PlatformAlreadyAssignedException{
         System.out.println("Minha Primeiro GPIO");
@@ -28,7 +28,7 @@ public class PI4J {
         final Console console = new Console();
         console.title("Teste GPIO");
         console.promptForExit();
-        public GpioController gpio = GpioFactory.getInstance();
+        GpioController gpio = GpioFactory.getInstance();
         
         Pin pin = CommandArgumentParser.getPin(OrangePiPin.class, OrangePiPin.GPIO_01,args);
         

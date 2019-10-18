@@ -9,7 +9,7 @@ public class ProgramacaoMaquina {
     private long metragemProgramada;
     private String dataProgramada;
     private Produto produto;
-
+    
 
     public ProgramacaoMaquina() {
     }
@@ -21,7 +21,7 @@ public class ProgramacaoMaquina {
     public void setDataProgramada(String dataProgramada) {
         this.dataProgramada = dataProgramada;
     }
-
+    
     public Produto getProduto() {
         return produto;
     }

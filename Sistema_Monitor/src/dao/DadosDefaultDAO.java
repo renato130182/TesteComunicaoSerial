@@ -116,6 +116,7 @@ public class DadosDefaultDAO {
         }
     }
     public String buscaCodigoMaquina(String serial){
+        String codMaquina;
         ConexaoDatabase db = new ConexaoDatabase();
         if(db.isInfoDB()){
             try {
@@ -125,7 +126,9 @@ public class DadosDefaultDAO {
                 st.setString(1,serial);                
                 ResultSet res = st.executeQuery();
                 if(res.next()){
-                    return res.getString("codigo_maquina_monitor");
+                    codMaquina = res.getString("codigo_maquina_monitor");
+                    db.desconectar();
+                    return codMaquina;
                 }
             } catch (SQLException ex) {
                 Logger.getLogger(DadosDefaultDAO.class.getName()).log(Level.SEVERE, null, ex);
@@ -147,13 +150,15 @@ public class DadosDefaultDAO {
                 PreparedStatement st = conec.prepareStatement(sql);
                 st.setString(1,serial);
                 st.setString(2,maquina);
-                st.execute();         
+                st.execute();     
+                db.desconectar();
                 return true;
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(null, ex.getMessage(),"Erro ao registrar dados",JOptionPane.ERROR_MESSAGE);
                 Logger.getLogger(DadosDefaultDAO.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        db.desconectar();
         return false;
     }
     
@@ -167,13 +172,15 @@ public class DadosDefaultDAO {
                 PreparedStatement st = conec.prepareStatement(sql);
                 st.setString(1,maquina);
                 st.setString(2,serial);
-                st.executeUpdate();         
+                st.executeUpdate();   
+                db.desconectar();
                 return true;
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(null, ex.getMessage(),"Erro ao atualizar dados",JOptionPane.ERROR_MESSAGE);
                 Logger.getLogger(DadosDefaultDAO.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        db.desconectar();
         return false;
     }
 }
