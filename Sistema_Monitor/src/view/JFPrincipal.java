@@ -56,6 +56,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private boolean maqParada = true;
     private boolean iniciaLeituras = true;
     private int resumoRelatorio,linhas =14;
+    private List<Long> metrosAlerta = new ArrayList<>();
     Login login = new Login();
     Maquina maquina = new Maquina();
     MaquinaDAO maqDao =  new MaquinaDAO();
@@ -77,7 +78,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     
     private void tarefaVelocidade(){
         int delay = 0;   // delay de 0 seg.
-        int interval = 5000;  // intervalo de 2 seg.        
+        int interval = 1500;  // intervalo de 2 seg.        
 
         timerVelocimetro.scheduleAtFixedRate(new TimerTask() {
                 @Override
@@ -88,7 +89,15 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                     }else{
                         maqParada = true;
                     }
+                    if(displaySingleEvtCarEntrada.getValue() <= maquina.getAlertaMetrosParaArrebentamento()){
+                        lightBulbAlertaEvento.setOn(true);
+                        jLabelAlerta.setVisible(true);
+                    }else{
+                        lightBulbAlertaEvento.setOn(false);
+                        jLabelAlerta.setVisible(false);
+                    }
                 }
+                
             }, delay, interval);
     }
     
@@ -127,7 +136,6 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        linear1 = new org.pushingpixels.trident.ease.Linear();
         jpRoot = new javax.swing.JPanel();
         jpLogin = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -221,8 +229,9 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         jPanelEventoEntrada = new javax.swing.JPanel();
         displaySingleEvtCarEntrada = new eu.hansolo.steelseries.gauges.DisplaySingle();
         jLabel36 = new javax.swing.JLabel();
+        lightBulbAlertaEvento = new eu.hansolo.lightbulb.LightBulb();
         radialLcdDiametro = new eu.hansolo.steelseries.gauges.Radial4Lcd();
-        lightBulb1 = new eu.hansolo.lightbulb.LightBulb();
+        jLabelAlerta = new javax.swing.JLabel();
         menuPrincipal = new javax.swing.JMenuBar();
         menuLogin = new javax.swing.JMenu();
         jMenuItemLogin = new javax.swing.JMenuItem();
@@ -301,7 +310,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                         .addGroup(jpLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jtfUser)
                             .addComponent(jpfPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE))))
-                .addContainerGap(645, Short.MAX_VALUE))
+                .addContainerGap(905, Short.MAX_VALUE))
             .addGroup(jpLoginLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPLogo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -322,7 +331,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 .addComponent(jbLogin)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 268, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(413, Short.MAX_VALUE))
+                .addContainerGap(506, Short.MAX_VALUE))
         );
 
         jpRoot.add(jpLogin, "jpLogin");
@@ -377,13 +386,13 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 .addGroup(jpProgramacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jpProgramacaoLayout.createSequentialGroup()
                         .addComponent(jLabel21)
-                        .addGap(0, 670, Short.MAX_VALUE))
+                        .addGap(0, 930, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpProgramacaoLayout.createSequentialGroup()
                         .addGroup(jpProgramacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jSeparator4, javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel22, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addContainerGap())))
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 924, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1184, Short.MAX_VALUE)
         );
         jpProgramacaoLayout.setVerticalGroup(
             jpProgramacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -395,7 +404,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel22)
                 .addGap(43, 43, 43)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 685, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 778, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -407,11 +416,11 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         jpParadas.setLayout(jpParadasLayout);
         jpParadasLayout.setHorizontalGroup(
             jpParadasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 924, Short.MAX_VALUE)
+            .addGap(0, 1184, Short.MAX_VALUE)
         );
         jpParadasLayout.setVerticalGroup(
             jpParadasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 790, Short.MAX_VALUE)
+            .addGap(0, 883, Short.MAX_VALUE)
         );
 
         jpRoot.add(jpParadas, "jpParadas");
@@ -543,7 +552,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                                 .addGroup(jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jpConfigDefaultLayout.createSequentialGroup()
                                         .addComponent(jtfDriverProducao, javax.swing.GroupLayout.PREFERRED_SIZE, 705, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(0, 97, Short.MAX_VALUE))
+                                        .addGap(0, 357, Short.MAX_VALUE))
                                     .addComponent(jtfServidorProducao)
                                     .addComponent(jtfUrlProducao)
                                     .addComponent(jtfBDProducao)
@@ -831,6 +840,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         jLabel36.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel36.setText("Proximo evento Carretel de entrada");
 
+        lightBulbAlertaEvento.setGlowColor(new java.awt.Color(255, 0, 0));
+
         javax.swing.GroupLayout jPanelEventoEntradaLayout = new javax.swing.GroupLayout(jPanelEventoEntrada);
         jPanelEventoEntrada.setLayout(jPanelEventoEntradaLayout);
         jPanelEventoEntradaLayout.setHorizontalGroup(
@@ -838,20 +849,22 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             .addGroup(jPanelEventoEntradaLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanelEventoEntradaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanelEventoEntradaLayout.createSequentialGroup()
-                        .addComponent(displaySingleEvtCarEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(displaySingleEvtCarEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel36, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lightBulbAlertaEvento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         jPanelEventoEntradaLayout.setVerticalGroup(
             jPanelEventoEntradaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelEventoEntradaLayout.createSequentialGroup()
-                .addGap(6, 6, 6)
+                .addGap(7, 7, 7)
                 .addComponent(jLabel36)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(displaySingleEvtCarEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(15, Short.MAX_VALUE))
+            .addGroup(jPanelEventoEntradaLayout.createSequentialGroup()
+                .addComponent(lightBulbAlertaEvento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         radialLcdDiametro.setLedColor(eu.hansolo.steelseries.tools.LedColor.GREEN_LED);
@@ -869,7 +882,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         radialLcdDiametro.setTrackStartColor(new java.awt.Color(255, 0, 0));
         radialLcdDiametro.setTrackVisible(true);
 
-        lightBulb1.setGlowColor(new java.awt.Color(255, 0, 0));
+        jLabelAlerta.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/ezgif.com-resize.gif"))); // NOI18N
+        jLabelAlerta.setText("jLabel37");
 
         javax.swing.GroupLayout jpProducaoLayout = new javax.swing.GroupLayout(jpProducao);
         jpProducao.setLayout(jpProducaoLayout);
@@ -886,73 +900,79 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                             .addGroup(jpProducaoLayout.createSequentialGroup()
                                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 567, Short.MAX_VALUE))
+                                .addComponent(jScrollPane3))
                             .addGroup(jpProducaoLayout.createSequentialGroup()
                                 .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel23)
                                     .addGroup(jpProducaoLayout.createSequentialGroup()
-                                        .addComponent(jLabel24)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jLabelProducaoOF))
-                                    .addGroup(jpProducaoLayout.createSequentialGroup()
-                                        .addComponent(jLabel25)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jLabelProducaoCodItem)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jLabel26)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jLabelProducaoDescricaoItem))
-                                    .addGroup(jpProducaoLayout.createSequentialGroup()
-                                        .addComponent(jLabel32)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jLabelProducaoDMinimo)
+                                        .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addGroup(jpProducaoLayout.createSequentialGroup()
+                                                .addComponent(jLabel24)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jLabelProducaoOF))
+                                            .addGroup(jpProducaoLayout.createSequentialGroup()
+                                                .addComponent(jLabel25)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jLabelProducaoCodItem)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jLabel26)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jLabelProducaoDescricaoItem))
+                                            .addGroup(jpProducaoLayout.createSequentialGroup()
+                                                .addComponent(jLabel32)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jLabelProducaoDMinimo)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jLabel33)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jLabelProducaoDnominal)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jLabel34)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jLabelProducaoDMaximo)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jLabel35)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jLabelProducaoVelIdeal))
+                                            .addGroup(jpProducaoLayout.createSequentialGroup()
+                                                .addComponent(jLabel27)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jLabelProducaoQtdProg)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jLabel28)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jLabelProducaoQtdProd)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jLabel29)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jLabelProducaoMetTotalProg)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jLabel30)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jLabelProducaoMetTotalProd)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jLabel31)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jLabelProducaoMetCarretel, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jLabel33)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jLabelProducaoDnominal)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jLabel34)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jLabelProducaoDMaximo)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jLabel35)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jLabelProducaoVelIdeal))
-                                    .addGroup(jpProducaoLayout.createSequentialGroup()
-                                        .addComponent(jLabel27)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jLabelProducaoQtdProg)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jLabel28)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jLabelProducaoQtdProd)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jLabel29)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jLabelProducaoMetTotalProg)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jLabel30)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jLabelProducaoMetTotalProd)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jLabel31)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jLabelProducaoMetCarretel, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addGap(0, 0, Short.MAX_VALUE)))
+                                        .addComponent(jLabelAlerta, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(0, 5, Short.MAX_VALUE)))
                         .addContainerGap())
                     .addGroup(jpProducaoLayout.createSequentialGroup()
                         .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(radialLcdVelocidade, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
                             .addComponent(radialLcdDiametro, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                        .addGap(18, 18, 18)
                         .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(linearCarretelSaida, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(linearProgramacao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(jpProducaoLayout.createSequentialGroup()
-                                .addComponent(jPanelEventoEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(linearProgramacao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addGroup(jpProducaoLayout.createSequentialGroup()
+                                        .addComponent(jPanelEventoEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, 346, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(0, 0, Short.MAX_VALUE))))
+                            .addGroup(jpProducaoLayout.createSequentialGroup()
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lightBulb1, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE))))))
+                                .addComponent(linearCarretelSaida, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))))
         );
         jpProducaoLayout.setVerticalGroup(
             jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -962,38 +982,41 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabelProducaoOF))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel27)
-                    .addComponent(jLabelProducaoQtdProg)
-                    .addComponent(jLabel28)
-                    .addComponent(jLabelProducaoQtdProd)
-                    .addComponent(jLabel29)
-                    .addComponent(jLabelProducaoMetTotalProg)
-                    .addComponent(jLabel30)
-                    .addComponent(jLabelProducaoMetTotalProd)
-                    .addComponent(jLabel31)
-                    .addComponent(jLabelProducaoMetCarretel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel25)
-                    .addComponent(jLabelProducaoCodItem)
-                    .addComponent(jLabel26)
-                    .addComponent(jLabelProducaoDescricaoItem))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel32)
-                    .addComponent(jLabelProducaoDMinimo)
-                    .addComponent(jLabel33)
-                    .addComponent(jLabelProducaoDnominal)
-                    .addComponent(jLabel34)
-                    .addComponent(jLabelProducaoDMaximo)
-                    .addComponent(jLabel35)
-                    .addComponent(jLabelProducaoVelIdeal))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jpProducaoLayout.createSequentialGroup()
+                        .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabelProducaoOF))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel27)
+                            .addComponent(jLabelProducaoQtdProg)
+                            .addComponent(jLabel28)
+                            .addComponent(jLabelProducaoQtdProd)
+                            .addComponent(jLabel29)
+                            .addComponent(jLabelProducaoMetTotalProg)
+                            .addComponent(jLabel30)
+                            .addComponent(jLabelProducaoMetTotalProd)
+                            .addComponent(jLabel31)
+                            .addComponent(jLabelProducaoMetCarretel))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel25)
+                            .addComponent(jLabelProducaoCodItem)
+                            .addComponent(jLabel26)
+                            .addComponent(jLabelProducaoDescricaoItem))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel32)
+                            .addComponent(jLabelProducaoDMinimo)
+                            .addComponent(jLabel33)
+                            .addComponent(jLabelProducaoDnominal)
+                            .addComponent(jLabel34)
+                            .addComponent(jLabelProducaoDMaximo)
+                            .addComponent(jLabel35)
+                            .addComponent(jLabelProducaoVelIdeal)))
+                    .addComponent(jLabelAlerta, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator6, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -1008,14 +1031,12 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(linearProgramacao, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPanelEventoEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lightBulb1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jPanelEventoEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jpProducaoLayout.createSequentialGroup()
                         .addComponent(radialLcdVelocidade, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(radialLcdDiametro, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(168, Short.MAX_VALUE))
         );
 
         jpRoot.add(jpProducao, "jpProducao");
@@ -1158,7 +1179,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         login.setSenha(jpfPassword.getText());
         //System.out.println("Psw: " + login.getSenha());
         if(login.logar(login)){
-            Usuariologado();
+            usuariologado();
         }else{
             JOptionPane.showMessageDialog(null, "Usuario ou Senha invalidos","Login",JOptionPane.ERROR_MESSAGE);            
         }
@@ -1431,6 +1452,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JLabel jLabelAlerta;
     private javax.swing.JLabel jLabelProducaoCodItem;
     private javax.swing.JLabel jLabelProducaoDMaximo;
     private javax.swing.JLabel jLabelProducaoDMinimo;
@@ -1492,8 +1514,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JTextField jtfUserDafaut;
     private javax.swing.JTextField jtfUsuarioProducao;
     private javax.swing.JTextField jtfUsuarioTeste;
-    private eu.hansolo.lightbulb.LightBulb lightBulb1;
-    private org.pushingpixels.trident.ease.Linear linear1;
+    private eu.hansolo.lightbulb.LightBulb lightBulbAlertaEvento;
     private eu.hansolo.steelseries.gauges.Linear linearCarretelSaida;
     private eu.hansolo.steelseries.gauges.Linear linearProgramacao;
     private javax.swing.JMenu menuConfiguracoes;
@@ -1529,9 +1550,9 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         
     private void buscarProgramacaoMaquina() {   
         DefaultTableModel modelo = (DefaultTableModel)jTableProgramacao.getModel();
-        ProgramacaoMaquinaDAO prog =  new ProgramacaoMaquinaDAO();
-        List<ProgramacaoMaquina> lista =  new ArrayList<ProgramacaoMaquina>();
-        lista = prog.buscaProgramacaoMaquina(codMaquina);
+        ProgramacaoMaquinaDAO programacao =  new ProgramacaoMaquinaDAO();
+        List<ProgramacaoMaquina> lista =  new ArrayList<>();
+        lista = programacao.buscaProgramacaoMaquina(codMaquina);
         for(int i=0;i<lista.size();i++){
             modelo.addRow(new Object[]{lista.get(i).getProduto().getCodigo(),
                 lista.get(i).getProduto().getDescricao(),lista.get(i).getLoteproducao(),
@@ -1587,6 +1608,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private void abrirTelaProducao() {
         limparJTable(jTableProducaoArrebentamentos);
         limparJTable(jTableProducaoParadas);
+        jLabelAlerta.setVisible(false);
         if(comMicrometro==null) comMicrometro = new SerialTxRx();
         if(parametrizarSerial(SERIAL_MICROMETRO)){
             if(comMicrometro.iniciaSerial()){
@@ -1595,8 +1617,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             }
         }
         buscarInformaçoesProducao();
-        AjustarMostradorVelocidade();
-        AjustarMostradoresMetragem();
+        ajustarMostradorVelocidade();
+        ajustarMostradoresMetragem();
         this.tarefaVelocidade();
         CardLayout card = (CardLayout) jpRoot.getLayout();
         card.show(jpRoot,"jpProducao");
@@ -1649,7 +1671,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         return false;
     }
     private void buscarRegistrosObservacaoPesagem() {
-        List<Pesagem> lista = new ArrayList<Pesagem>();
+        List<Pesagem> lista = new ArrayList<>();
         PesagemDAO daoPes = new PesagemDAO();
         ControllerProducao ctr = new ControllerProducao();
         lista = daoPes.buscapesagensMontagem(codMaquina);
@@ -1658,7 +1680,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             for(int i=0;i<lista.size();i++){
                 ctr.AddicionarMetragensObservacao(lista.get(i).getObservacao(),lista.get(i).getMetragemOperador());
             }
-            List<Long> metrosAlerta = ctr.getListaMetragemObservacao();
+            
+            metrosAlerta = ctr.getListaMetragemObservacao();
             for (int i=0;i<metrosAlerta.size();i++){
                 modelo.addRow(new Object[]{String.valueOf(i+1),metrosAlerta.get(i).toString()});
             }
@@ -1703,8 +1726,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 
                 if(metAnterior < metAtual) {
                     metrosProduzidos = metAtual - metAnterior;
-                    AtualizarMostradoresMetragem(metrosProduzidos);
-                    AtualiMostradorParadaEntrada(metrosProduzidos);
+                    atualizarMostradoresMetragem(metrosProduzidos);
                     //System.out.println("Tempo calculado pelo sistema: " + (tempoCalculadoSistema / 1000.0));
                     velocidade = (metrosProduzidos/(tempoCalculadoSistema/1000.0));
                     tempoSistema = System.currentTimeMillis();
@@ -1782,7 +1804,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             }
             login.setCode(code);              
             if(login.logarCode(login)){
-                Usuariologado();            
+                usuariologado();            
             }else{
                 login.setCode(code);
                 JOptionPane.showMessageDialog(null, "Codigo de Identificação não vinculado","Codigo invalido",JOptionPane.ERROR_MESSAGE);
@@ -1790,7 +1812,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         }
     }
     
-    private void Usuariologado() {
+    private void usuariologado() {
         if(!login.getNome().trim().equals("")) bloquearMenu();
             habilitarMenu();
             System.out.println("Logado com " + login.getNome()
@@ -1798,7 +1820,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             abrirTelaProducao();           
         }
 
-    private void AjustarMostradorVelocidade() {
+    private void ajustarMostradorVelocidade() {
         try {
             double maxVel = (double) prodmaq.getVelocidade() * 2;
             double alvoVel = (double) prodmaq.getVelocidade();
@@ -1819,7 +1841,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         }
     }
 
-    private void AjustarMostradoresMetragem() {
+    private void ajustarMostradoresMetragem() {
         try {
             double metProgramada = (double) prog.getMetragemProgramada();
             double metMaxima = (double) prodCar.getMetragemMaxima();
@@ -1836,16 +1858,18 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             displaySingleMetragemProgramado.setValue(metTotalProduzida);
             double percProduzido = (metTotalProduzida/metTotalProgramada) * 100;
             linearProgramacao.setValueAnimated(percProduzido);
+            atualiMostradorParadaEntrada(metProduzida);
             
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             e.printStackTrace();
         }
     }
     
-    private void AtualizarMostradoresMetragem( double metrosProduzidos){
+    private void atualizarMostradoresMetragem( double metrosProduzidos){
         try {       
             if(metrosProduzidos>0){
                 displaySingleMetragemCarretel.setValue(displaySingleMetragemCarretel.getValue() + metrosProduzidos);
+                atualiMostradorParadaEntrada(displaySingleMetragemCarretel.getValue());
                 displaySingleMetragemProgramado.setValue(displaySingleMetragemProgramado.getValue() + metrosProduzidos);
                 linearProgramacao.setValue((displaySingleMetragemProgramado.getValue() / prog.getMetragemTotalProgramada()) * 100);            
                 linearCarretelSaida.setValue((displaySingleMetragemCarretel.getValue() / prodCar.getMetragemMaxima())*100);
@@ -1855,9 +1879,18 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         }
     }
 
-    private void AtualiMostradorParadaEntrada(double metrosProduzidos) {
+    private void atualiMostradorParadaEntrada(double metrosProduzidos) {
+        double metrosParaAlerta=0;
         try {
-            
+            for (int i=0;i<metrosAlerta.size();i++){
+                //modelo.addRow(new Object[]{String.valueOf(i+1),metrosAlerta.get(i).toString()});                
+                metrosParaAlerta = (double) metrosAlerta.get(i);
+                if(metrosProduzidos < metrosParaAlerta){
+                    metrosParaAlerta = metrosParaAlerta - metrosProduzidos;
+                    displaySingleEvtCarEntrada.setValue(metrosParaAlerta);
+                    return;
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
