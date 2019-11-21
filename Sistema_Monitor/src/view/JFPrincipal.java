@@ -5,7 +5,6 @@
  */
 package view;
 
-
 import com.pi4j.system.SystemInfo;
 import controller.ControllerProducao;
 import controller.Login;
@@ -36,7 +35,12 @@ import model.ProgramacaoMaquina;
 import model.Usuario;
 import Serial.*;
 import controller.ControllerConfigSerialPort;
-import javax.swing.JPopupMenu;
+import controller.ControllerMicrometro;
+import dao.ProdutoCarretelDAO;
+import java.util.Timer;
+import java.util.TimerTask;
+import javax.swing.JFrame;
+import model.Micrometro;
 
 /**
  *
@@ -44,17 +48,50 @@ import javax.swing.JPopupMenu;
  */
 public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private static final String SERIAL_RFID = "rfidserial";
+    private static final String SERIAL_MICROMETRO = "micrometroserial";
     private  static String identificador;
     private static String codMaquina;
+    private long tempoSistema = System.currentTimeMillis(); 
+    private double[] mediaVel = {0,0,0,0,0,0,0,0,0,0};  
+    private boolean maqParada = true;
+    private boolean iniciaLeituras = true;
+    private int resumoRelatorio,linhas =14;
     Login login = new Login();
     Maquina maquina = new Maquina();
     MaquinaDAO maqDao =  new MaquinaDAO();
     ProdutoMaquina prodmaq = new ProdutoMaquina();
-    ProdutoCarretel prodCar = new ProdutoCarretel();    
+    ProgramacaoMaquina prog = new ProgramacaoMaquina();
+    ProdutoCarretel prodCar = new ProdutoCarretel();
+    Producao prod = new Producao();
     SerialTxRx comRFID ;
+    SerialTxRx comMicrometro;
+    Micrometro leituraAtual = new Micrometro();
+    Micrometro leituraAnterior = new Micrometro();
+    ControllerMicrometro mic = new ControllerMicrometro();
+    
     /**
      * Creates new form JFPrincipal
      */
+    
+    Timer timerVelocimetro = new Timer();
+    
+    private void tarefaVelocidade(){
+        int delay = 0;   // delay de 0 seg.
+        int interval = 5000;  // intervalo de 2 seg.        
+
+        timerVelocimetro.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    System.out.println("Enveto Timer");
+                    if(maqParada){
+                        System.out.println("parada???");
+                    }else{
+                        maqParada = true;
+                    }
+                }
+            }, delay, interval);
+    }
+    
     public JFPrincipal() {
         try {
             if(System.getProperty("os.name").equals("Linux")){
@@ -90,15 +127,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        androidToolkitHandler1 = new org.pushingpixels.trident.android.AndroidToolkitHandler();
-        androidPropertyInterpolators1 = new org.pushingpixels.trident.android.AndroidPropertyInterpolators();
-        compass1 = new eu.hansolo.steelseries.gauges.Compass();
-        aWTPropertyInterpolators1 = new org.pushingpixels.trident.swing.AWTPropertyInterpolators();
-        clock1 = new eu.hansolo.steelseries.gauges.Clock();
-        altimeter1 = new eu.hansolo.steelseries.gauges.Altimeter();
-        compass2 = new eu.hansolo.steelseries.gauges.Compass();
-        corePropertyInterpolators1 = new org.pushingpixels.trident.interpolator.CorePropertyInterpolators();
-        digitalRadial1 = new eu.hansolo.steelseries.gauges.DigitalRadial();
+        linear1 = new org.pushingpixels.trident.ease.Linear();
         jpRoot = new javax.swing.JPanel();
         jpLogin = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -114,39 +143,6 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTableProgramacao = new javax.swing.JTable();
         jpParadas = new javax.swing.JPanel();
-        jpProducao = new javax.swing.JPanel();
-        jLabel23 = new javax.swing.JLabel();
-        jSeparator5 = new javax.swing.JSeparator();
-        jLabel24 = new javax.swing.JLabel();
-        jLabel25 = new javax.swing.JLabel();
-        jLabelProducaoCodItem = new javax.swing.JLabel();
-        jLabel26 = new javax.swing.JLabel();
-        jLabelProducaoDescricaoItem = new javax.swing.JLabel();
-        jLabel27 = new javax.swing.JLabel();
-        jLabelProducaoQtdProg = new javax.swing.JLabel();
-        jLabel28 = new javax.swing.JLabel();
-        jLabelProducaoQtdProd = new javax.swing.JLabel();
-        jLabel29 = new javax.swing.JLabel();
-        jLabelProducaoOF = new javax.swing.JLabel();
-        jLabelProducaoMetTotalProg = new javax.swing.JLabel();
-        jLabel30 = new javax.swing.JLabel();
-        jLabelProducaoMetTotalProd = new javax.swing.JLabel();
-        jLabel31 = new javax.swing.JLabel();
-        jLabelProducaoMetCarretel = new javax.swing.JLabel();
-        jLabel32 = new javax.swing.JLabel();
-        jLabelProducaoDMinimo = new javax.swing.JLabel();
-        jLabel33 = new javax.swing.JLabel();
-        jLabelProducaoDnominal = new javax.swing.JLabel();
-        jLabel34 = new javax.swing.JLabel();
-        jLabelProducaoDMaximo = new javax.swing.JLabel();
-        jLabel35 = new javax.swing.JLabel();
-        jLabelProducaoVelIdeal = new javax.swing.JLabel();
-        jSeparator6 = new javax.swing.JSeparator();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jTableProducaoArrebentamentos = new javax.swing.JTable();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jTableProducaoParadas = new javax.swing.JTable();
-        jSeparator7 = new javax.swing.JSeparator();
         jpConfigDefault = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
@@ -184,11 +180,55 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         jbCriarArquivosDefault = new javax.swing.JButton();
         jpfSenhaProducao = new javax.swing.JPasswordField();
         jpfSenhaTeste = new javax.swing.JPasswordField();
+        jpProducao = new javax.swing.JPanel();
+        jLabel23 = new javax.swing.JLabel();
+        jSeparator5 = new javax.swing.JSeparator();
+        jLabel24 = new javax.swing.JLabel();
+        jLabel25 = new javax.swing.JLabel();
+        jLabelProducaoCodItem = new javax.swing.JLabel();
+        jLabel26 = new javax.swing.JLabel();
+        jLabelProducaoDescricaoItem = new javax.swing.JLabel();
+        jLabel27 = new javax.swing.JLabel();
+        jLabelProducaoQtdProg = new javax.swing.JLabel();
+        jLabel28 = new javax.swing.JLabel();
+        jLabelProducaoQtdProd = new javax.swing.JLabel();
+        jLabel29 = new javax.swing.JLabel();
+        jLabelProducaoOF = new javax.swing.JLabel();
+        jLabelProducaoMetTotalProg = new javax.swing.JLabel();
+        jLabel30 = new javax.swing.JLabel();
+        jLabelProducaoMetTotalProd = new javax.swing.JLabel();
+        jLabel31 = new javax.swing.JLabel();
+        jLabelProducaoMetCarretel = new javax.swing.JLabel();
+        jLabel32 = new javax.swing.JLabel();
+        jLabelProducaoDMinimo = new javax.swing.JLabel();
+        jLabel33 = new javax.swing.JLabel();
+        jLabelProducaoDnominal = new javax.swing.JLabel();
+        jLabel34 = new javax.swing.JLabel();
+        jLabelProducaoDMaximo = new javax.swing.JLabel();
+        jLabel35 = new javax.swing.JLabel();
+        jLabelProducaoVelIdeal = new javax.swing.JLabel();
+        jSeparator6 = new javax.swing.JSeparator();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTableProducaoArrebentamentos = new javax.swing.JTable();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTableProducaoParadas = new javax.swing.JTable();
+        jSeparator7 = new javax.swing.JSeparator();
+        radialLcdVelocidade = new eu.hansolo.steelseries.gauges.Radial4Lcd();
+        linearCarretelSaida = new eu.hansolo.steelseries.gauges.Linear();
+        displaySingleMetragemCarretel = new eu.hansolo.steelseries.gauges.DisplaySingle();
+        linearProgramacao = new eu.hansolo.steelseries.gauges.Linear();
+        displaySingleMetragemProgramado = new eu.hansolo.steelseries.gauges.DisplaySingle();
+        jPanelEventoEntrada = new javax.swing.JPanel();
+        displaySingleEvtCarEntrada = new eu.hansolo.steelseries.gauges.DisplaySingle();
+        jLabel36 = new javax.swing.JLabel();
+        radialLcdDiametro = new eu.hansolo.steelseries.gauges.Radial4Lcd();
+        lightBulb1 = new eu.hansolo.lightbulb.LightBulb();
         menuPrincipal = new javax.swing.JMenuBar();
         menuLogin = new javax.swing.JMenu();
         jMenuItemLogin = new javax.swing.JMenuItem();
         jMenuItemSair = new javax.swing.JMenuItem();
         jMenuItemDesligar = new javax.swing.JMenuItem();
+        jMenuItemReiniciar = new javax.swing.JMenuItem();
         menuProgramacao = new javax.swing.JMenu();
         jMenuItemProgramacao = new javax.swing.JMenuItem();
         menuParadas = new javax.swing.JMenu();
@@ -200,11 +240,27 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         jMenuTrocarMaquina = new javax.swing.JMenuItem();
         jMenuConfigSerialRFID = new javax.swing.JMenuItem();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Sistema Condumig");
         setExtendedState(JFPrincipal.MAXIMIZED_BOTH);
         setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         setName("framePrincipal"); // NOI18N
+        addWindowStateListener(new java.awt.event.WindowStateListener() {
+            public void windowStateChanged(java.awt.event.WindowEvent evt) {
+                formWindowStateChanged(evt);
+            }
+        });
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+            public void windowDeactivated(java.awt.event.WindowEvent evt) {
+                formWindowDeactivated(evt);
+            }
+            public void windowIconified(java.awt.event.WindowEvent evt) {
+                formWindowIconified(evt);
+            }
+        });
 
         jpRoot.setLayout(new java.awt.CardLayout());
 
@@ -245,7 +301,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                         .addGroup(jpLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jtfUser)
                             .addComponent(jpfPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE))))
-                .addContainerGap(633, Short.MAX_VALUE))
+                .addContainerGap(645, Short.MAX_VALUE))
             .addGroup(jpLoginLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPLogo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -266,7 +322,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 .addComponent(jbLogin)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 268, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(337, Short.MAX_VALUE))
+                .addContainerGap(413, Short.MAX_VALUE))
         );
 
         jpRoot.add(jpLogin, "jpLogin");
@@ -321,13 +377,13 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 .addGroup(jpProgramacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jpProgramacaoLayout.createSequentialGroup()
                         .addComponent(jLabel21)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addGap(0, 670, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpProgramacaoLayout.createSequentialGroup()
                         .addGroup(jpProgramacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 892, Short.MAX_VALUE)
                             .addComponent(jSeparator4, javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel22, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addContainerGap())))
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 924, Short.MAX_VALUE)
         );
         jpProgramacaoLayout.setVerticalGroup(
             jpProgramacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -338,8 +394,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel22)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE)
+                .addGap(43, 43, 43)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 685, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -351,272 +407,14 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         jpParadas.setLayout(jpParadasLayout);
         jpParadasLayout.setHorizontalGroup(
             jpParadasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 912, Short.MAX_VALUE)
+            .addGap(0, 924, Short.MAX_VALUE)
         );
         jpParadasLayout.setVerticalGroup(
             jpParadasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 714, Short.MAX_VALUE)
+            .addGap(0, 790, Short.MAX_VALUE)
         );
 
         jpRoot.add(jpParadas, "jpParadas");
-
-        jpProducao.setBackground(new java.awt.Color(204, 255, 255));
-
-        jLabel23.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel23.setText("Acompanhamento de produção:");
-
-        jLabel24.setText("Informações da ordem de fabricação:");
-
-        jLabel25.setText("Codigo do Item:");
-
-        jLabelProducaoCodItem.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabelProducaoCodItem.setText("400500000000");
-
-        jLabel26.setText("Desccrição: ");
-
-        jLabelProducaoDescricaoItem.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabelProducaoDescricaoItem.setText("jLabelProducaoDescriçãoItem");
-
-        jLabel27.setText("Quantidade programada:");
-
-        jLabelProducaoQtdProg.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabelProducaoQtdProg.setText("00");
-
-        jLabel28.setText("Quantidade produzida:");
-
-        jLabelProducaoQtdProd.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabelProducaoQtdProd.setText("00");
-
-        jLabel29.setText("Metragem total programada :");
-
-        jLabelProducaoOF.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabelProducaoOF.setText("000000");
-
-        jLabelProducaoMetTotalProg.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabelProducaoMetTotalProg.setText("0000000");
-        jLabelProducaoMetTotalProg.setToolTipText("");
-
-        jLabel30.setText("Metragem total produzida:");
-
-        jLabelProducaoMetTotalProd.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabelProducaoMetTotalProd.setText("0000000");
-
-        jLabel31.setText("Metragem por carretel:");
-
-        jLabelProducaoMetCarretel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabelProducaoMetCarretel.setText("000000");
-        jLabelProducaoMetCarretel.setToolTipText("");
-
-        jLabel32.setText("Diametro minimo:");
-
-        jLabelProducaoDMinimo.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabelProducaoDMinimo.setText("0.00");
-
-        jLabel33.setText("Diametro nominal:");
-
-        jLabelProducaoDnominal.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabelProducaoDnominal.setText("0.00");
-
-        jLabel34.setText("Diametro máximo:");
-
-        jLabelProducaoDMaximo.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabelProducaoDMaximo.setText("0.00");
-
-        jLabel35.setText("Velocidade de produção ideal:");
-
-        jLabelProducaoVelIdeal.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabelProducaoVelIdeal.setText("000");
-
-        jScrollPane2.setBackground(new java.awt.Color(204, 255, 255));
-        jScrollPane2.setBorder(javax.swing.BorderFactory.createTitledBorder("Arrebentamentos carretel de entrada:"));
-
-        jTableProducaoArrebentamentos.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null}
-            },
-            new String [] {
-                "Numero", "Metragem"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false, false
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        jTableProducaoArrebentamentos.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_NEXT_COLUMN);
-        jTableProducaoArrebentamentos.setCellSelectionEnabled(true);
-        jScrollPane2.setViewportView(jTableProducaoArrebentamentos);
-        if (jTableProducaoArrebentamentos.getColumnModel().getColumnCount() > 0) {
-            jTableProducaoArrebentamentos.getColumnModel().getColumn(0).setResizable(false);
-            jTableProducaoArrebentamentos.getColumnModel().getColumn(1).setResizable(false);
-        }
-
-        jScrollPane3.setBackground(new java.awt.Color(204, 255, 255));
-        jScrollPane3.setBorder(javax.swing.BorderFactory.createTitledBorder("Paradas durante a produção:"));
-
-        jTableProducaoParadas.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null}
-            },
-            new String [] {
-                "Numero", "Cod. Parada", "Tempo", "Descricao"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.Object.class, java.lang.Object.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        jScrollPane3.setViewportView(jTableProducaoParadas);
-        if (jTableProducaoParadas.getColumnModel().getColumnCount() > 0) {
-            jTableProducaoParadas.getColumnModel().getColumn(0).setResizable(false);
-            jTableProducaoParadas.getColumnModel().getColumn(0).setPreferredWidth(1);
-            jTableProducaoParadas.getColumnModel().getColumn(1).setResizable(false);
-            jTableProducaoParadas.getColumnModel().getColumn(1).setPreferredWidth(1);
-            jTableProducaoParadas.getColumnModel().getColumn(2).setResizable(false);
-            jTableProducaoParadas.getColumnModel().getColumn(2).setPreferredWidth(1);
-            jTableProducaoParadas.getColumnModel().getColumn(3).setResizable(false);
-        }
-
-        javax.swing.GroupLayout jpProducaoLayout = new javax.swing.GroupLayout(jpProducao);
-        jpProducao.setLayout(jpProducaoLayout);
-        jpProducaoLayout.setHorizontalGroup(
-            jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jpProducaoLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jSeparator7, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jSeparator5, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jSeparator6, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jpProducaoLayout.createSequentialGroup()
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane3))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jpProducaoLayout.createSequentialGroup()
-                        .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel23, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jpProducaoLayout.createSequentialGroup()
-                                .addComponent(jLabel24)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabelProducaoOF))
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jpProducaoLayout.createSequentialGroup()
-                                .addComponent(jLabel25)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabelProducaoCodItem)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel26)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabelProducaoDescricaoItem))
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jpProducaoLayout.createSequentialGroup()
-                                .addComponent(jLabel32)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabelProducaoDMinimo)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel33)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabelProducaoDnominal)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel34)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabelProducaoDMaximo)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel35)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabelProducaoVelIdeal))
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jpProducaoLayout.createSequentialGroup()
-                                .addComponent(jLabel27)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabelProducaoQtdProg)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel28)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabelProducaoQtdProd)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel29)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabelProducaoMetTotalProg)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel30)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabelProducaoMetTotalProd)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel31)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabelProducaoMetCarretel, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
-        );
-        jpProducaoLayout.setVerticalGroup(
-            jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jpProducaoLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel23)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabelProducaoOF))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel27)
-                    .addComponent(jLabelProducaoQtdProg)
-                    .addComponent(jLabel28)
-                    .addComponent(jLabelProducaoQtdProd)
-                    .addComponent(jLabel29)
-                    .addComponent(jLabelProducaoMetTotalProg)
-                    .addComponent(jLabel30)
-                    .addComponent(jLabelProducaoMetTotalProd)
-                    .addComponent(jLabel31)
-                    .addComponent(jLabelProducaoMetCarretel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel25)
-                    .addComponent(jLabelProducaoCodItem)
-                    .addComponent(jLabel26)
-                    .addComponent(jLabelProducaoDescricaoItem))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel32)
-                    .addComponent(jLabelProducaoDMinimo)
-                    .addComponent(jLabel33)
-                    .addComponent(jLabelProducaoDnominal)
-                    .addComponent(jLabel34)
-                    .addComponent(jLabelProducaoDMaximo)
-                    .addComponent(jLabel35)
-                    .addComponent(jLabelProducaoVelIdeal))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSeparator6, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSeparator7, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(258, Short.MAX_VALUE))
-        );
-
-        jpRoot.add(jpProducao, "jpProducao");
 
         jpConfigDefault.setBackground(new java.awt.Color(204, 255, 255));
         jpConfigDefault.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
@@ -745,7 +543,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                                 .addGroup(jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jpConfigDefaultLayout.createSequentialGroup()
                                         .addComponent(jtfDriverProducao, javax.swing.GroupLayout.PREFERRED_SIZE, 705, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(0, 85, Short.MAX_VALUE))
+                                        .addGap(0, 97, Short.MAX_VALUE))
                                     .addComponent(jtfServidorProducao)
                                     .addComponent(jtfUrlProducao)
                                     .addComponent(jtfBDProducao)
@@ -842,6 +640,386 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         jpRoot.add(jpConfigDefault, "jpConfigDefault");
         jpConfigDefault.getAccessibleContext().setAccessibleName("");
 
+        jpProducao.setBackground(new java.awt.Color(204, 255, 255));
+        jpProducao.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+
+        jLabel23.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel23.setText("Acompanhamento de produção:");
+
+        jLabel24.setText("Informações da ordem de fabricação:");
+
+        jLabel25.setText("Codigo do Item:");
+
+        jLabelProducaoCodItem.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelProducaoCodItem.setText("400500000000");
+
+        jLabel26.setText("Desccrição: ");
+
+        jLabelProducaoDescricaoItem.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelProducaoDescricaoItem.setText("jLabelProducaoDescriçãoItem");
+
+        jLabel27.setText("Quantidade programada:");
+
+        jLabelProducaoQtdProg.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelProducaoQtdProg.setText("00");
+
+        jLabel28.setText("Quantidade produzida:");
+
+        jLabelProducaoQtdProd.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelProducaoQtdProd.setText("00");
+
+        jLabel29.setText("Metragem total programada :");
+
+        jLabelProducaoOF.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelProducaoOF.setText("000000");
+
+        jLabelProducaoMetTotalProg.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelProducaoMetTotalProg.setText("0000000");
+        jLabelProducaoMetTotalProg.setToolTipText("");
+
+        jLabel30.setText("Metragem total apontada:");
+        jLabel30.setToolTipText("");
+
+        jLabelProducaoMetTotalProd.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelProducaoMetTotalProd.setText("0000000");
+
+        jLabel31.setText("Metragem por carretel:");
+
+        jLabelProducaoMetCarretel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelProducaoMetCarretel.setText("000000");
+        jLabelProducaoMetCarretel.setToolTipText("");
+
+        jLabel32.setText("Diametro minimo:");
+
+        jLabelProducaoDMinimo.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelProducaoDMinimo.setText("0.00");
+
+        jLabel33.setText("Diametro nominal:");
+
+        jLabelProducaoDnominal.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelProducaoDnominal.setText("0.00");
+
+        jLabel34.setText("Diametro máximo:");
+
+        jLabelProducaoDMaximo.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelProducaoDMaximo.setText("0.00");
+
+        jLabel35.setText("Velocidade de produção ideal:");
+
+        jLabelProducaoVelIdeal.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelProducaoVelIdeal.setText("000");
+
+        jScrollPane2.setBackground(new java.awt.Color(204, 255, 255));
+        jScrollPane2.setBorder(javax.swing.BorderFactory.createTitledBorder("Arrebentamentos carretel de entrada:"));
+
+        jTableProducaoArrebentamentos.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null}
+            },
+            new String [] {
+                "Numero", "Metragem"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jTableProducaoArrebentamentos.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_NEXT_COLUMN);
+        jTableProducaoArrebentamentos.setCellSelectionEnabled(true);
+        jScrollPane2.setViewportView(jTableProducaoArrebentamentos);
+        if (jTableProducaoArrebentamentos.getColumnModel().getColumnCount() > 0) {
+            jTableProducaoArrebentamentos.getColumnModel().getColumn(0).setResizable(false);
+            jTableProducaoArrebentamentos.getColumnModel().getColumn(1).setResizable(false);
+        }
+
+        jScrollPane3.setBackground(new java.awt.Color(204, 255, 255));
+        jScrollPane3.setBorder(javax.swing.BorderFactory.createTitledBorder("Paradas durante a produção:"));
+
+        jTableProducaoParadas.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null}
+            },
+            new String [] {
+                "Numero", "Cod. Parada", "Tempo", "Descricao"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.Object.class, java.lang.Object.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane3.setViewportView(jTableProducaoParadas);
+        if (jTableProducaoParadas.getColumnModel().getColumnCount() > 0) {
+            jTableProducaoParadas.getColumnModel().getColumn(0).setResizable(false);
+            jTableProducaoParadas.getColumnModel().getColumn(0).setPreferredWidth(1);
+            jTableProducaoParadas.getColumnModel().getColumn(1).setResizable(false);
+            jTableProducaoParadas.getColumnModel().getColumn(1).setPreferredWidth(1);
+            jTableProducaoParadas.getColumnModel().getColumn(2).setResizable(false);
+            jTableProducaoParadas.getColumnModel().getColumn(2).setPreferredWidth(1);
+            jTableProducaoParadas.getColumnModel().getColumn(3).setResizable(false);
+        }
+
+        radialLcdVelocidade.setLedColor(eu.hansolo.steelseries.tools.LedColor.GREEN_LED);
+        radialLcdVelocidade.setLedVisible(false);
+        radialLcdVelocidade.setMaxMeasuredValueVisible(true);
+        radialLcdVelocidade.setMaxValue(500.0);
+        radialLcdVelocidade.setName(""); // NOI18N
+        radialLcdVelocidade.setThreshold(500.0);
+        radialLcdVelocidade.setThresholdVisible(true);
+        radialLcdVelocidade.setTickLabelPeriod(50);
+        radialLcdVelocidade.setTrackRange(100.0);
+        radialLcdVelocidade.setTrackSection(50.0);
+        radialLcdVelocidade.setTrackSectionColor(new java.awt.Color(0, 255, 0));
+        radialLcdVelocidade.setTrackStart(10.0);
+        radialLcdVelocidade.setTrackStartColor(new java.awt.Color(255, 0, 0));
+        radialLcdVelocidade.setTrackVisible(true);
+
+        linearCarretelSaida.setThreshold(80.0);
+        linearCarretelSaida.setThresholdVisible(true);
+        linearCarretelSaida.setTitle("Carrele de Saida (%)");
+        linearCarretelSaida.setTrackRange(100.0);
+        linearCarretelSaida.setTrackSection(50.0);
+        linearCarretelSaida.setTrackSectionColor(new java.awt.Color(0, 255, 0));
+        linearCarretelSaida.setTrackStartColor(new java.awt.Color(255, 255, 0));
+        linearCarretelSaida.setTrackStopColor(new java.awt.Color(255, 255, 0));
+        linearCarretelSaida.setUnitString("Metros");
+        linearCarretelSaida.setUnitStringVisible(false);
+
+        displaySingleMetragemCarretel.setLcdDecimals(0);
+        displaySingleMetragemCarretel.setUnitString("m");
+        linearCarretelSaida.add(displaySingleMetragemCarretel);
+        displaySingleMetragemCarretel.setBounds(30, 40, 100, 30);
+
+        linearProgramacao.setTitle("Programação para o lote (%)");
+        linearProgramacao.setTrackRange(10.0);
+        linearProgramacao.setUnitStringVisible(false);
+
+        displaySingleMetragemProgramado.setLcdDecimals(0);
+        displaySingleMetragemProgramado.setUnitString("m");
+        linearProgramacao.add(displaySingleMetragemProgramado);
+        displaySingleMetragemProgramado.setBounds(30, 40, 100, 30);
+
+        jPanelEventoEntrada.setBackground(new java.awt.Color(204, 204, 204));
+        jPanelEventoEntrada.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanelEventoEntrada.setToolTipText("Proximo evento anotado no carretel de entrada.");
+        jPanelEventoEntrada.setName("PainelEventosEntrada"); // NOI18N
+
+        displaySingleEvtCarEntrada.setLcdDecimals(0);
+        displaySingleEvtCarEntrada.setUnitString("m");
+
+        jLabel36.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel36.setText("Proximo evento Carretel de entrada");
+
+        javax.swing.GroupLayout jPanelEventoEntradaLayout = new javax.swing.GroupLayout(jPanelEventoEntrada);
+        jPanelEventoEntrada.setLayout(jPanelEventoEntradaLayout);
+        jPanelEventoEntradaLayout.setHorizontalGroup(
+            jPanelEventoEntradaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelEventoEntradaLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelEventoEntradaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelEventoEntradaLayout.createSequentialGroup()
+                        .addComponent(displaySingleEvtCarEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jLabel36, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanelEventoEntradaLayout.setVerticalGroup(
+            jPanelEventoEntradaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelEventoEntradaLayout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(jLabel36)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(displaySingleEvtCarEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        radialLcdDiametro.setLedColor(eu.hansolo.steelseries.tools.LedColor.GREEN_LED);
+        radialLcdDiametro.setLedVisible(false);
+        radialLcdDiametro.setMaxMeasuredValueVisible(true);
+        radialLcdDiametro.setMaxValue(500.0);
+        radialLcdDiametro.setName(""); // NOI18N
+        radialLcdDiametro.setThreshold(500.0);
+        radialLcdDiametro.setThresholdVisible(true);
+        radialLcdDiametro.setTickLabelPeriod(50);
+        radialLcdDiametro.setTrackRange(100.0);
+        radialLcdDiametro.setTrackSection(50.0);
+        radialLcdDiametro.setTrackSectionColor(new java.awt.Color(0, 255, 0));
+        radialLcdDiametro.setTrackStart(10.0);
+        radialLcdDiametro.setTrackStartColor(new java.awt.Color(255, 0, 0));
+        radialLcdDiametro.setTrackVisible(true);
+
+        lightBulb1.setGlowColor(new java.awt.Color(255, 0, 0));
+
+        javax.swing.GroupLayout jpProducaoLayout = new javax.swing.GroupLayout(jpProducao);
+        jpProducao.setLayout(jpProducaoLayout);
+        jpProducaoLayout.setHorizontalGroup(
+            jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jpProducaoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jpProducaoLayout.createSequentialGroup()
+                        .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jSeparator7, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jSeparator5)
+                            .addComponent(jSeparator6)
+                            .addGroup(jpProducaoLayout.createSequentialGroup()
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 567, Short.MAX_VALUE))
+                            .addGroup(jpProducaoLayout.createSequentialGroup()
+                                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel23)
+                                    .addGroup(jpProducaoLayout.createSequentialGroup()
+                                        .addComponent(jLabel24)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jLabelProducaoOF))
+                                    .addGroup(jpProducaoLayout.createSequentialGroup()
+                                        .addComponent(jLabel25)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jLabelProducaoCodItem)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jLabel26)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jLabelProducaoDescricaoItem))
+                                    .addGroup(jpProducaoLayout.createSequentialGroup()
+                                        .addComponent(jLabel32)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jLabelProducaoDMinimo)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jLabel33)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jLabelProducaoDnominal)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jLabel34)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jLabelProducaoDMaximo)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jLabel35)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jLabelProducaoVelIdeal))
+                                    .addGroup(jpProducaoLayout.createSequentialGroup()
+                                        .addComponent(jLabel27)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jLabelProducaoQtdProg)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jLabel28)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jLabelProducaoQtdProd)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jLabel29)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jLabelProducaoMetTotalProg)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jLabel30)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jLabelProducaoMetTotalProd)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jLabel31)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jLabelProducaoMetCarretel, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addContainerGap())
+                    .addGroup(jpProducaoLayout.createSequentialGroup()
+                        .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(radialLcdVelocidade, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
+                            .addComponent(radialLcdDiametro, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .addGap(18, 18, 18)
+                        .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(linearCarretelSaida, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(linearProgramacao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(jpProducaoLayout.createSequentialGroup()
+                                .addComponent(jPanelEventoEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lightBulb1, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))))))
+        );
+        jpProducaoLayout.setVerticalGroup(
+            jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jpProducaoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel23)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabelProducaoOF))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel27)
+                    .addComponent(jLabelProducaoQtdProg)
+                    .addComponent(jLabel28)
+                    .addComponent(jLabelProducaoQtdProd)
+                    .addComponent(jLabel29)
+                    .addComponent(jLabelProducaoMetTotalProg)
+                    .addComponent(jLabel30)
+                    .addComponent(jLabelProducaoMetTotalProd)
+                    .addComponent(jLabel31)
+                    .addComponent(jLabelProducaoMetCarretel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel25)
+                    .addComponent(jLabelProducaoCodItem)
+                    .addComponent(jLabel26)
+                    .addComponent(jLabelProducaoDescricaoItem))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel32)
+                    .addComponent(jLabelProducaoDMinimo)
+                    .addComponent(jLabel33)
+                    .addComponent(jLabelProducaoDnominal)
+                    .addComponent(jLabel34)
+                    .addComponent(jLabelProducaoDMaximo)
+                    .addComponent(jLabel35)
+                    .addComponent(jLabelProducaoVelIdeal))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jSeparator6, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSeparator7, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jpProducaoLayout.createSequentialGroup()
+                        .addComponent(linearCarretelSaida, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(linearProgramacao, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jPanelEventoEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lightBulb1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jpProducaoLayout.createSequentialGroup()
+                        .addComponent(radialLcdVelocidade, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(radialLcdDiametro, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jpRoot.add(jpProducao, "jpProducao");
+
         getContentPane().add(jpRoot, java.awt.BorderLayout.CENTER);
 
         menuLogin.setText("Incial");
@@ -869,6 +1047,14 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             }
         });
         menuLogin.add(jMenuItemDesligar);
+
+        jMenuItemReiniciar.setText("Reiniciar");
+        jMenuItemReiniciar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemReiniciarActionPerformed(evt);
+            }
+        });
+        menuLogin.add(jMenuItemReiniciar);
 
         menuPrincipal.add(menuLogin);
 
@@ -939,6 +1125,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         setJMenuBar(menuPrincipal);
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItemProgramacaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemProgramacaoActionPerformed
@@ -1064,6 +1251,44 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         cfg.setVisible(true);
     }//GEN-LAST:event_jMenuConfigSerialRFIDActionPerformed
 
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // TODO add your handling code here:
+        //System.out.println("Fechando");
+        if(login.getNivel().equals("0")) {
+            setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        }else{
+            setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        }
+    }//GEN-LAST:event_formWindowClosing
+
+    private void formWindowIconified(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowIconified
+        // TODO add your handling code here:           
+        if(!login.getNivel().equals("0"))  setExtendedState(MAXIMIZED_BOTH);
+    }//GEN-LAST:event_formWindowIconified
+
+    private void formWindowStateChanged(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowStateChanged
+        // TODO add your handling code here:
+        //System.out.println("formWindowStateChanged");
+        if(!login.getNivel().equals("0"))
+            setExtendedState(MAXIMIZED_BOTH);        
+    }//GEN-LAST:event_formWindowStateChanged
+
+    private void formWindowDeactivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowDeactivated
+        // TODO add your handling code here:
+        //System.out.println("formWindowDeactivated");
+        if(!login.getNivel().equals("0"))
+            setExtendedState(MAXIMIZED_BOTH);          
+    }//GEN-LAST:event_formWindowDeactivated
+
+    private void jMenuItemReiniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemReiniciarActionPerformed
+        try {
+            // TODO add your handling code here:
+            Runtime.getRuntime().exec("reboot");
+        } catch (IOException ex) {
+            Logger.getLogger(JFPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jMenuItemReiniciarActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1090,7 +1315,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-            new JFPrincipal().setVisible(true);   
+            new JFPrincipal().setVisible(true);     
+            
             if(codMaquina==null){
                 JOptionPane.showMessageDialog(null, "Não foi encontrada uma maquina cadastrada para este sistema",
                         "Registro necessário",JOptionPane.ERROR_MESSAGE);
@@ -1166,15 +1392,9 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private org.pushingpixels.trident.swing.AWTPropertyInterpolators aWTPropertyInterpolators1;
-    private eu.hansolo.steelseries.gauges.Altimeter altimeter1;
-    private org.pushingpixels.trident.android.AndroidPropertyInterpolators androidPropertyInterpolators1;
-    private org.pushingpixels.trident.android.AndroidToolkitHandler androidToolkitHandler1;
-    private eu.hansolo.steelseries.gauges.Clock clock1;
-    private eu.hansolo.steelseries.gauges.Compass compass1;
-    private eu.hansolo.steelseries.gauges.Compass compass2;
-    private org.pushingpixels.trident.interpolator.CorePropertyInterpolators corePropertyInterpolators1;
-    private eu.hansolo.steelseries.gauges.DigitalRadial digitalRadial1;
+    private eu.hansolo.steelseries.gauges.DisplaySingle displaySingleEvtCarEntrada;
+    private eu.hansolo.steelseries.gauges.DisplaySingle displaySingleMetragemCarretel;
+    private eu.hansolo.steelseries.gauges.DisplaySingle displaySingleMetragemProgramado;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -1204,6 +1424,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JLabel jLabel33;
     private javax.swing.JLabel jLabel34;
     private javax.swing.JLabel jLabel35;
+    private javax.swing.JLabel jLabel36;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
@@ -1229,9 +1450,11 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JMenuItem jMenuItemParadas;
     private javax.swing.JMenuItem jMenuItemProducao;
     private javax.swing.JMenuItem jMenuItemProgramacao;
+    private javax.swing.JMenuItem jMenuItemReiniciar;
     private javax.swing.JMenuItem jMenuItemSair;
     private javax.swing.JMenuItem jMenuTrocarMaquina;
     private javax.swing.JPanel jPLogo;
+    private javax.swing.JPanel jPanelEventoEntrada;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
@@ -1269,12 +1492,18 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JTextField jtfUserDafaut;
     private javax.swing.JTextField jtfUsuarioProducao;
     private javax.swing.JTextField jtfUsuarioTeste;
+    private eu.hansolo.lightbulb.LightBulb lightBulb1;
+    private org.pushingpixels.trident.ease.Linear linear1;
+    private eu.hansolo.steelseries.gauges.Linear linearCarretelSaida;
+    private eu.hansolo.steelseries.gauges.Linear linearProgramacao;
     private javax.swing.JMenu menuConfiguracoes;
     private javax.swing.JMenu menuLogin;
     private javax.swing.JMenu menuParadas;
     private javax.swing.JMenuBar menuPrincipal;
     private javax.swing.JMenu menuProducao;
     private javax.swing.JMenu menuProgramacao;
+    private eu.hansolo.steelseries.gauges.Radial4Lcd radialLcdDiametro;
+    private eu.hansolo.steelseries.gauges.Radial4Lcd radialLcdVelocidade;
     // End of variables declaration//GEN-END:variables
 
     private void limparCamposConfigDefault() {
@@ -1311,12 +1540,13 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     }
     
     private void buscarInformaçoesProducao(){
-        Producao prod = new Producao();
+        
         ProducaoDAO daoProd = new ProducaoDAO();
         prod = daoProd.buscaItemProducao(codMaquina);
         if(prod != null){
-            ProgramacaoMaquina prog = new ProgramacaoMaquina();
+            
             ProgramacaoMaquinaDAO daoProg = new ProgramacaoMaquinaDAO();
+            ProdutoCarretelDAO daoProdCar =  new ProdutoCarretelDAO();
             prog = daoProg.buscaProgramacaoLoteItem(prod.getLoteProducao(),prod.getItemProducao());
             if(prog != null){
                 jLabelProducaoCodItem.setText(prod.getItemProducao());
@@ -1330,10 +1560,10 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 jLabelProducaoDnominal.setText(String.valueOf(prog.getProduto().getDiametroNominal()));
                 jLabelProducaoDMaximo.setText(String.valueOf(prog.getProduto().getDiametroMaximo()));
                 jLabelProducaoMetTotalProd.setText(String.valueOf(daoProd.BuscaMetragemProduzida(prod.getLoteProducao(),prod.getItemProducao())));
-                ProdutoMaquina prodMaq = new ProdutoMaquina();
                 ProdutoMaquinaDAO daoProdMaq = new ProdutoMaquinaDAO();
-                prodMaq = daoProdMaq.buscaVelocidadeProdutoMaquina(prod.getItemProducao(), codMaquina);
-                jLabelProducaoVelIdeal.setText(String.valueOf(prodMaq.getVelocidade())+ " " + prodMaq.getUnidade());
+                prodmaq = daoProdMaq.buscaVelocidadeProdutoMaquina(prod.getItemProducao(), codMaquina);
+                prodCar = daoProdCar.buscaDadosProdutoCarretel(prod.getItemProducao(),"0131250",codMaquina);
+                jLabelProducaoVelIdeal.setText(String.valueOf(prodmaq.getVelocidade())+ " " + prodmaq.getUnidade());
                 buscarRegistrosObservacaoPesagem();
             }else{
                 JOptionPane.showMessageDialog(rootPane,"Falha ao busrcar dados da programação do item em produção, "
@@ -1356,8 +1586,18 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
 
     private void abrirTelaProducao() {
         limparJTable(jTableProducaoArrebentamentos);
-        limparJTable(jTableProducaoParadas);        
+        limparJTable(jTableProducaoParadas);
+        if(comMicrometro==null) comMicrometro = new SerialTxRx();
+        if(parametrizarSerial(SERIAL_MICROMETRO)){
+            if(comMicrometro.iniciaSerial()){
+                System.out.println("serial Micrometro iniciada");
+                comMicrometro.addActionListener(this);
+            }
+        }
         buscarInformaçoesProducao();
+        AjustarMostradorVelocidade();
+        AjustarMostradoresMetragem();
+        this.tarefaVelocidade();
         CardLayout card = (CardLayout) jpRoot.getLayout();
         card.show(jpRoot,"jpProducao");
     }
@@ -1369,28 +1609,44 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         login.setNivel("");
         login.setSenha("");
         login.setCode("");
-        if(true) limparTelaLogin(); //apenas para teste, passar para true em producao
+        if(false) limparTelaLogin(); //apenas para teste, passar para true em producao
         bloquearMenu();
-        parametrizarSerial(SERIAL_RFID);
-        if(comRFID.iniciaSerial()){
-            System.out.println("serial RFID iniciada");
-            comRFID.addActionListener(this);
-        }            
+        if(parametrizarSerial(SERIAL_RFID)){
+            if(comRFID.iniciaSerial()){
+                System.out.println("serial RFID iniciada");
+                comRFID.addActionListener(this);
+            }            
+        }
         CardLayout card = (CardLayout) jpRoot.getLayout();
         card.show(jpRoot,"jpLogin");
     }
-    private void parametrizarSerial(String configName ){
+    private boolean parametrizarSerial(String configName ){
         ControllerConfigSerialPort cfg = new ControllerConfigSerialPort();
         if(configName.equals(SERIAL_RFID)){
             if(comRFID!=null){               
-               comRFID = cfg.configurarPortaSerial(configName);
-               if(comRFID != null){
+               comRFID = cfg.configurarPortaSerial(configName,identificador);
+               if(comRFID!=null){                   
                    System.out.println("Serial comfigurada com sucesso!! " + comRFID.getSerialPortName());
-               }else{
+                   return true;
+               }else{                   
                    System.out.println("Falha ao configurar porta serial");
+                   return false;
                }                    
            }
         }
+        if(configName.equals(SERIAL_MICROMETRO)){
+            if(comMicrometro!=null){               
+               comMicrometro = cfg.configurarPortaSerial(configName,identificador);
+               if(comMicrometro!=null){                   
+                   System.out.println("Serial do micrometro comfigurada com sucesso!! " + comMicrometro.getSerialPortName());
+                   return true;
+               }else{                   
+                   System.out.println("Falha ao configurar porta serial para comunicação com micrometro");
+                   return false;
+               }                    
+           }
+        }
+        return false;
     }
     private void buscarRegistrosObservacaoPesagem() {
         List<Pesagem> lista = new ArrayList<Pesagem>();
@@ -1410,14 +1666,121 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        String code="";
-        if(!login.getCode().equals(e.getActionCommand())){
-            System.out.println("Evento: " + e.getActionCommand());        
+    public void actionPerformed(ActionEvent e) {            
+        if(e.getActionCommand().trim().equals("")) return;
+        System.out.println(e.getActionCommand());
+        if(e.getActionCommand().substring(0,3).equalsIgnoreCase("TAG")){
+            tagEvent(e.getActionCommand());
+        }else{
+            if(e.getActionCommand().equals("**********  Troca de bobina  - Novo relatorio  **********")){
+                Object[] options = { "Sim", "Não" }; 
+                int i = JOptionPane.showOptionDialog(null, "Deseja realizar uma troca de carretel de saída?", 
+                        "Troca de carretel", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, 
+                        null, options, options[0]); 
+                if (i == JOptionPane.YES_OPTION) {
+                    System.out.println("Apontar pesagem e trocar carretel de saida"); 
+                }else{
+                    leituraAnterior.setMetragem(0);
+                    System.out.println("Metragem leitura anterior: " + leituraAnterior.getMetragem());
+                    return;
+                }
+            }
+            dadosSerialMicrometro(e.getActionCommand());
+        }                        
+    }
+    
+    private void dadosSerialMicrometro(String dados){
+        double tempoCalculadoSistema;
+        double metrosProduzidos;
+        double velocidade;
+        try {                    
+            
+            if(!iniciaLeituras){
+                double metAnterior = (double) leituraAnterior.getMetragem();
+                leituraAtual = mic.setarDadosMicrometro(dados);               
+                tempoCalculadoSistema = (double)(System.currentTimeMillis() - tempoSistema);                
+                double metAtual = (double) leituraAtual.getMetragem();
+                
+                if(metAnterior < metAtual) {
+                    metrosProduzidos = metAtual - metAnterior;
+                    AtualizarMostradoresMetragem(metrosProduzidos);
+                    AtualiMostradorParadaEntrada(metrosProduzidos);
+                    //System.out.println("Tempo calculado pelo sistema: " + (tempoCalculadoSistema / 1000.0));
+                    velocidade = (metrosProduzidos/(tempoCalculadoSistema/1000.0));
+                    tempoSistema = System.currentTimeMillis();
+                    //System.out.println("Metros Produzidos: " + metrosProduzidos);
+                    //System.out.println("tempo sistema: " + tempoSistema);    
+                    //System.out.println("Velocidade: " + velocidade + "m/s");
+                    //System.out.println("Velocidade pelo tempo micrimetro: " + velocidadePeloTempoMicrometro + "m/s");
+                    //System.out.println("Velocidade: " + (velocidade * 60) + "m/min");
+                    //System.out.println("Velocidade pelo tempo micrometro: " + (velocidadePeloTempoMicrometro * 60) + "m/min");  
+                    //System.out.println("Media velocidade " + mediaVelocidade(velocidade)*60);                 
+                    ProducaoDAO daoProd = new ProducaoDAO();                    
+                    if(daoProd.atualizaMetragemProduzida(codMaquina, String.valueOf(metrosProduzidos))) 
+                        leituraAnterior = mic.setarDadosMicrometro(dados);  
+                    double velMediana = mediaVelocidade(velocidade*60);                    
+                    //System.out.println("Mediana: " + velMediana);
+                    resumoRelatorio = 0;
+                    radialLcdVelocidade.setValueAnimated(velMediana);                             
+                    maqParada = false;
+                    if(velMediana < radialLcdVelocidade.getTrackStart()){
+                        System.out.println("Parada por velocidade abaixo da minima");
+                    }
+                }else{
+                    if(resumoRelatorio >= linhas){
+                        radialLcdVelocidade.setValueAnimated(mediaVelocidade(0));
+                        if (radialLcdVelocidade.getValue()==0) System.out.println("Parada!!!");      
+                    }else{
+                        resumoRelatorio ++;
+                        System.out.println("Resumo relatoio: " + resumoRelatorio);
+                    }
+                }
+            }else{            
+                iniciarLeiturasSerial(dados);
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    private void iniciarLeiturasSerial(String dados){
+        try {
+            leituraAnterior = mic.setarDadosMicrometro(dados);
+            leituraAtual = mic.setarDadosMicrometro(dados);
+            tempoSistema = System.currentTimeMillis();
+            iniciaLeituras = false;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    private double mediaVelocidade(double ultimaVel){
+        double media=0;
+        int interacaoes=0;
+        try {                    
+            for (int i=8;i>=0;i--){
+                mediaVel[i+1]=mediaVel[i];    
+            } 
+            mediaVel[0]=ultimaVel;
+            for (int i=0;i<=9;i++){
+                //if(mediaVel[i]>=1){
+                    media = media + mediaVel[i];
+                    interacaoes = interacaoes + 1;
+                //}
+            }
+            media = media / interacaoes;            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return media;
+    }
+    private void tagEvent(String tag){        
+        String code=tag.substring(3,tag.length());
+        if(!login.getCode().equals(code)){
+            //System.out.println("Evento: " + code);        
             if(!login.getCode().trim().equals("")){
                 code = login.getCode();
             }
-            login.setCode(e.getActionCommand());              
+            login.setCode(code);              
             if(login.logarCode(login)){
                 Usuariologado();            
             }else{
@@ -1426,7 +1789,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             }        
         }
     }
-
+    
     private void Usuariologado() {
         if(!login.getNome().trim().equals("")) bloquearMenu();
             habilitarMenu();
@@ -1434,4 +1797,69 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 + " e nivel de permissão: " + login.getNivel()); 
             abrirTelaProducao();           
         }
+
+    private void AjustarMostradorVelocidade() {
+        try {
+            double maxVel = (double) prodmaq.getVelocidade() * 2;
+            double alvoVel = (double) prodmaq.getVelocidade();
+            double startTrack = (double) (alvoVel * maquina.getAlertaPercentualVelocidade());
+            double rangeVel = (double) (maxVel - (2 * startTrack));
+            System.out.println("Unidade: " + prodmaq.getUnidade());
+            radialLcdVelocidade.setUnitString(prodmaq.getUnidade());
+            radialLcdVelocidade.setTitle("Velocidade");
+            radialLcdVelocidade.setMaxMeasuredValueVisible(true);
+            radialLcdVelocidade.setMaxValue(maxVel);
+            radialLcdVelocidade.setTrackStart(startTrack);
+            radialLcdVelocidade.setTrackRange(rangeVel); 
+            radialLcdVelocidade.setTrackSection(alvoVel);
+            radialLcdVelocidade.setThreshold(alvoVel);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void AjustarMostradoresMetragem() {
+        try {
+            double metProgramada = (double) prog.getMetragemProgramada();
+            double metMaxima = (double) prodCar.getMetragemMaxima();
+            double metProduzida = (double) prod.getMetragemProduzida();
+            double metTotalProduzida = Double.valueOf(jLabelProducaoMetTotalProd.getText());
+            metTotalProduzida = metTotalProduzida + metProduzida;
+            double metTotalProgramada = Double.valueOf(jLabelProducaoMetTotalProg.getText());
+            double metAlvo = ((metProgramada / metMaxima) * 100);
+            //System.out.println("Met Alvo: " + metAlvo);            
+            linearCarretelSaida.setThreshold(metAlvo);
+            linearCarretelSaida.setThresholdVisible(true);
+            linearCarretelSaida.setValueAnimated((metProduzida/metMaxima)*100);
+            displaySingleMetragemCarretel.setValue(metProduzida);
+            displaySingleMetragemProgramado.setValue(metTotalProduzida);
+            double percProduzido = (metTotalProduzida/metTotalProgramada) * 100;
+            linearProgramacao.setValueAnimated(percProduzido);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private void AtualizarMostradoresMetragem( double metrosProduzidos){
+        try {       
+            if(metrosProduzidos>0){
+                displaySingleMetragemCarretel.setValue(displaySingleMetragemCarretel.getValue() + metrosProduzidos);
+                displaySingleMetragemProgramado.setValue(displaySingleMetragemProgramado.getValue() + metrosProduzidos);
+                linearProgramacao.setValue((displaySingleMetragemProgramado.getValue() / prog.getMetragemTotalProgramada()) * 100);            
+                linearCarretelSaida.setValue((displaySingleMetragemCarretel.getValue() / prodCar.getMetragemMaxima())*100);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void AtualiMostradorParadaEntrada(double metrosProduzidos) {
+        try {
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }                                 

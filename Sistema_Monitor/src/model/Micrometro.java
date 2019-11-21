@@ -8,13 +8,13 @@ public class Micrometro {
     private int metragem;
     private Time micrometroHora;
     private Date micrometroData;
-    private Produto produto;
     private float diametroMedio;
     private float desvio;
     private float diametroMaximo;
     private float diametroMinimo;
 
     public Micrometro() {
+        micrometroHora= Time.valueOf("99:99:99");        
     }
 
     public int getMetragem() {
@@ -40,15 +40,6 @@ public class Micrometro {
     public void setMicrometroData(Date micrometroData) {
         this.micrometroData = micrometroData;
     }
-
-    public Produto getProduto() {
-        return produto;
-    }
-
-    public void setProduto(Produto produto) {
-        this.produto = produto;
-    }
-
 
     public float getDiametroMedio() {
         return diametroMedio;

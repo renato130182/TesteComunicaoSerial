@@ -6,7 +6,6 @@
 package controller;
 
 import Serial.SerialTxRx;
-import dao.ConexaoDatabase;
 import dao.ConfigSerialDAO;
 import model.ConfigSerialPort;
 
@@ -14,20 +13,22 @@ import model.ConfigSerialPort;
  *
  * @author renato.soares
  */
-public class ControllerConfigSerialPort {    
-    public SerialTxRx configurarPortaSerial(String configName){
+public class ControllerConfigSerialPort {   
+    
+    
+    public SerialTxRx configurarPortaSerial(String configName, String maqSerial){
         ConfigSerialPort cfg =  new ConfigSerialPort();                
         ConfigSerialDAO dao = new ConfigSerialDAO();
         SerialTxRx conn = new SerialTxRx();
-        cfg=dao.buscaDadosConfigSerial(configName);
-        if(cfg != null){
+        cfg=dao.buscaDadosConfigSerial(configName,maqSerial);
+        if(!cfg.getSerialPortName().trim().equals("")){
             conn.setDATA_BITS(cfg.getDataBits());
             conn.setDATA_RATE(cfg.getDataRate());
             conn.setFLOW_CONTROL(cfg.getFlowControl());
             conn.setPARITY(cfg.getParity());
             conn.setSTOP_BITS(cfg.getStopBits());
             conn.setSerialPortName(cfg.getSerialPortName());
-            conn.setTIME_OUT(cfg.getTimeOut());
+            conn.setTIME_OUT(cfg.getTimeOut());            
             return conn;
         }
         return null;

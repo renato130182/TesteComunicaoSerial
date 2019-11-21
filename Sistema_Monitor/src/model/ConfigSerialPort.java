@@ -11,6 +11,7 @@ package model;
  */
 public class ConfigSerialPort {
     private String configName;
+    private String serialMaquina;
     private int timeOut;
     private int dataBits;
     private int stopBits;
@@ -18,8 +19,25 @@ public class ConfigSerialPort {
     private int flowControl;
     private int dataRate;
     private String serialPortName;
-
+    
     public ConfigSerialPort() {
+        configName = "";
+        serialMaquina="";
+        timeOut=1000;
+        dataBits=8;
+        stopBits=1;
+        parity=0;
+        flowControl=0;
+        dataRate=9600;
+        serialPortName="";
+    }
+
+    public String getSerialMaquina() {
+        return serialMaquina;
+    }
+
+    public void setSerialMaquina(String serialMaquina) {
+        this.serialMaquina = serialMaquina;
     }
     
     

@@ -276,7 +276,6 @@
                 <StringItem index="9" value="115200"/>
               </StringArray>
             </Property>
-            <Property name="selectedIndex" type="int" value="5"/>
           </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>

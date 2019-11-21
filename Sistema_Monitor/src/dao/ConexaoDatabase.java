@@ -43,11 +43,11 @@ public class ConexaoDatabase extends DadosConexao{
             }else{
                 man.setArquivo(DadosDefaultDAO.getARQDBTESTE());
             }
-            System.out.println("Arquivo: " + man.getArquivo());
+            //System.out.println("Arquivo: " + man.getArquivo());
             man.BuscarArquivo();
             String arqCripto = man.getDados().trim();        
             String[] dadosConexao = CriptoCode.decrypt(CriptoCode.converterStringByte(arqCripto, " ")).split(";");
-            System.out.println("Dados da conexao: " + dadosConexao[3]);
+            //System.out.println("Dados da conexao: " + dadosConexao[3]);
             if(dadosConexao.length==6){
                 this.driverName=dadosConexao[0];
                 this.myDatabase=dadosConexao[1];
@@ -69,7 +69,7 @@ public class ConexaoDatabase extends DadosConexao{
      public java.sql.Connection getConnection() {                    
          try {
              //Carregando driver JDBC      
-             System.out.println("Drive: " + driverName);
+             //System.out.println("Drive: " + driverName);
              Class.forName(driverName);
              //Configurações da caonexão
              /*

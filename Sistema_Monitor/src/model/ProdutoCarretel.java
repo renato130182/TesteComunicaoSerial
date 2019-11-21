@@ -2,31 +2,13 @@ package model;
 
 public class ProdutoCarretel {
 
-    private Produto produto;
-    private Carretel carretel;
     private int metragemPadrao;
     private int metragemMaxima;
 
     public ProdutoCarretel() {
+        metragemMaxima = 0;
+        metragemPadrao = 0;
     }
-
-    public Produto getProduto() {
-        return produto;
-    }
-
-    public void setProduto(Produto produto) {
-        this.produto = produto;
-    }
-
-    public Carretel getCarretel() {
-        return carretel;
-    }
-
-    public void setCarretel(Carretel carretel) {
-        this.carretel = carretel;
-    }
-
-   
 
     public int getMetragemPadrao() {
         return metragemPadrao;

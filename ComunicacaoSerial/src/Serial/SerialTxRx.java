@@ -41,7 +41,7 @@ public class SerialTxRx implements SerialPortEventListener{
     private int PARITY=0;
     private int FLOW_CONTROL=0;
 
-    private String serialPortName = "COM3";
+    private String serialPortName = "";
     private String[] portas;
     private String[] tipoPortas;
     
@@ -100,12 +100,12 @@ public class SerialTxRx implements SerialPortEventListener{
     }
     public synchronized boolean close(){
         try {            
-            if(serialPort != null){
+            //if(serialPort != null){
                 
                 serialPort.close(); 
                 serialPort.removeEventListener();
                 
-            }
+            //}
             return true;
         } catch (Exception e) {
             return false;

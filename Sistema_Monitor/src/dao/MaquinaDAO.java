@@ -47,8 +47,8 @@ public class MaquinaDAO {
                 if(res.next()){                  
                     maq.setCodigo(res.getString("maq.codigo"));
                     maq.setDescricao(res.getString("maq.descricao"));
-                    maq.setAlertaMetrosParaArrebentamento(0);
-                    maq.setAlertaPercentualVelocidade(0.f);
+                    maq.setAlertaMetrosParaArrebentamento(res.getInt("metros_arrebentamento"));
+                    maq.setAlertaPercentualVelocidade(res.getFloat("percentual_velocidade_parada"));
                     db.desconectar();
                     return maq;
                 }else{

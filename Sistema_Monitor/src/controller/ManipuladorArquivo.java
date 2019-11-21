@@ -23,7 +23,7 @@ public class ManipuladorArquivo {
     private String arquivo;  
 
     public ManipuladorArquivo() {
-        System.out.println("Iniciando manipulador de arquivos");
+        //System.out.println("Iniciando manipulador de arquivos");
         dados = "";
         arquivo ="";
     }
@@ -51,7 +51,7 @@ public class ManipuladorArquivo {
             
             try (BufferedReader buffer = new BufferedReader(new FileReader(this.arquivo))) {
                 this.setDados(buffer.readLine());
-                System.out.println("dados bufferizados: " + this.getDados()) ;
+                //System.out.println("dados bufferizados: " + this.getDados()) ;
             }
             
         } catch (FileNotFoundException ex) {
@@ -65,7 +65,7 @@ public class ManipuladorArquivo {
         try {
             try (BufferedWriter buffWrite = new BufferedWriter(new FileWriter(this.arquivo))) {   
                 buffWrite.append(this.dados);
-                System.out.println("caminho gravado: " + this.arquivo);    
+                //System.out.println("caminho gravado: " + this.arquivo);    
             }
         } catch (IOException ex) {
             Logger.getLogger(ManipuladorArquivo.class.getName()).log(Level.SEVERE, null, ex);

@@ -7,6 +7,7 @@ package view;
 
 import Serial.SerialTxRx;
 import dao.ConfigSerialDAO;
+import java.lang.reflect.Field;
 import javax.swing.JOptionPane;
 import model.ConfigSerialPort;
 
@@ -16,6 +17,8 @@ import model.ConfigSerialPort;
  */
 public class JFConfigSerialRFID extends javax.swing.JFrame {
     SerialTxRx serialPorts = new SerialTxRx();
+    
+    ConfigSerialDAO dao = new ConfigSerialDAO();
     private String configName;
     
     /**
@@ -23,8 +26,7 @@ public class JFConfigSerialRFID extends javax.swing.JFrame {
      */
     public JFConfigSerialRFID() {
         initComponents();
-        CarregaPortasDisponiveis();
-        
+        CarregaPortasDisponiveis();        
     }
     
     private void CarregaPortasDisponiveis(){
@@ -41,6 +43,7 @@ public class JFConfigSerialRFID extends javax.swing.JFrame {
         }else{
           jButtonSalvar.setEnabled(false);
        }
+       serialPorts.close();
     }
 
     /**
@@ -77,7 +80,7 @@ public class JFConfigSerialRFID extends javax.swing.JFrame {
         jPanel1.setBackground(new java.awt.Color(204, 255, 255));
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel1.setText("Configurações da comunicação seria para RFID:");
+        jLabel1.setText("Configurações da comunicação serial para RFID:");
 
         jLabel2.setText("Portas disponíveis:");
 
@@ -196,7 +199,14 @@ public class JFConfigSerialRFID extends javax.swing.JFrame {
 
     private void jButtonSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSalvarActionPerformed
         // TODO add your handling code here:
-        ConfigSerialPort conn = new ConfigSerialPort();        
+        boolean nova,regs;
+        ConfigSerialPort conn = new ConfigSerialPort();  
+        conn = dao.buscaDadosConfigSerial(configName,JFPrincipal.getIdentificador());        
+        if(!conn.getSerialMaquina().trim().equals("")){
+            nova = false;            
+        }else{
+            nova = true;            
+        }        
         conn.setSerialPortName(cmbPorta.getSelectedItem().toString());
         conn.setDataRate(Integer.parseInt(cmbBaudRate.getSelectedItem().toString()));
         conn.setDataBits(Integer.parseInt(cmbBitsDados.getSelectedItem().toString()));        
@@ -204,12 +214,26 @@ public class JFConfigSerialRFID extends javax.swing.JFrame {
         conn.setParity(cmbParidade.getSelectedIndex());
         conn.setFlowControl(cmbControleFluxo.getSelectedIndex());
         conn.setConfigName(configName);
-        ConfigSerialDAO dao = new ConfigSerialDAO();
-        if(dao.AtualizarConfigSerial(conn)){
+        conn.setSerialMaquina(JFPrincipal.getIdentificador());
+        conn.setTimeOut(1000);
+        if(nova){
+            if(dao.adicionarNovaConfigSerial(conn)){
+                regs = true;
+            }else{
+                regs = false;
+            }
+        }else{
+            if(dao.AtualizarConfigSerial(conn)){
+                regs = true;                
+            }else{
+                regs = false;                
+            }     
+        }
+        if(regs){
             JOptionPane.showMessageDialog(rootPane,"Configuração atualizada com sucesso!","Configuração atualizada",JOptionPane.OK_OPTION);
         }else{
             JOptionPane.showMessageDialog(rootPane,"Falha ao atualizar os dados da configuração, por favor tente novamente.","Falha...",JOptionPane.ERROR_MESSAGE);
-        }        
+        }
     }//GEN-LAST:event_jButtonSalvarActionPerformed
 
 
@@ -235,5 +259,5 @@ public class JFConfigSerialRFID extends javax.swing.JFrame {
 
     public void setConfigName(String configName) {
         this.configName = configName;
-    }
+    }  
 }

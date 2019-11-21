@@ -152,7 +152,6 @@ public class FramePrincipal extends javax.swing.JFrame implements ActionListener
         jLabel8.setText("Controle de Fluxo:");
 
         cmbBaudRate.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "110", "300", "1200", "2400", "4800", "9600", "19200", "38400", "56700", "115200" }));
-        cmbBaudRate.setSelectedIndex(5);
 
         cmbBitsDados.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "5", "6", "7", "8" }));
         cmbBitsDados.setSelectedIndex(3);

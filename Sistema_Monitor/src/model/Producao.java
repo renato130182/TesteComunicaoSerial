@@ -12,8 +12,13 @@ package model;
 public class Producao {
     private  String loteProducao;
     private String itemProducao;
-    private String metragemProduzida;
+    private long metragemProduzida;
+    private String carretelSaida;
     public Producao() {
+        loteProducao = "";
+        itemProducao = "";
+        metragemProduzida =0;
+        carretelSaida = "";
     }
 
     public String getLoteProducao() {
@@ -32,11 +37,19 @@ public class Producao {
         this.itemProducao = itemProducao;
     }
 
-    public String getMetragemProduzida() {
+    public String getCarretelSaida() {
+        return carretelSaida;
+    }
+
+    public void setCarretelSaida(String carretelSaida) {
+        this.carretelSaida = carretelSaida;
+    }
+
+    public long getMetragemProduzida() {
         return metragemProduzida;
     }
 
-    public void setMetragemProduzida(String metragemProduzida) {
+    public void setMetragemProduzida(long metragemProduzida) {
         this.metragemProduzida = metragemProduzida;
     }
     
