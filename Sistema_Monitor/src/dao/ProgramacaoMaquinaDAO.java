@@ -23,7 +23,7 @@ public class ProgramacaoMaquinaDAO {
     private String sql;
     
     public List<ProgramacaoMaquina> buscaProgramacaoMaquina(String codMaquina){
-        List<ProgramacaoMaquina> lista = new ArrayList<ProgramacaoMaquina>();
+        List<ProgramacaoMaquina> lista = new ArrayList<>();
         ConexaoDatabase db = new ConexaoDatabase();
         if(db.equals(db)){
             try {
@@ -47,6 +47,7 @@ public class ProgramacaoMaquinaDAO {
                    prog.setDataProgramada(res.getString("prog.datacadastro"));
                    lista.add(prog);
                 }
+                conec.close();
                 return lista;
             } catch (SQLException ex) {
                 Logger.getLogger(ProgramacaoMaquinaDAO.class.getName()).log(Level.SEVERE, null, ex);

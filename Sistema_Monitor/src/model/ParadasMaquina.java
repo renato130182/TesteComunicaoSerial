@@ -1,34 +1,31 @@
 package model;
 
-public class ParadasMaquina extends Paradas {
+import java.util.ArrayList;
+import java.util.List;
 
-    private Paradas paradas;
-    private Maquina maquina;
-    private int codigoParadaMaquina;
+public class ParadasMaquina {
 
-    public Paradas getParadas() {
-        return paradas;
+    private List<Paradas> listaParadas;
+    private String cod_maquina;
+
+    public ParadasMaquina() {
+        this.listaParadas = new ArrayList<>();
     }
 
-    public void setParadas(Paradas paradas) {
-        this.paradas = paradas;
+    public List<Paradas> getListaParadas() {
+        return listaParadas;
     }
 
-    public Maquina getMaquina() {
-        return maquina;
+    public void setListaParadas(List<Paradas> listaParadas) {
+        this.listaParadas = listaParadas;
+    }
+    
+    public String getCod_maquina() {
+        return cod_maquina;
     }
 
-    public void setMaquina(Maquina maquina) {
-        this.maquina = maquina;
-    }
-
-
-    public int getCodigoParadaMaquina() {
-        return codigoParadaMaquina;
-    }
-
-    public void setCodigoParadaMaquina(int codigoParadaMaquina) {
-        this.codigoParadaMaquina = codigoParadaMaquina;
+    public void setCod_maquina(String cod_maquina) {
+        this.cod_maquina = cod_maquina;
     }
 
 }

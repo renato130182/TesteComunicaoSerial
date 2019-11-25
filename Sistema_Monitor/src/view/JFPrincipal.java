@@ -36,6 +36,7 @@ import model.Usuario;
 import Serial.*;
 import controller.ControllerConfigSerialPort;
 import controller.ControllerMicrometro;
+import controller.ControllerParadasMaquina;
 import dao.ProdutoCarretelDAO;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -53,9 +54,11 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private static String codMaquina;
     private long tempoSistema = System.currentTimeMillis(); 
     private double[] mediaVel = {0,0,0,0,0,0,0,0,0,0};  
-    private boolean maqParada = true;
+    private boolean maqParada = false;
+    private boolean evtRegistrado = true;
     private boolean iniciaLeituras = true;
-    private int resumoRelatorio,linhas =14;
+    private int resumoRelatorio,linhas=14;
+    private int eventosTimer,qtdEvt=10;
     private List<Long> metrosAlerta = new ArrayList<>();
     Login login = new Login();
     Maquina maquina = new Maquina();
@@ -69,6 +72,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     Micrometro leituraAtual = new Micrometro();
     Micrometro leituraAnterior = new Micrometro();
     ControllerMicrometro mic = new ControllerMicrometro();
+    ControllerParadasMaquina paradas;
     
     /**
      * Creates new form JFPrincipal
@@ -77,27 +81,36 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     Timer timerVelocimetro = new Timer();
     
     private void tarefaVelocidade(){
-        int delay = 0;   // delay de 0 seg.
-        int interval = 1500;  // intervalo de 2 seg.        
+        int delay = 0;   // delay de 1 seg.
+        int interval = 1100;  // intervalo de 1 seg.        
 
         timerVelocimetro.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
                     System.out.println("Enveto Timer");
-                    if(maqParada){
-                        System.out.println("parada???");
+                    
+                    if(eventosTimer >= qtdEvt){
+                        radialLcdVelocidade.setValueAnimated(mediaVelocidade(0));
+                        System.out.println("Parada pelo Timer!!!!");
+                        if(!maqParada){
+                            abrirTelaParadas();                            
+                        }
+                        if(!evtRegistrado)evtRegistrado=paradas.registraInicioParadamaquina((long) 
+                            displaySingleMetragemCarretel.getValue() , codMaquina);
                     }else{
-                        maqParada = true;
+                        eventosTimer++;
                     }
                     if(displaySingleEvtCarEntrada.getValue() <= maquina.getAlertaMetrosParaArrebentamento()){
                         lightBulbAlertaEvento.setOn(true);
+                       
+                        jLabelAlerta.setSize(250,125);
                         jLabelAlerta.setVisible(true);
                     }else{
                         lightBulbAlertaEvento.setOn(false);
                         jLabelAlerta.setVisible(false);
                     }
-                }
-                
+                    
+                }                
             }, delay, interval);
     }
     
@@ -136,6 +149,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jTextField1 = new javax.swing.JTextField();
         jpRoot = new javax.swing.JPanel();
         jpLogin = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -151,6 +165,18 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTableProgramacao = new javax.swing.JTable();
         jpParadas = new javax.swing.JPanel();
+        jLabel37 = new javax.swing.JLabel();
+        jSeparator8 = new javax.swing.JSeparator();
+        jLabel38 = new javax.swing.JLabel();
+        jComboBoxParadasMaquina = new javax.swing.JComboBox<>();
+        jLabel39 = new javax.swing.JLabel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jTextAreaObsParada = new javax.swing.JTextArea();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        jTableMotivosParada = new javax.swing.JTable();
+        jButtonIncluirMotivoParada = new javax.swing.JButton();
+        jButtonRemoverMotivoParada = new javax.swing.JButton();
+        jButtonRegistrarParada = new javax.swing.JButton();
         jpConfigDefault = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
@@ -230,8 +256,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         displaySingleEvtCarEntrada = new eu.hansolo.steelseries.gauges.DisplaySingle();
         jLabel36 = new javax.swing.JLabel();
         lightBulbAlertaEvento = new eu.hansolo.lightbulb.LightBulb();
-        radialLcdDiametro = new eu.hansolo.steelseries.gauges.Radial4Lcd();
         jLabelAlerta = new javax.swing.JLabel();
+        radialLcdDiametro = new eu.hansolo.steelseries.gauges.Radial4Lcd();
         menuPrincipal = new javax.swing.JMenuBar();
         menuLogin = new javax.swing.JMenu();
         jMenuItemLogin = new javax.swing.JMenuItem();
@@ -248,6 +274,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         jMenuConfigDefault = new javax.swing.JMenuItem();
         jMenuTrocarMaquina = new javax.swing.JMenuItem();
         jMenuConfigSerialRFID = new javax.swing.JMenuItem();
+
+        jTextField1.setText("jTextField1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Sistema Condumig");
@@ -310,10 +338,10 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                         .addGroup(jpLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jtfUser)
                             .addComponent(jpfPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE))))
-                .addContainerGap(905, Short.MAX_VALUE))
+                .addContainerGap(644, Short.MAX_VALUE))
             .addGroup(jpLoginLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPLogo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPLogo, javax.swing.GroupLayout.DEFAULT_SIZE, 903, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jpLoginLayout.setVerticalGroup(
@@ -331,7 +359,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 .addComponent(jbLogin)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 268, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(506, Short.MAX_VALUE))
+                .addContainerGap(399, Short.MAX_VALUE))
         );
 
         jpRoot.add(jpLogin, "jpLogin");
@@ -386,13 +414,13 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 .addGroup(jpProgramacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jpProgramacaoLayout.createSequentialGroup()
                         .addComponent(jLabel21)
-                        .addGap(0, 930, Short.MAX_VALUE))
+                        .addGap(0, 669, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpProgramacaoLayout.createSequentialGroup()
                         .addGroup(jpProgramacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jSeparator4, javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel22, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addContainerGap())))
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1184, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 923, Short.MAX_VALUE)
         );
         jpProgramacaoLayout.setVerticalGroup(
             jpProgramacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -404,23 +432,104 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel22)
                 .addGap(43, 43, 43)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 778, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 671, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         jpRoot.add(jpProgramacao, "jpProgramacao");
 
-        jpParadas.setBackground(new java.awt.Color(255, 204, 204));
+        jpParadas.setBackground(new java.awt.Color(208, 93, 79));
+
+        jLabel37.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel37.setText("Apontamento de paradas.");
+
+        jLabel38.setText("Motivo da Parada:");
+
+        jComboBoxParadasMaquina.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        jLabel39.setText("Observações:");
+
+        jTextAreaObsParada.setColumns(20);
+        jTextAreaObsParada.setRows(5);
+        jScrollPane4.setViewportView(jTextAreaObsParada);
+
+        jTableMotivosParada.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+            },
+            new String [] {
+                "Cod. Parada", "Abreviação", "Descriçao","observação"
+            }
+        ));
+        jScrollPane5.setViewportView(jTableMotivosParada);
+
+        jButtonIncluirMotivoParada.setText("Incluir Motivo");
+        jButtonIncluirMotivoParada.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonIncluirMotivoParadaActionPerformed(evt);
+            }
+        });
+
+        jButtonRemoverMotivoParada.setText("Remover Motivo");
+        jButtonRemoverMotivoParada.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRemoverMotivoParadaActionPerformed(evt);
+            }
+        });
+
+        jButtonRegistrarParada.setText("Registrar Parada");
+        jButtonRegistrarParada.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRegistrarParadaActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jpParadasLayout = new javax.swing.GroupLayout(jpParadas);
         jpParadas.setLayout(jpParadasLayout);
         jpParadasLayout.setHorizontalGroup(
             jpParadasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1184, Short.MAX_VALUE)
+            .addGroup(jpParadasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jpParadasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel37, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jSeparator8)
+                    .addComponent(jScrollPane4)
+                    .addComponent(jComboBoxParadasMaquina, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 903, Short.MAX_VALUE)
+                    .addComponent(jLabel38, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel39, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jpParadasLayout.createSequentialGroup()
+                        .addComponent(jButtonIncluirMotivoParada, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButtonRemoverMotivoParada, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jpParadasLayout.createSequentialGroup()
+                        .addComponent(jButtonRegistrarParada, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         jpParadasLayout.setVerticalGroup(
             jpParadasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 883, Short.MAX_VALUE)
+            .addGroup(jpParadasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel37)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSeparator8, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel38)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jComboBoxParadasMaquina, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel39)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(11, 11, 11)
+                .addGroup(jpParadasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButtonIncluirMotivoParada, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonRemoverMotivoParada, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButtonRegistrarParada, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         jpRoot.add(jpParadas, "jpParadas");
@@ -552,7 +661,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                                 .addGroup(jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jpConfigDefaultLayout.createSequentialGroup()
                                         .addComponent(jtfDriverProducao, javax.swing.GroupLayout.PREFERRED_SIZE, 705, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(0, 357, Short.MAX_VALUE))
+                                        .addGap(0, 96, Short.MAX_VALUE))
                                     .addComponent(jtfServidorProducao)
                                     .addComponent(jtfUrlProducao)
                                     .addComponent(jtfBDProducao)
@@ -867,6 +976,9 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
+        jLabelAlerta.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/ezgif.com-resize.gif"))); // NOI18N
+        jLabelAlerta.setText("jLabel37");
+
         radialLcdDiametro.setLedColor(eu.hansolo.steelseries.tools.LedColor.GREEN_LED);
         radialLcdDiametro.setLedVisible(false);
         radialLcdDiametro.setMaxMeasuredValueVisible(true);
@@ -882,9 +994,6 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         radialLcdDiametro.setTrackStartColor(new java.awt.Color(255, 0, 0));
         radialLcdDiametro.setTrackVisible(true);
 
-        jLabelAlerta.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/ezgif.com-resize.gif"))); // NOI18N
-        jLabelAlerta.setText("jLabel37");
-
         javax.swing.GroupLayout jpProducaoLayout = new javax.swing.GroupLayout(jpProducao);
         jpProducao.setLayout(jpProducaoLayout);
         jpProducaoLayout.setHorizontalGroup(
@@ -892,87 +1001,80 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             .addGroup(jpProducaoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jSeparator5)
+                    .addComponent(jSeparator7, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jSeparator6)
                     .addGroup(jpProducaoLayout.createSequentialGroup()
-                        .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jSeparator7, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jSeparator5)
-                            .addComponent(jSeparator6)
-                            .addGroup(jpProducaoLayout.createSequentialGroup()
-                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane3))
-                            .addGroup(jpProducaoLayout.createSequentialGroup()
-                                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel23)
-                                    .addGroup(jpProducaoLayout.createSequentialGroup()
-                                        .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addGroup(jpProducaoLayout.createSequentialGroup()
-                                                .addComponent(jLabel24)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jLabelProducaoOF))
-                                            .addGroup(jpProducaoLayout.createSequentialGroup()
-                                                .addComponent(jLabel25)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jLabelProducaoCodItem)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jLabel26)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jLabelProducaoDescricaoItem))
-                                            .addGroup(jpProducaoLayout.createSequentialGroup()
-                                                .addComponent(jLabel32)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jLabelProducaoDMinimo)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(jLabel33)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jLabelProducaoDnominal)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jLabel34)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jLabelProducaoDMaximo)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jLabel35)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jLabelProducaoVelIdeal))
-                                            .addGroup(jpProducaoLayout.createSequentialGroup()
-                                                .addComponent(jLabel27)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jLabelProducaoQtdProg)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jLabel28)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jLabelProducaoQtdProd)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jLabel29)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jLabelProducaoMetTotalProg)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jLabel30)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jLabelProducaoMetTotalProd)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jLabel31)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(jLabelProducaoMetCarretel, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jLabelAlerta, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addGap(0, 5, Short.MAX_VALUE)))
-                        .addContainerGap())
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane3))
                     .addGroup(jpProducaoLayout.createSequentialGroup()
                         .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(radialLcdVelocidade, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
                             .addComponent(radialLcdDiametro, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jpProducaoLayout.createSequentialGroup()
-                                .addGap(18, 18, 18)
-                                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(linearProgramacao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addGroup(jpProducaoLayout.createSequentialGroup()
-                                        .addComponent(jPanelEventoEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, 346, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(0, 0, Short.MAX_VALUE))))
+                                .addComponent(jPanelEventoEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, 345, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(linearCarretelSaida, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(linearProgramacao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(jpProducaoLayout.createSequentialGroup()
+                        .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jpProducaoLayout.createSequentialGroup()
+                                .addComponent(jLabel27)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabelProducaoQtdProg)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel28)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabelProducaoQtdProd)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel29)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabelProducaoMetTotalProg)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel30)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabelProducaoMetTotalProd)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel31)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabelProducaoMetCarretel, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jpProducaoLayout.createSequentialGroup()
+                                .addComponent(jLabel25)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabelProducaoCodItem)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel26)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabelProducaoDescricaoItem))
+                            .addGroup(jpProducaoLayout.createSequentialGroup()
+                                .addComponent(jLabel32)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabelProducaoDMinimo)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(linearCarretelSaida, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))))
+                                .addComponent(jLabel33)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabelProducaoDnominal)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel34)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabelProducaoDMaximo)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel35)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabelProducaoVelIdeal))
+                            .addComponent(jLabel23))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jpProducaoLayout.createSequentialGroup()
+                        .addComponent(jLabel24)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabelProducaoOF)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabelAlerta, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(118, 118, 118)))
+                .addContainerGap())
         );
         jpProducaoLayout.setVerticalGroup(
             jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -980,10 +1082,10 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 .addContainerGap()
                 .addComponent(jLabel23)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jpProducaoLayout.createSequentialGroup()
+                        .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabelProducaoOF))
@@ -1014,29 +1116,29 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                             .addComponent(jLabel34)
                             .addComponent(jLabelProducaoDMaximo)
                             .addComponent(jLabel35)
-                            .addComponent(jLabelProducaoVelIdeal)))
-                    .addComponent(jLabelAlerta, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSeparator6, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSeparator7, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jpProducaoLayout.createSequentialGroup()
-                        .addComponent(linearCarretelSaida, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabelProducaoVelIdeal))
+                        .addGap(11, 11, 11)
+                        .addComponent(jSeparator6, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(linearProgramacao, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanelEventoEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jpProducaoLayout.createSequentialGroup()
-                        .addComponent(radialLcdVelocidade, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jSeparator7, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(radialLcdDiametro, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(168, Short.MAX_VALUE))
+                        .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jpProducaoLayout.createSequentialGroup()
+                                .addComponent(linearCarretelSaida, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(linearProgramacao, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jPanelEventoEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jpProducaoLayout.createSequentialGroup()
+                                .addComponent(radialLcdVelocidade, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(radialLcdDiametro, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addComponent(jLabelAlerta, javax.swing.GroupLayout.PREFERRED_SIZE, 8, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jpRoot.add(jpProducao, "jpProducao");
@@ -1162,8 +1264,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
 
     private void jMenuItemParadasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemParadasActionPerformed
         // TODO add your handling code here:
-        CardLayout card = (CardLayout) jpRoot.getLayout();
-        card.show(jpRoot,"jpParadas");
+        abrirTelaParadas();        
     }//GEN-LAST:event_jMenuItemParadasActionPerformed
 
     private void jMenuItemProducaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemProducaoActionPerformed
@@ -1252,7 +1353,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private void jMenuItemDesligarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemDesligarActionPerformed
         try {
             // TODO add your handling code here:
-            Runtime.getRuntime().exec("shutdown -h now");
+             if(System.getProperty("os.name").equals("Linux"))Runtime.getRuntime().exec("shutdown -h now");
         } catch (IOException ex) {
             Logger.getLogger(JFPrincipal.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -1304,11 +1405,33 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private void jMenuItemReiniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemReiniciarActionPerformed
         try {
             // TODO add your handling code here:
-            Runtime.getRuntime().exec("reboot");
+             if(System.getProperty("os.name").equals("Linux"))Runtime.getRuntime().exec("reboot");
         } catch (IOException ex) {
             Logger.getLogger(JFPrincipal.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jMenuItemReiniciarActionPerformed
+
+    private void jButtonRemoverMotivoParadaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRemoverMotivoParadaActionPerformed
+        // TODO add your handling code here:
+        DefaultTableModel modelo = (DefaultTableModel)jTableMotivosParada.getModel();
+        modelo.removeRow(jTableMotivosParada.getSelectedRow());
+    }//GEN-LAST:event_jButtonRemoverMotivoParadaActionPerformed
+
+    private void jButtonIncluirMotivoParadaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonIncluirMotivoParadaActionPerformed
+        // TODO add your handling code here:
+        DefaultTableModel modelo = (DefaultTableModel)jTableMotivosParada.getModel();
+        int motivoEscolhido = jComboBoxParadasMaquina.getSelectedIndex();
+        List<String> infoParadas = paradas.buscaInfoParadaPorCodigo(motivoEscolhido);
+        modelo.addRow(new Object[]{infoParadas.get(0),infoParadas.get(1),infoParadas.get(2),
+            jTextAreaObsParada.getText().trim()});
+    }//GEN-LAST:event_jButtonIncluirMotivoParadaActionPerformed
+
+    private void jButtonRegistrarParadaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRegistrarParadaActionPerformed
+        // TODO add your handling code here:
+        if(!maqParada)
+            abrirTelaProducao();
+        
+    }//GEN-LAST:event_jButtonRegistrarParadaActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1416,6 +1539,10 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private eu.hansolo.steelseries.gauges.DisplaySingle displaySingleEvtCarEntrada;
     private eu.hansolo.steelseries.gauges.DisplaySingle displaySingleMetragemCarretel;
     private eu.hansolo.steelseries.gauges.DisplaySingle displaySingleMetragemProgramado;
+    private javax.swing.JButton jButtonIncluirMotivoParada;
+    private javax.swing.JButton jButtonRegistrarParada;
+    private javax.swing.JButton jButtonRemoverMotivoParada;
+    private javax.swing.JComboBox<String> jComboBoxParadasMaquina;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -1446,6 +1573,9 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JLabel jLabel34;
     private javax.swing.JLabel jLabel35;
     private javax.swing.JLabel jLabel36;
+    private javax.swing.JLabel jLabel37;
+    private javax.swing.JLabel jLabel38;
+    private javax.swing.JLabel jLabel39;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
@@ -1480,6 +1610,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
@@ -1487,9 +1619,13 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JSeparator jSeparator5;
     private javax.swing.JSeparator jSeparator6;
     private javax.swing.JSeparator jSeparator7;
+    private javax.swing.JSeparator jSeparator8;
+    private javax.swing.JTable jTableMotivosParada;
     private javax.swing.JTable jTableProducaoArrebentamentos;
     private javax.swing.JTable jTableProducaoParadas;
     private javax.swing.JTable jTableProgramacao;
+    private javax.swing.JTextArea jTextAreaObsParada;
+    private javax.swing.JTextField jTextField1;
     private javax.swing.JButton jbCriarArquivosDefault;
     private javax.swing.JButton jbLogin;
     private javax.swing.JPanel jpConfigDefault;
@@ -1597,7 +1733,26 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             abrirTelaProgramacao();
         }
     }
-
+    private void abrirTelaParadas() {
+        try {
+            if(paradas==null) paradas = new ControllerParadasMaquina(codMaquina);            
+            long metragem = (long) displaySingleMetragemCarretel.getValue();
+            evtRegistrado=paradas.registraInicioParadamaquina(metragem, codMaquina);
+            List<String> listaParadas = new ArrayList<>();
+            listaParadas = paradas.buscaListaParadasDescricao();
+            jComboBoxParadasMaquina.removeAllItems();
+            for(int i=0;i<listaParadas.size();i++){
+                jComboBoxParadasMaquina.addItem(listaParadas.get(i));
+            } 
+            maqParada = true;
+            bloquearMenu();
+            CardLayout card = (CardLayout) jpRoot.getLayout();
+            card.show(jpRoot,"jpParadas");
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }        
+    }
     private void abrirTelaProgramacao() {
         limparJTable(jTableProgramacao);
         buscarProgramacaoMaquina();
@@ -1744,14 +1899,21 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                     //System.out.println("Mediana: " + velMediana);
                     resumoRelatorio = 0;
                     radialLcdVelocidade.setValueAnimated(velMediana);                             
-                    maqParada = false;
-                    if(velMediana < radialLcdVelocidade.getTrackStart()){
+                    if(maqParada)if(velMediana>=(radialLcdVelocidade.getTrackStart() + 10))registrarRetornoEvento();
+                    eventosTimer = 0;
+                    if(velMediana < radialLcdVelocidade.getTrackStart() - 10){
                         System.out.println("Parada por velocidade abaixo da minima");
+                        if(!maqParada){
+                            abrirTelaParadas();
+                        }
                     }
                 }else{
                     if(resumoRelatorio >= linhas){
-                        radialLcdVelocidade.setValueAnimated(mediaVelocidade(0));
-                        if (radialLcdVelocidade.getValue()==0) System.out.println("Parada!!!");      
+                        if(radialLcdVelocidade.getValue()>0)radialLcdVelocidade.setValueAnimated(mediaVelocidade(0));
+                        if (radialLcdVelocidade.getValue()==0){
+                            System.out.println("Parada!!!");
+                            if(!maqParada)abrirTelaParadas();
+                        } 
                     }else{
                         resumoRelatorio ++;
                         System.out.println("Resumo relatoio: " + resumoRelatorio);
@@ -1816,8 +1978,12 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         if(!login.getNome().trim().equals("")) bloquearMenu();
             habilitarMenu();
             System.out.println("Logado com " + login.getNome()
-                + " e nivel de permissão: " + login.getNivel()); 
-            abrirTelaProducao();           
+                + " e nivel de permissão: " + login.getNivel());
+            if(maqParada){
+                abrirTelaParadas();
+            }else{
+                abrirTelaProducao();           
+            }
         }
 
     private void ajustarMostradorVelocidade() {
@@ -1894,5 +2060,13 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void registrarRetornoEvento() {
+        if(paradas.registraRetornoParadamaquina((long) displaySingleMetragemCarretel.getValue(), codMaquina)){
+            maqParada = false;
+            eventosTimer = 0;
+            habilitarMenu();
+        }        
     }
 }                                 

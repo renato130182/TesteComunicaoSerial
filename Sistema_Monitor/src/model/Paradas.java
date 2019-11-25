@@ -1,14 +1,15 @@
 package model;
 
-import controller.InterfaceParadas;
-
-public class Paradas implements InterfaceParadas {
+public class Paradas {
 
     private int codigo;
     private String descricao;
     private String abreviacao;
 
     public Paradas() {
+        codigo = 0;
+        descricao = "";
+        abreviacao = "";
     }
 
     public int getCodigo() {
@@ -34,10 +35,4 @@ public class Paradas implements InterfaceParadas {
     public void setAbreviacao(String abreviacao) {
         this.abreviacao = abreviacao;
     }
-
-    @Override
-    public int buscaDadosParada(int codigo) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
 }
