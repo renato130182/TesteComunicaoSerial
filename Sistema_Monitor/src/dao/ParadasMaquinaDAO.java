@@ -130,4 +130,88 @@ public class ParadasMaquinaDAO {
         db.desconectar();
         return false;    
     }
+    
+    public boolean incluirMotivoEventoMaquina(long cod_parada, long id_Evento,String obs){
+        sql = "insert into bd_sistema_monitor.tb_maquina_evento_parada "
+                + "(id_maquina_evento, cod_parada_maquina) values (?,?)";
+        ConexaoDatabase db = new ConexaoDatabase();
+        if(db.isInfoDB()){
+            Connection conec = db.getConnection();
+            try {
+                PreparedStatement st = conec.prepareStatement(sql);
+                st.setLong(1,id_Evento);
+                st.setLong(2,cod_parada);           
+                st.executeUpdate();
+                if(st.getUpdateCount()!=0){
+                    if(!obs.trim().equals("")){                        
+                        sql = "insert into bd_sistema_monitor.tb_maquina_evento_observacao "
+                            + "(id_maquina_evento_parada, observacao) values (last_insert_id(), ? );";
+                        PreparedStatement st1 = conec.prepareStatement(sql);
+                        st1.setString(1, obs);
+                        st1.executeUpdate();
+                        if(st1.getUpdateCount()!=0){
+                            db.desconectar();
+                            return true;
+                        }else{
+                            db.desconectar();
+                            return false;
+                        }
+                    }else{
+                        db.desconectar();
+                        return true;
+                    }
+                }else{
+                    db.desconectar();
+                    return false;
+                }                                
+            } catch (SQLException ex) {
+                Logger.getLogger(LoginDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }            
+        }
+        db.desconectar();
+        return false;    
+    }
+    
+    public ParadasMaquina buscaParadasMaquinaProducaoAtual(String cod_maquina){
+        ParadasMaquina paradasMaquina = new ParadasMaquina();
+        List<Paradas> listaParadas = new ArrayList<>();
+        //Long identificadores[] = null;
+        ConexaoDatabase db = new ConexaoDatabase();
+        if(db.equals(db)){
+            try {
+                sql = "SELECT par.id as idPar, par.cod_parada_maquina as codParada, "
+                        + "pardesc.abreviacao as abrev, obs.observacao as obs  "
+                        + "FROM bd_sistema_monitor.tb_maquina_evento evt Inner join "
+                        + "bd_sistema_monitor.tb_maquina_evento_parada par on "
+                        + "evt.id = par.id_maquina_evento Inner join condumigproducao.paradas "
+                        + "pardesc on par.cod_parada_maquina = pardesc.codigo "
+                        + "left join bd_sistema_monitor.tb_maquina_evento_observacao obs "
+                        + "on par.id = obs.id_maquina_evento_parada where evt.cod_maquina = ?";
+                java.sql.Connection conec = db.getConnection();
+                PreparedStatement st = conec.prepareStatement(sql);
+                st.setString(1, cod_maquina);
+                ResultSet res = st.executeQuery();
+                paradasMaquina.setCod_maquina(cod_maquina);
+                //if(res.last()){
+                //    identificadores = new Long[res.getRow()];
+                //    res.beforeFirst();
+                //}
+                while(res.next()){
+                   Paradas parada = new Paradas();
+                   parada.setCodigo(res.getInt("codParada"));
+                   parada.setAbreviacao(res.getString("abrev"));
+                   parada.setObservacao(res.getString("obs"));                   
+                   listaParadas.add(parada);
+                   //identificadores[res.getRow()] = res.getLong("idPar");
+                }
+                paradasMaquina.setListaParadas(listaParadas);
+                db.desconectar();
+                return paradasMaquina;
+            } catch (SQLException ex) {
+                Logger.getLogger(ProgramacaoMaquinaDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        db.desconectar();
+        return null;            
+    }    
 }

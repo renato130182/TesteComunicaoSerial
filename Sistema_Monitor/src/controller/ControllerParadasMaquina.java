@@ -8,6 +8,7 @@ package controller;
 import dao.ParadasMaquinaDAO;
 import java.util.List;
 import java.util.ArrayList;
+import javax.swing.JTable;
 import model.EventoMaquina;
 import model.Paradas;
 import model.ParadasMaquina;
@@ -18,7 +19,7 @@ import model.ParadasMaquina;
  */
 public class ControllerParadasMaquina {
     private ParadasMaquina paradasMaquina = new ParadasMaquina();
-    
+    private long ultimoEvento;
     public ControllerParadasMaquina(String cod_Maquina) {
         ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO();
         this.paradasMaquina = daoPar.buscaParadasmaquina(cod_Maquina);
@@ -75,11 +76,38 @@ public class ControllerParadasMaquina {
             ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO();      
             EventoMaquina evt = new EventoMaquina();            
             evt.setMetragem(metragem);            
-            evt.setIdEvento(daoPar.buscarIDEventoAberto(cod_maquina));            
+            evt.setIdEvento(daoPar.buscarIDEventoAberto(cod_maquina));
+            this.ultimoEvento = evt.getIdEvento();
             return  daoPar.RegistrarRetornoEventoMaquina(evt);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
     }
+
+    public long getUltimoEvento() {
+        return ultimoEvento;
+    }
+    
+    public boolean registraMotivoParadaMaquina(String codigo,String obs){
+        try {
+            ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO();
+            return daoPar.incluirMotivoEventoMaquina(Long.valueOf(codigo), ultimoEvento,obs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    public ParadasMaquina buscaParadasProcessoAtual(String cod_maquina){
+        try {                    
+            ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO();
+            ParadasMaquina par = daoPar.buscaParadasMaquinaProducaoAtual(cod_maquina);
+            return par;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;               
+    }
+        
 }

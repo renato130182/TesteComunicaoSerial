@@ -99,4 +99,29 @@ public class ProducaoDAO {
         
         return false;
     }
+    
+    public boolean atualizaSaldoConsumoEntrada (String cod_Pesagem, String metragem){
+        sql = "update condumigproducao.pesagem set saldoconsumo = (saldoconsumo - ?) where codigo = ?";        
+        ConexaoDatabase db = new ConexaoDatabase();
+        if(db.isInfoDB()){
+            Connection conec = db.getConnection();
+            try {
+                PreparedStatement st = conec.prepareStatement(sql);
+                st.setString(1, metragem);
+                st.setString(2, cod_Pesagem);
+                st.executeUpdate();
+                if(st.getUpdateCount()!=0){
+                    db.desconectar();
+                    return true;
+                }else{
+                    db.desconectar();
+                    return false;
+                }                                
+            } catch (SQLException ex) {
+                Logger.getLogger(LoginDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }            
+        }
+        db.desconectar();        
+        return false;
+    }
 }

@@ -27,7 +27,8 @@ public class PesagemDAO {
         ConexaoDatabase db = new ConexaoDatabase();
         if(db.equals(db)){
             try {
-                sql = "SELECT pes.codigo, pes.observacao,pes.metragemoperador FROM condumigproducao.reservamaquina res "
+                sql = "SELECT pes.codigo, pes.observacao,pes.metragemoperador,pes.saldoconsumo,"
+                        + " pes.codigoembalagem FROM condumigproducao.reservamaquina res "
                         + "Inner join condumigproducao.pesagem pes on pes.codigo = res.pesagem "
                         + "where res.codigomaquina = ?;";
                 Connection conec = db.getConnection();
@@ -39,6 +40,8 @@ public class PesagemDAO {
                     pes.setCodigo(res.getString("codigo"));
                     pes.setObservacao(res.getString("observacao"));
                     pes.setMetragemOperador(res.getLong("metragemoperador"));
+                    pes.setCodEmbalagem(res.getString("codigoembalagem"));
+                    pes.setSaldoConsumo(res.getLong("saldoconsumo"));
                     lista.add(pes);
                 }
                 db.desconectar();

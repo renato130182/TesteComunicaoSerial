@@ -38,10 +38,13 @@ import controller.ControllerConfigSerialPort;
 import controller.ControllerMicrometro;
 import controller.ControllerParadasMaquina;
 import dao.ProdutoCarretelDAO;
+import java.awt.HeadlessException;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.JFrame;
+import javax.swing.table.TableRowSorter;
 import model.Micrometro;
+import model.ParadasMaquina;
 
 /**
  *
@@ -59,7 +62,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private boolean iniciaLeituras = true;
     private int resumoRelatorio,linhas=14;
     private int eventosTimer,qtdEvt=10;
-    private List<Long> metrosAlerta = new ArrayList<>();
+    private List<String> metrosAlerta = new ArrayList<>();
     Login login = new Login();
     Maquina maquina = new Maquina();
     MaquinaDAO maqDao =  new MaquinaDAO();
@@ -67,6 +70,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     ProgramacaoMaquina prog = new ProgramacaoMaquina();
     ProdutoCarretel prodCar = new ProdutoCarretel();
     Producao prod = new Producao();
+    List<Pesagem> listaPesagens = new ArrayList<>();
     SerialTxRx comRFID ;
     SerialTxRx comMicrometro;
     Micrometro leituraAtual = new Micrometro();
@@ -101,15 +105,26 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                         eventosTimer++;
                     }
                     if(displaySingleEvtCarEntrada.getValue() <= maquina.getAlertaMetrosParaArrebentamento()){
-                        lightBulbAlertaEvento.setOn(true);
-                       
-                        jLabelAlerta.setSize(250,125);
+                        lightBulbAlertaEvento.setOn(true);                                               
                         jLabelAlerta.setVisible(true);
                     }else{
                         lightBulbAlertaEvento.setOn(false);
                         jLabelAlerta.setVisible(false);
                     }
-                    
+                    if(displaySingleSaldoCarretelEntrada1.getValue()<=maquina.getAlertaMetrosParaArrebentamento()){
+                        lightBulbAlertaSaldoEntrada1.setOn(true);
+                        jLabelAlerta.setVisible(true);
+                    }else{
+                        lightBulbAlertaSaldoEntrada1.setOn(false);
+                        jLabelAlerta.setVisible(false);
+                    }
+                    if(displaySingleSaldoCarretelEntrada2.getValue()<=maquina.getAlertaMetrosParaArrebentamento()){
+                        lightBulbAlertaSaldoEntrada2.setOn(true);
+                        jLabelAlerta.setVisible(true);
+                    }else{
+                        lightBulbAlertaSaldoEntrada2.setOn(false);
+                        jLabelAlerta.setVisible(false);
+                    }
                 }                
             }, delay, interval);
     }
@@ -252,12 +267,20 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         displaySingleMetragemCarretel = new eu.hansolo.steelseries.gauges.DisplaySingle();
         linearProgramacao = new eu.hansolo.steelseries.gauges.Linear();
         displaySingleMetragemProgramado = new eu.hansolo.steelseries.gauges.DisplaySingle();
+        jLabelAlerta = new javax.swing.JLabel();
         jPanelEventoEntrada = new javax.swing.JPanel();
         displaySingleEvtCarEntrada = new eu.hansolo.steelseries.gauges.DisplaySingle();
         jLabel36 = new javax.swing.JLabel();
         lightBulbAlertaEvento = new eu.hansolo.lightbulb.LightBulb();
-        jLabelAlerta = new javax.swing.JLabel();
         radialLcdDiametro = new eu.hansolo.steelseries.gauges.Radial4Lcd();
+        jPanelEventoEntrada2 = new javax.swing.JPanel();
+        displaySingleSaldoCarretelEntrada1 = new eu.hansolo.steelseries.gauges.DisplaySingle();
+        jLabelCarretel1 = new javax.swing.JLabel();
+        lightBulbAlertaSaldoEntrada1 = new eu.hansolo.lightbulb.LightBulb();
+        jPanelEventoEntrada3 = new javax.swing.JPanel();
+        displaySingleSaldoCarretelEntrada2 = new eu.hansolo.steelseries.gauges.DisplaySingle();
+        jLabelCarretel2 = new javax.swing.JLabel();
+        lightBulbAlertaSaldoEntrada2 = new eu.hansolo.lightbulb.LightBulb();
         menuPrincipal = new javax.swing.JMenuBar();
         menuLogin = new javax.swing.JMenu();
         jMenuItemLogin = new javax.swing.JMenuItem();
@@ -338,10 +361,10 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                         .addGroup(jpLoginLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jtfUser)
                             .addComponent(jpfPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE))))
-                .addContainerGap(644, Short.MAX_VALUE))
+                .addContainerGap(703, Short.MAX_VALUE))
             .addGroup(jpLoginLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPLogo, javax.swing.GroupLayout.DEFAULT_SIZE, 903, Short.MAX_VALUE)
+                .addComponent(jPLogo, javax.swing.GroupLayout.DEFAULT_SIZE, 962, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jpLoginLayout.setVerticalGroup(
@@ -359,7 +382,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 .addComponent(jbLogin)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 268, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(399, Short.MAX_VALUE))
+                .addContainerGap(526, Short.MAX_VALUE))
         );
 
         jpRoot.add(jpLogin, "jpLogin");
@@ -414,13 +437,13 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 .addGroup(jpProgramacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jpProgramacaoLayout.createSequentialGroup()
                         .addComponent(jLabel21)
-                        .addGap(0, 669, Short.MAX_VALUE))
+                        .addGap(0, 728, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpProgramacaoLayout.createSequentialGroup()
                         .addGroup(jpProgramacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jSeparator4, javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel22, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addContainerGap())))
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 923, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 982, Short.MAX_VALUE)
         );
         jpProgramacaoLayout.setVerticalGroup(
             jpProgramacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -432,7 +455,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel22)
                 .addGap(43, 43, 43)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 671, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 798, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -494,7 +517,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                     .addComponent(jSeparator8)
                     .addComponent(jScrollPane4)
                     .addComponent(jComboBoxParadasMaquina, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 903, Short.MAX_VALUE)
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 962, Short.MAX_VALUE)
                     .addComponent(jLabel38, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel39, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jpParadasLayout.createSequentialGroup()
@@ -661,7 +684,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                                 .addGroup(jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jpConfigDefaultLayout.createSequentialGroup()
                                         .addComponent(jtfDriverProducao, javax.swing.GroupLayout.PREFERRED_SIZE, 705, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(0, 96, Short.MAX_VALUE))
+                                        .addGap(0, 155, Short.MAX_VALUE))
                                     .addComponent(jtfServidorProducao)
                                     .addComponent(jtfUrlProducao)
                                     .addComponent(jtfBDProducao)
@@ -832,17 +855,17 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
 
         jTableProducaoArrebentamentos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null}
+                {null, null, null}
             },
             new String [] {
-                "Numero", "Metragem"
+                "Numero", "Metragem", "Cod. Embalagem"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class
+                java.lang.String.class, java.lang.Integer.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false
+                false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -866,14 +889,14 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
 
         jTableProducaoParadas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null}
+
             },
             new String [] {
-                "Numero", "Cod. Parada", "Tempo", "Descricao"
+                "Numero", "Cod. Parada", "Abreviação", "Observação"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.Object.class, java.lang.Object.class
+                java.lang.Long.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
                 false, false, false, false
@@ -927,7 +950,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         displaySingleMetragemCarretel.setLcdDecimals(0);
         displaySingleMetragemCarretel.setUnitString("m");
         linearCarretelSaida.add(displaySingleMetragemCarretel);
-        displaySingleMetragemCarretel.setBounds(30, 40, 100, 30);
+        displaySingleMetragemCarretel.setBounds(30, 40, 90, 30);
 
         linearProgramacao.setTitle("Programação para o lote (%)");
         linearProgramacao.setTrackRange(10.0);
@@ -936,7 +959,10 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         displaySingleMetragemProgramado.setLcdDecimals(0);
         displaySingleMetragemProgramado.setUnitString("m");
         linearProgramacao.add(displaySingleMetragemProgramado);
-        displaySingleMetragemProgramado.setBounds(30, 40, 100, 30);
+        displaySingleMetragemProgramado.setBounds(30, 40, 90, 30);
+
+        jLabelAlerta.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/ezgif.com-resize.gif"))); // NOI18N
+        jLabelAlerta.setText("jLabel37");
 
         jPanelEventoEntrada.setBackground(new java.awt.Color(204, 204, 204));
         jPanelEventoEntrada.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -947,7 +973,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         displaySingleEvtCarEntrada.setUnitString("m");
 
         jLabel36.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jLabel36.setText("Proximo evento Carretel de entrada");
+        jLabel36.setText("Evento Carretel de entrada");
 
         lightBulbAlertaEvento.setGlowColor(new java.awt.Color(255, 0, 0));
 
@@ -955,13 +981,13 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         jPanelEventoEntrada.setLayout(jPanelEventoEntradaLayout);
         jPanelEventoEntradaLayout.setHorizontalGroup(
             jPanelEventoEntradaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelEventoEntradaLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanelEventoEntradaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(displaySingleEvtCarEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel36, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lightBulbAlertaEvento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelEventoEntradaLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanelEventoEntradaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel36, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(displaySingleEvtCarEntrada, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lightBulbAlertaEvento, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         jPanelEventoEntradaLayout.setVerticalGroup(
             jPanelEventoEntradaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -969,15 +995,11 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 .addGap(7, 7, 7)
                 .addComponent(jLabel36)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(displaySingleEvtCarEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(15, Short.MAX_VALUE))
-            .addGroup(jPanelEventoEntradaLayout.createSequentialGroup()
-                .addComponent(lightBulbAlertaEvento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addGroup(jPanelEventoEntradaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(lightBulbAlertaEvento, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(displaySingleEvtCarEntrada, javax.swing.GroupLayout.DEFAULT_SIZE, 62, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-
-        jLabelAlerta.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/ezgif.com-resize.gif"))); // NOI18N
-        jLabelAlerta.setText("jLabel37");
 
         radialLcdDiametro.setLedColor(eu.hansolo.steelseries.tools.LedColor.GREEN_LED);
         radialLcdDiametro.setLedVisible(false);
@@ -993,6 +1015,85 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         radialLcdDiametro.setTrackStart(10.0);
         radialLcdDiametro.setTrackStartColor(new java.awt.Color(255, 0, 0));
         radialLcdDiametro.setTrackVisible(true);
+
+        jPanelEventoEntrada2.setBackground(new java.awt.Color(204, 204, 204));
+        jPanelEventoEntrada2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanelEventoEntrada2.setToolTipText("Proximo evento anotado no carretel de entrada.");
+        jPanelEventoEntrada2.setName("PainelEventosEntrada"); // NOI18N
+
+        displaySingleSaldoCarretelEntrada1.setLcdDecimals(0);
+        displaySingleSaldoCarretelEntrada1.setUnitString("m");
+
+        jLabelCarretel1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelCarretel1.setText("Saldo Carretel de entrada: ");
+
+        lightBulbAlertaSaldoEntrada1.setGlowColor(new java.awt.Color(255, 0, 0));
+
+        javax.swing.GroupLayout jPanelEventoEntrada2Layout = new javax.swing.GroupLayout(jPanelEventoEntrada2);
+        jPanelEventoEntrada2.setLayout(jPanelEventoEntrada2Layout);
+        jPanelEventoEntrada2Layout.setHorizontalGroup(
+            jPanelEventoEntrada2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelEventoEntrada2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelEventoEntrada2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelEventoEntrada2Layout.createSequentialGroup()
+                        .addComponent(displaySingleSaldoCarretelEntrada1, javax.swing.GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lightBulbAlertaSaldoEntrada1, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabelCarretel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanelEventoEntrada2Layout.setVerticalGroup(
+            jPanelEventoEntrada2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelEventoEntrada2Layout.createSequentialGroup()
+                .addGap(12, 12, 12)
+                .addComponent(jLabelCarretel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelEventoEntrada2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(lightBulbAlertaSaldoEntrada1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(displaySingleSaldoCarretelEntrada1, javax.swing.GroupLayout.DEFAULT_SIZE, 62, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanelEventoEntrada3.setBackground(new java.awt.Color(204, 204, 204));
+        jPanelEventoEntrada3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanelEventoEntrada3.setToolTipText("Proximo evento anotado no carretel de entrada.");
+        jPanelEventoEntrada3.setName("PainelEventosEntrada"); // NOI18N
+
+        displaySingleSaldoCarretelEntrada2.setLcdDecimals(0);
+        displaySingleSaldoCarretelEntrada2.setUnitString("m");
+
+        jLabelCarretel2.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelCarretel2.setText("Saldo Carretel de entrada: ");
+
+        lightBulbAlertaSaldoEntrada2.setGlowColor(new java.awt.Color(255, 0, 0));
+
+        javax.swing.GroupLayout jPanelEventoEntrada3Layout = new javax.swing.GroupLayout(jPanelEventoEntrada3);
+        jPanelEventoEntrada3.setLayout(jPanelEventoEntrada3Layout);
+        jPanelEventoEntrada3Layout.setHorizontalGroup(
+            jPanelEventoEntrada3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelEventoEntrada3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelEventoEntrada3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelEventoEntrada3Layout.createSequentialGroup()
+                        .addComponent(displaySingleSaldoCarretelEntrada2, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lightBulbAlertaSaldoEntrada2, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanelEventoEntrada3Layout.createSequentialGroup()
+                        .addComponent(jLabelCarretel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())))
+        );
+        jPanelEventoEntrada3Layout.setVerticalGroup(
+            jPanelEventoEntrada3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelEventoEntrada3Layout.createSequentialGroup()
+                .addGap(12, 12, 12)
+                .addComponent(jLabelCarretel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelEventoEntrada3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(displaySingleSaldoCarretelEntrada2, javax.swing.GroupLayout.DEFAULT_SIZE, 62, Short.MAX_VALUE)
+                    .addComponent(lightBulbAlertaSaldoEntrada2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout jpProducaoLayout = new javax.swing.GroupLayout(jpProducao);
         jpProducao.setLayout(jpProducaoLayout);
@@ -1014,11 +1115,14 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                             .addComponent(radialLcdDiametro, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jpProducaoLayout.createSequentialGroup()
-                                .addComponent(jPanelEventoEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, 345, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE))
                             .addComponent(linearCarretelSaida, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(linearProgramacao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(linearProgramacao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(jpProducaoLayout.createSequentialGroup()
+                                .addComponent(jPanelEventoEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jPanelEventoEntrada2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jPanelEventoEntrada3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(jpProducaoLayout.createSequentialGroup()
                         .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jpProducaoLayout.createSequentialGroup()
@@ -1066,7 +1170,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jLabelProducaoVelIdeal))
                             .addComponent(jLabel23))
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addGap(0, 402, Short.MAX_VALUE))
                     .addGroup(jpProducaoLayout.createSequentialGroup()
                         .addComponent(jLabel24)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -1132,13 +1236,16 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(linearProgramacao, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanelEventoEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(jPanelEventoEntrada2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jPanelEventoEntrada, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jPanelEventoEntrada3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(jpProducaoLayout.createSequentialGroup()
                                 .addComponent(radialLcdVelocidade, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(radialLcdDiametro, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addComponent(jLabelAlerta, javax.swing.GroupLayout.PREFERRED_SIZE, 8, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(188, 188, 188))
         );
 
         jpRoot.add(jpProducao, "jpProducao");
@@ -1413,7 +1520,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
 
     private void jButtonRemoverMotivoParadaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRemoverMotivoParadaActionPerformed
         // TODO add your handling code here:
-        DefaultTableModel modelo = (DefaultTableModel)jTableMotivosParada.getModel();
+        DefaultTableModel modelo = (DefaultTableModel)jTableMotivosParada.getModel();        
         modelo.removeRow(jTableMotivosParada.getSelectedRow());
     }//GEN-LAST:event_jButtonRemoverMotivoParadaActionPerformed
 
@@ -1422,15 +1529,30 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         DefaultTableModel modelo = (DefaultTableModel)jTableMotivosParada.getModel();
         int motivoEscolhido = jComboBoxParadasMaquina.getSelectedIndex();
         List<String> infoParadas = paradas.buscaInfoParadaPorCodigo(motivoEscolhido);
-        modelo.addRow(new Object[]{infoParadas.get(0),infoParadas.get(1),infoParadas.get(2),
-            jTextAreaObsParada.getText().trim()});
+        //if(paradas.RegistraMotivoParadaMaquina(infoParadas.get(0))){
+            modelo.addRow(new Object[]{infoParadas.get(0),infoParadas.get(1),infoParadas.get(2),
+                    jTextAreaObsParada.getText().trim()});
+        //}else{
+        //    JOptionPane.showMessageDialog(rootPane,"Falha ao cadastrar motivo, por favor tente novamente.","Cadasto de motivo",JOptionPane.ERROR_MESSAGE);
+        //} 
+        jTextAreaObsParada.setText("");
     }//GEN-LAST:event_jButtonIncluirMotivoParadaActionPerformed
 
     private void jButtonRegistrarParadaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRegistrarParadaActionPerformed
-        // TODO add your handling code here:
-        if(!maqParada)
-            abrirTelaProducao();
+        // TODO add your handling code here:        
+        if(!maqParada){
+            if(jTableMotivosParada.getRowCount()>0){
+                abrirTelaProducao();
+                registrarMotivoParadas();
+                JOptionPane.showMessageDialog(rootPane,"Registros criados com sucesso!!!","Cadastro de paradas",JOptionPane.INFORMATION_MESSAGE);
+            }else{
+                JOptionPane.showMessageDialog(rootPane, "Por favor indique o motivo da parada!","Aguardando motivo da parada",JOptionPane.ERROR_MESSAGE);
+            }            
+        }else{
+            JOptionPane.showMessageDialog(rootPane, "Ainda não foi detectado o retorno de produção","Maquina permanece parada",JOptionPane.ERROR_MESSAGE);
+        }
         
+                
     }//GEN-LAST:event_jButtonRegistrarParadaActionPerformed
 
     /**
@@ -1539,6 +1661,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private eu.hansolo.steelseries.gauges.DisplaySingle displaySingleEvtCarEntrada;
     private eu.hansolo.steelseries.gauges.DisplaySingle displaySingleMetragemCarretel;
     private eu.hansolo.steelseries.gauges.DisplaySingle displaySingleMetragemProgramado;
+    private eu.hansolo.steelseries.gauges.DisplaySingle displaySingleSaldoCarretelEntrada1;
+    private eu.hansolo.steelseries.gauges.DisplaySingle displaySingleSaldoCarretelEntrada2;
     private javax.swing.JButton jButtonIncluirMotivoParada;
     private javax.swing.JButton jButtonRegistrarParada;
     private javax.swing.JButton jButtonRemoverMotivoParada;
@@ -1583,6 +1707,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JLabel jLabelAlerta;
+    private javax.swing.JLabel jLabelCarretel1;
+    private javax.swing.JLabel jLabelCarretel2;
     private javax.swing.JLabel jLabelProducaoCodItem;
     private javax.swing.JLabel jLabelProducaoDMaximo;
     private javax.swing.JLabel jLabelProducaoDMinimo;
@@ -1607,6 +1733,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JMenuItem jMenuTrocarMaquina;
     private javax.swing.JPanel jPLogo;
     private javax.swing.JPanel jPanelEventoEntrada;
+    private javax.swing.JPanel jPanelEventoEntrada2;
+    private javax.swing.JPanel jPanelEventoEntrada3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
@@ -1651,6 +1779,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JTextField jtfUsuarioProducao;
     private javax.swing.JTextField jtfUsuarioTeste;
     private eu.hansolo.lightbulb.LightBulb lightBulbAlertaEvento;
+    private eu.hansolo.lightbulb.LightBulb lightBulbAlertaSaldoEntrada1;
+    private eu.hansolo.lightbulb.LightBulb lightBulbAlertaSaldoEntrada2;
     private eu.hansolo.steelseries.gauges.Linear linearCarretelSaida;
     private eu.hansolo.steelseries.gauges.Linear linearProgramacao;
     private javax.swing.JMenu menuConfiguracoes;
@@ -1745,6 +1875,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 jComboBoxParadasMaquina.addItem(listaParadas.get(i));
             } 
             maqParada = true;
+            limparJTable(jTableMotivosParada);
             bloquearMenu();
             CardLayout card = (CardLayout) jpRoot.getLayout();
             card.show(jpRoot,"jpParadas");
@@ -1761,6 +1892,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     }
 
     private void abrirTelaProducao() {
+        jLabelAlerta.setSize(250,125);
         limparJTable(jTableProducaoArrebentamentos);
         limparJTable(jTableProducaoParadas);
         jLabelAlerta.setVisible(false);
@@ -1772,6 +1904,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             }
         }
         buscarInformaçoesProducao();
+        buscarParadasProcessoProducao();
         ajustarMostradorVelocidade();
         ajustarMostradoresMetragem();
         this.tarefaVelocidade();
@@ -1826,21 +1959,43 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         return false;
     }
     private void buscarRegistrosObservacaoPesagem() {
-        List<Pesagem> lista = new ArrayList<>();
+        String dado[];
+        
         PesagemDAO daoPes = new PesagemDAO();
         ControllerProducao ctr = new ControllerProducao();
-        lista = daoPes.buscapesagensMontagem(codMaquina);
-        if(lista != null){
+        listaPesagens = daoPes.buscapesagensMontagem(codMaquina);
+        if(listaPesagens != null){
             DefaultTableModel modelo = (DefaultTableModel)jTableProducaoArrebentamentos.getModel();
-            for(int i=0;i<lista.size();i++){
-                ctr.AddicionarMetragensObservacao(lista.get(i).getObservacao(),lista.get(i).getMetragemOperador());
+            for(int i=0;i<listaPesagens.size();i++){
+                ctr.AddicionarMetragensObservacao(listaPesagens.get(i).getObservacao(),listaPesagens.get(i).getMetragemOperador(),listaPesagens.get(i).getCodEmbalagem());
             }
             
             metrosAlerta = ctr.getListaMetragemObservacao();
             for (int i=0;i<metrosAlerta.size();i++){
-                modelo.addRow(new Object[]{String.valueOf(i+1),metrosAlerta.get(i).toString()});
+                dado = metrosAlerta.get(i).split("#");
+                modelo.addRow(new Object[]{String.valueOf(i+1),Integer.valueOf(dado[0]),dado[1]});
             }
+            TableRowSorter tableSorter = new TableRowSorter(modelo);
+            jTableProducaoArrebentamentos.setRowSorter(tableSorter);
+            tableSorter.toggleSortOrder(1);
+            
+            configuraMostradoresSaldoEntrada(listaPesagens);
         }        
+    }
+    
+    private void configuraMostradoresSaldoEntrada(List<Pesagem> lista){
+        
+        if(lista.size()==2){
+            displaySingleSaldoCarretelEntrada1.setValue(lista.get(0).getSaldoConsumo());
+            jLabelCarretel1.setText("Saldo Carretel de entrada: " + lista.get(0).getCodEmbalagem());
+            displaySingleSaldoCarretelEntrada2.setVisible(true);
+            displaySingleSaldoCarretelEntrada2.setValue(lista.get(1).getSaldoConsumo());
+            jLabelCarretel2.setText("Saldo Carretel de entrada: " + lista.get(1).getCodEmbalagem());
+        }else{
+            displaySingleSaldoCarretelEntrada1.setValue(lista.get(0).getSaldoConsumo());
+            jLabelCarretel1.setText("Saldo Carretel de entrada: " + lista.get(0).getCodEmbalagem());
+            displaySingleSaldoCarretelEntrada2.setVisible(false);
+        }                        
     }
 
     @Override
@@ -1892,16 +2047,19 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                     //System.out.println("Velocidade: " + (velocidade * 60) + "m/min");
                     //System.out.println("Velocidade pelo tempo micrometro: " + (velocidadePeloTempoMicrometro * 60) + "m/min");  
                     //System.out.println("Media velocidade " + mediaVelocidade(velocidade)*60);                 
-                    ProducaoDAO daoProd = new ProducaoDAO();                    
-                    if(daoProd.atualizaMetragemProduzida(codMaquina, String.valueOf(metrosProduzidos))) 
-                        leituraAnterior = mic.setarDadosMicrometro(dados);  
+                    //ProducaoDAO daoProd = new ProducaoDAO();
+                    ControllerProducao prd = new ControllerProducao();
+                    if(prd.atualizaMetragemProduzida(listaPesagens, metrosProduzidos, codMaquina))leituraAnterior = mic.setarDadosMicrometro(dados);  
+                    
+                    //if(daoProd.atualizaMetragemProduzida(codMaquina, String.valueOf(metrosProduzidos))) 
+                      //  leituraAnterior = mic.setarDadosMicrometro(dados);  
                     double velMediana = mediaVelocidade(velocidade*60);                    
                     //System.out.println("Mediana: " + velMediana);
                     resumoRelatorio = 0;
                     radialLcdVelocidade.setValueAnimated(velMediana);                             
-                    if(maqParada)if(velMediana>=(radialLcdVelocidade.getTrackStart() + 10))registrarRetornoEvento();
+                    if(maqParada)if(velMediana>=(radialLcdVelocidade.getTrackStart() + 5))registrarRetornoEvento();
                     eventosTimer = 0;
-                    if(velMediana < radialLcdVelocidade.getTrackStart() - 10){
+                    if(velMediana < radialLcdVelocidade.getTrackStart() - 5){
                         System.out.println("Parada por velocidade abaixo da minima");
                         if(!maqParada){
                             abrirTelaParadas();
@@ -2035,10 +2193,12 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         try {       
             if(metrosProduzidos>0){
                 displaySingleMetragemCarretel.setValue(displaySingleMetragemCarretel.getValue() + metrosProduzidos);
-                atualiMostradorParadaEntrada(displaySingleMetragemCarretel.getValue());
                 displaySingleMetragemProgramado.setValue(displaySingleMetragemProgramado.getValue() + metrosProduzidos);
                 linearProgramacao.setValue((displaySingleMetragemProgramado.getValue() / prog.getMetragemTotalProgramada()) * 100);            
                 linearCarretelSaida.setValue((displaySingleMetragemCarretel.getValue() / prodCar.getMetragemMaxima())*100);
+                displaySingleSaldoCarretelEntrada1.setValue(displaySingleSaldoCarretelEntrada1.getValue() - metrosProduzidos);
+                displaySingleSaldoCarretelEntrada2.setValue(displaySingleSaldoCarretelEntrada2.getValue() - metrosProduzidos);
+                atualiMostradorParadaEntrada(displaySingleMetragemCarretel.getValue());                
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -2047,16 +2207,44 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
 
     private void atualiMostradorParadaEntrada(double metrosProduzidos) {
         double metrosParaAlerta=0;
+        double metrosConsu1=0;
+        double metrosConsu2=0;
+        double Alerta1=999999;
+        double Alerta2=999999;
+        String dado[] = new String[2];
+        int Alerta=0;
         try {
+            if(listaPesagens.size() == 2){
+                metrosConsu1 = listaPesagens.get(0).getMetragemOperador() - displaySingleSaldoCarretelEntrada1.getValue();
+                metrosConsu2 = listaPesagens.get(1).getMetragemOperador() - displaySingleSaldoCarretelEntrada2.getValue();
+            }else{
+                metrosConsu1 = listaPesagens.get(0).getMetragemOperador() - displaySingleSaldoCarretelEntrada1.getValue();
+            }
             for (int i=0;i<metrosAlerta.size();i++){
-                //modelo.addRow(new Object[]{String.valueOf(i+1),metrosAlerta.get(i).toString()});                
-                metrosParaAlerta = (double) metrosAlerta.get(i);
-                if(metrosProduzidos < metrosParaAlerta){
-                    metrosParaAlerta = metrosParaAlerta - metrosProduzidos;
-                    displaySingleEvtCarEntrada.setValue(metrosParaAlerta);
-                    return;
+                dado = metrosAlerta.get(i).split("#");
+                if(dado[1].equals(listaPesagens.get(0).getCodEmbalagem())){
+                    if(metrosConsu1<Double.valueOf(dado[0])){
+                        if(Alerta1>Double.valueOf(dado[0]))
+                            Alerta1 = Double.valueOf(dado[0]);
+                    }
                 }
             }
+            for (int i=0;i<metrosAlerta.size();i++){
+                dado = metrosAlerta.get(i).split("#");
+                if(dado[1].equals(listaPesagens.get(1).getCodEmbalagem())){
+                    if(metrosConsu2<Double.valueOf(dado[0])){
+                        if(Alerta2>Double.valueOf(dado[0]))
+                            Alerta2 = Double.valueOf(dado[0]);
+                    }
+                }
+            }
+            
+            if((Alerta1-metrosConsu1)<(Alerta2-metrosConsu2)){
+                displaySingleEvtCarEntrada.setValue(Alerta1-metrosConsu1);
+            }else{
+                displaySingleEvtCarEntrada.setValue(Alerta2-metrosConsu2);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -2068,5 +2256,46 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             eventosTimer = 0;
             habilitarMenu();
         }        
+    }
+
+    private void registrarMotivoParadas() {                
+        try {                 
+            int column;
+            Object value ;
+            String codParada,obs;          
+            //selrow = jTableMotivosParada.getSelectedRow();
+            for (int i=0;i<jTableMotivosParada.getRowCount();i++){
+                column = jTableMotivosParada.convertColumnIndexToView(0);
+                value = jTableMotivosParada.getValueAt(i, column);
+                codParada = String.valueOf(value);
+                column = jTableMotivosParada.convertColumnIndexToView(3);
+                value = jTableMotivosParada.getValueAt(i, column);
+                if(!value.toString().trim().equals("")){
+                        obs = String.valueOf(value);
+                }else{
+                    obs = "";
+                }
+                if(!paradas.registraMotivoParadaMaquina(codParada,obs)){                                        
+                    JOptionPane.showMessageDialog(rootPane,"falha ao registrar motivo da parada","Falha no Registro",JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } catch (HeadlessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void buscarParadasProcessoProducao() {
+        try {
+            DefaultTableModel table = (DefaultTableModel) jTableProducaoParadas.getModel();
+            if(paradas==null) paradas = new ControllerParadasMaquina(codMaquina);  
+            ParadasMaquina paradasProcesso = this.paradas.buscaParadasProcessoAtual(codMaquina);
+            for (int i=0;i<paradasProcesso.getListaParadas().size();i++){
+                table.addRow(new Object[]{String.valueOf(i),paradasProcesso.getListaParadas().get(i).getCodigo(),
+                    paradasProcesso.getListaParadas().get(i).getAbreviacao(), 
+                    paradasProcesso.getListaParadas().get(i).getObservacao()});
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }                                 

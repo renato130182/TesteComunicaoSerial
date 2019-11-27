@@ -5,6 +5,7 @@ public class Paradas {
     private int codigo;
     private String descricao;
     private String abreviacao;
+    private String observacao;
 
     public Paradas() {
         codigo = 0;
@@ -34,5 +35,13 @@ public class Paradas {
 
     public void setAbreviacao(String abreviacao) {
         this.abreviacao = abreviacao;
+    }
+
+    public String getObservacao() {
+        return observacao;
+    }
+
+    public void setObservacao(String observacao) {
+        this.observacao = observacao;
     }
 }

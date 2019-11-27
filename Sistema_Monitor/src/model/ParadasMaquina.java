@@ -7,6 +7,7 @@ public class ParadasMaquina {
 
     private List<Paradas> listaParadas;
     private String cod_maquina;
+    private long identificadores[];
 
     public ParadasMaquina() {
         this.listaParadas = new ArrayList<>();
@@ -26,6 +27,15 @@ public class ParadasMaquina {
 
     public void setCod_maquina(String cod_maquina) {
         this.cod_maquina = cod_maquina;
+    }
+
+    public long[] getIdentificadores() {
+        return identificadores;
+    }
+
+    public void setIdentificadores(long[] identificadores) {
+        this.identificadores = new long[identificadores.length];
+        this.identificadores = identificadores;
     }
 
 }

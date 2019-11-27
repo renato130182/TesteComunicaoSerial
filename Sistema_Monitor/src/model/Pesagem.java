@@ -3,7 +3,9 @@ package model;
 public class Pesagem {
     private String codigo;
     private String observacao;
+    private String codEmbalagem;
     private Long metragemOperador;
+    private Long saldoConsumo;
     public Pesagem() {
     }
 
@@ -29,6 +31,22 @@ public class Pesagem {
 
     public void setObservacao(String observacao) {
         this.observacao = observacao;
+    }
+
+    public String getCodEmbalagem() {
+        return codEmbalagem;
+    }
+
+    public void setCodEmbalagem(String codEmbalagem) {
+        this.codEmbalagem = codEmbalagem;
+    }
+
+    public Long getSaldoConsumo() {
+        return saldoConsumo;
+    }
+
+    public void setSaldoConsumo(Long saldoConsumo) {
+        this.saldoConsumo = saldoConsumo;
     }
     
 
