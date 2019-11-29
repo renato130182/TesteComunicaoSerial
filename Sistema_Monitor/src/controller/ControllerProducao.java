@@ -35,7 +35,7 @@ public class ControllerProducao {
                 lista[i] = lista[i].replace(",", "");
                 if(SoTemNumeros(lista[i])){
                     metros = Long.parseLong(lista[i]);                               
-                    metros = metragemOperador - metros;
+                    //metros = metragemOperador - metros;  descomentar para inverssão de metragens no aviso de eventos do carretel de entrada
                     dado = String.valueOf(metros) + "#" + codEmbalagem;                
                     listaMetragemObservacao.add(dado);
                 }
@@ -65,4 +65,6 @@ public class ControllerProducao {
         }
         return true;
     }
+    
+    
 }
