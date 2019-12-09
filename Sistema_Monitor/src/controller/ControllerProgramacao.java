@@ -5,8 +5,6 @@
  */
 package controller;
 
-import java.util.ArrayList;
-import java.util.List;
 import model.ProgramacaoMaquina;
 
 /**
@@ -14,11 +12,8 @@ import model.ProgramacaoMaquina;
  * @author renato.soares
  */
 public class ControllerProgramacao extends ProgramacaoMaquina{
-
+    LogErro erro = new LogErro();
     public ControllerProgramacao() {
         super();
-    }
-    
-    
-    
+    }            
 }

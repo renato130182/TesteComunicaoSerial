@@ -6,6 +6,7 @@
 package dao;
 
 
+import controller.LogErro;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,8 +14,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import model.Maquina;
 
 /**
@@ -23,7 +22,7 @@ import model.Maquina;
  */
 public class MaquinaDAO {
     private String sql;
-
+    LogErro erro = new LogErro();
     public MaquinaDAO() {
         sql = "";
     }
@@ -53,8 +52,9 @@ public class MaquinaDAO {
                     return maq;
                 }else{
                     System.out.println("Query não buscou dados da maquina");
-                }} catch (SQLException ex) {
-                Logger.getLogger(MaquinaDAO.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } catch (SQLException ex) {
+                erro.gravaErro(ex);
             }
         }
         db.desconectar();
@@ -62,25 +62,31 @@ public class MaquinaDAO {
     }
     
     public List<String> listarMaquinas() throws SQLException{
-        List<String> lista = new ArrayList();
-        sql = "SELECT codigo FROM condumigproducao.maquina where situacao = 1;";
         ConexaoDatabase db = new ConexaoDatabase();
-        if(db.isInfoDB()){
-            
-            Connection conec = db.getConnection();
-            Statement st = conec.prepareStatement(sql);
-            ResultSet res = st.executeQuery(sql);
-            if(res.next()){
-                while(res.next()){
-                    lista.add(res.getString("codigo"));
+        Connection conec = db.getConnection();
+        try {                    
+            List<String> lista = new ArrayList();
+            sql = "SELECT codigo FROM condumigproducao.maquina where situacao = 1;";            
+            if(db.isInfoDB()){            
+                
+                Statement st = conec.prepareStatement(sql);
+                ResultSet res = st.executeQuery(sql);
+                if(res.next()){
+                    while(res.next()){
+                        lista.add(res.getString("codigo"));
+                   }
+                   db.desconectar();
+                   return lista;
+               }else{
+                   System.out.println("Query não listou maquinas");
                }
-               db.desconectar();
-               return lista;
-           }else{
-               System.out.println("Query não listou maquinas");
-           }
+            }
+            db.desconectar();
+            return null;
+        } catch (SQLException e) {
+            erro.gravaErro(e);
+            db.desconectar();
+            return null;
         }
-        db.desconectar();
-        return null;
     }
 }

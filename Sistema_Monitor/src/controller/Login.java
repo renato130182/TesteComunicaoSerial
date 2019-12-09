@@ -16,24 +16,35 @@ import model.Usuario;
 public class Login extends Usuario{
     private String userDefault;
     private String passDefault;
+    LogErro erro = new LogErro();
     
     public boolean logar(Usuario us){
-        if(buscaDadosDafault()){
-            if(userDefault.equals(this.getUsuario()) && passDefault.equals(this.getSenha())){
-                us.setNome("Usuário Default");
-                us.setNivel("0");
-                return true;                
+        try {                    
+            if(buscaDadosDafault()){
+                if(userDefault.equals(this.getUsuario()) && passDefault.equals(this.getSenha())){
+                    us.setNome("Usuário Default");
+                    us.setNivel("0");
+                    return true;                
+                }
             }
+            LoginDAO log = new LoginDAO();
+            log.validarLogin(us);
+            return log.isLogado();       
+        } catch (Exception e) {
+            erro.gravaErro(e);
+            return false;
         }
-        LoginDAO log = new LoginDAO();
-        log.validarLogin(us);
-        return log.isLogado();       
     }
     
     public boolean  logarCode(Usuario us){
-        LoginDAO log = new LoginDAO();
-        log.validarCodeLogin(us);
-        return log.isLogado();       
+        try {                    
+            LoginDAO log = new LoginDAO();
+            log.validarCodeLogin(us);
+            return log.isLogado();       
+        } catch (Exception e) {
+            erro.gravaErro(e);
+            return false;
+        }
     }
     
     private boolean buscaDadosDafault(){
@@ -56,7 +67,7 @@ public class Login extends Usuario{
                 return false;                
             }
         } catch (Exception e) {            
-            System.out.println(e.getMessage());
+            erro.gravaErro(e);
             return false;
         }
     }

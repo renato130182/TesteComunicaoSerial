@@ -6,12 +6,11 @@
 package dao;
 
 import controller.CriptoCode;
+import controller.LogErro;
 import controller.ManipuladorArquivo;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import model.DadosConexao;
 
@@ -23,15 +22,21 @@ public class ConexaoDatabase extends DadosConexao{
     private Connection conexao = null;
 
     private static final boolean AMBPROD = false;
-    private final boolean infoDB;
+    private boolean infoDB=false;
+    LogErro erro = new LogErro();
     
-    public ConexaoDatabase() {        
-        if(buscaDadosConexao()){
-            infoDB = true;
-        }else{
-            infoDB = false;
-            JOptionPane.showMessageDialog(null, "Não foi possivel buscar dados para conexão,"
-                    + " Arquivo .cnf não encontrado","Conexão com Banco de dados",JOptionPane.ERROR_MESSAGE);
+    public ConexaoDatabase() {   
+        try {                    
+            if(buscaDadosConexao()){
+                infoDB = true;
+            }else{
+                infoDB = false;
+                JOptionPane.showMessageDialog(null, "Não foi possivel buscar dados para conexão,"
+                        + " Arquivo .cnf não encontrado","Conexão com Banco de dados",JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+            erro.gravaErro(e);
+            infoDB= false;
         }
     }
     
@@ -61,7 +66,7 @@ public class ConexaoDatabase extends DadosConexao{
                 return false;
             }           
         }catch(Exception e){
-            System.out.println(e.getMessage());
+            erro.gravaErro(e);
             return false;
         }
     }
@@ -86,10 +91,10 @@ public class ConexaoDatabase extends DadosConexao{
             }                                    
             return conexao;
         } catch (SQLException e){
-            System.err.println("Não foi possivel conectar ao banco de dados!!!" + e.getMessage());
+            erro.gravaErro(e);
             return null;
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(ConexaoDatabase.class.getName()).log(Level.SEVERE, null, ex);
+            erro.gravaErro(ex);
         }
     return null;
     }
@@ -98,7 +103,7 @@ public class ConexaoDatabase extends DadosConexao{
             try {
                 conexao.close();
             } catch (SQLException ex) {
-                Logger.getLogger(ConexaoDatabase.class.getName()).log(Level.SEVERE, null, ex);
+                erro.gravaErro(ex);
             }
         }
     }

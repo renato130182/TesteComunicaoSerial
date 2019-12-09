@@ -5,13 +5,12 @@
  */
 package dao;
 
+import controller.LogErro;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import model.Produto;
 import model.ProgramacaoMaquina;
 
@@ -21,6 +20,7 @@ import model.ProgramacaoMaquina;
  */
 public class ProgramacaoMaquinaDAO {
     private String sql;
+    LogErro erro = new LogErro();
     
     public List<ProgramacaoMaquina> buscaProgramacaoMaquina(String codMaquina){
         List<ProgramacaoMaquina> lista = new ArrayList<>();
@@ -50,7 +50,7 @@ public class ProgramacaoMaquinaDAO {
                 conec.close();
                 return lista;
             } catch (SQLException ex) {
-                Logger.getLogger(ProgramacaoMaquinaDAO.class.getName()).log(Level.SEVERE, null, ex);
+                erro.gravaErro(ex);
             }
         }
         return null;
@@ -85,7 +85,7 @@ public class ProgramacaoMaquinaDAO {
                     }
             }
         } catch (SQLException ex) {
-            Logger.getLogger(ProgramacaoMaquinaDAO.class.getName()).log(Level.SEVERE, null, ex);
+            erro.gravaErro(ex);
         }
         db.desconectar();
         return null;

@@ -5,6 +5,7 @@
  */
 package dao;
 
+import controller.LogErro;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,7 +18,7 @@ import model.ProdutoMaquina;
  */
 public class ProdutoMaquinaDAO {
     private String sql;
-    
+    LogErro erro = new LogErro();
     public ProdutoMaquina buscaVelocidadeProdutoMaquina(String produto, String maquina){
         ProdutoMaquina prodMaq = new ProdutoMaquina();
         ConexaoDatabase db = new ConexaoDatabase();
@@ -36,7 +37,7 @@ public class ProdutoMaquinaDAO {
                 return prodMaq;
             }
         } catch (SQLException e) {
-            System.err.println("Falha ao buscar item em producao" + e.getMessage());
+            erro.gravaErro(e);
         }
         db.desconectar();
         return null;

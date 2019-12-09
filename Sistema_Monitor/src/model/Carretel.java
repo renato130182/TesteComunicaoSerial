@@ -1,7 +1,7 @@
 package model;
 import controller.InterfaceCarretel;
 
-public class Carretel implements InterfaceCarretel {
+public class Carretel implements InterfaceCarretel{
 
     private String codigo;
     private String descricao;
@@ -36,7 +36,7 @@ public class Carretel implements InterfaceCarretel {
 
     @Override
     public void buscaDadosCarretel() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
     }
 
 

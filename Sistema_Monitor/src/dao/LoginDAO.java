@@ -5,12 +5,11 @@
  */
 package dao;
 
+import controller.LogErro;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import model.Usuario;
 
 /**
@@ -20,7 +19,8 @@ import model.Usuario;
 public class LoginDAO{
     private String sql;
     private boolean logado;
-
+    LogErro erro = new LogErro();
+    
     public boolean isLogado() {
         return logado;
     }
@@ -44,7 +44,7 @@ public class LoginDAO{
                     this.logado = false;
                 }                    
             } catch (SQLException ex) {
-                Logger.getLogger(LoginDAO.class.getName()).log(Level.SEVERE, null, ex);
+                erro.gravaErro(ex);
             }
             
         }
@@ -68,7 +68,7 @@ public class LoginDAO{
                     this.logado = false;
                 }                    
             } catch (SQLException ex) {
-                Logger.getLogger(LoginDAO.class.getName()).log(Level.SEVERE, null, ex);
+                erro.gravaErro(ex);
             }
             
         }

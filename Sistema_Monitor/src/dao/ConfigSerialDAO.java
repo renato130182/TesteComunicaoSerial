@@ -5,12 +5,11 @@
  */
 package dao;
 
+import controller.LogErro;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import model.ConfigSerialPort;
 
 /**
@@ -20,7 +19,9 @@ import model.ConfigSerialPort;
 public class ConfigSerialDAO {
     private String sql;
     ConfigSerialPort cfg = new ConfigSerialPort();
-    public ConfigSerialPort buscaDadosConfigSerial(String configName, String maqSerial){
+    LogErro erro = new LogErro();
+    
+    public ConfigSerialPort buscaDadosConfigSerial(String configName, String maqSerial) {
         sql = "SELECT * FROM bd_sistema_monitor.tb_config_serial where configname = ? and serial_maquina_monitor = ?;";
         ConexaoDatabase db = new ConexaoDatabase();
         if(db.isInfoDB()){
@@ -42,7 +43,7 @@ public class ConfigSerialDAO {
                     cfg.setSerialPortName("");
                 }                    
             } catch (SQLException ex) {
-                Logger.getLogger(LoginDAO.class.getName()).log(Level.SEVERE, null, ex);
+                erro.gravaErro(ex);
             }            
         }
         db.desconectar();
@@ -76,7 +77,7 @@ public class ConfigSerialDAO {
                     return false;
                 }                                
             } catch (SQLException ex) {
-                Logger.getLogger(LoginDAO.class.getName()).log(Level.SEVERE, null, ex);
+                erro.gravaErro(ex);
             }            
         }
         db.desconectar();
@@ -111,7 +112,7 @@ public class ConfigSerialDAO {
                     return false;
                 }                                
             } catch (SQLException ex) {
-                Logger.getLogger(LoginDAO.class.getName()).log(Level.SEVERE, null, ex);
+                erro.gravaErro(ex);
             }            
         }
         db.desconectar();

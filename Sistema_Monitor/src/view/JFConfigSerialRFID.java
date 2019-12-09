@@ -6,8 +6,9 @@
 package view;
 
 import Serial.SerialTxRx;
+import controller.LogErro;
 import dao.ConfigSerialDAO;
-import java.lang.reflect.Field;
+import java.awt.HeadlessException;
 import javax.swing.JOptionPane;
 import model.ConfigSerialPort;
 
@@ -17,7 +18,7 @@ import model.ConfigSerialPort;
  */
 public class JFConfigSerialRFID extends javax.swing.JFrame {
     SerialTxRx serialPorts = new SerialTxRx();
-    
+    LogErro erro = new LogErro();
     ConfigSerialDAO dao = new ConfigSerialDAO();
     private String configName;
     
@@ -30,20 +31,24 @@ public class JFConfigSerialRFID extends javax.swing.JFrame {
     }
     
     private void CarregaPortasDisponiveis(){
-        cmbPorta.removeAllItems();
-        
-        String portas[] = serialPorts.BuscarPortas();       
-        for(int i=0;i<portas.length;i++){           
-            if(portas[i]!=null){
-                cmbPorta.addItem(portas[i]);
+        try {                    
+            cmbPorta.removeAllItems();
+
+            String portas[] = serialPorts.BuscarPortas();       
+            for(int i=0;i<portas.length;i++){           
+                if(portas[i]!=null){
+                    cmbPorta.addItem(portas[i]);
+                }
             }
+           if(cmbPorta.getItemCount()>0){
+               jButtonSalvar.setEnabled(true);
+            }else{
+              jButtonSalvar.setEnabled(false);
+           }
+           serialPorts.close();
+        } catch (Exception e) {
+            erro.gravaErro(e);
         }
-       if(cmbPorta.getItemCount()>0){
-           jButtonSalvar.setEnabled(true);
-        }else{
-          jButtonSalvar.setEnabled(false);
-       }
-       serialPorts.close();
     }
 
     /**
@@ -199,40 +204,32 @@ public class JFConfigSerialRFID extends javax.swing.JFrame {
 
     private void jButtonSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSalvarActionPerformed
         // TODO add your handling code here:
-        boolean nova,regs;
-        ConfigSerialPort conn = new ConfigSerialPort();  
-        conn = dao.buscaDadosConfigSerial(configName,JFPrincipal.getIdentificador());        
-        if(!conn.getSerialMaquina().trim().equals("")){
-            nova = false;            
-        }else{
-            nova = true;            
-        }        
-        conn.setSerialPortName(cmbPorta.getSelectedItem().toString());
-        conn.setDataRate(Integer.parseInt(cmbBaudRate.getSelectedItem().toString()));
-        conn.setDataBits(Integer.parseInt(cmbBitsDados.getSelectedItem().toString()));        
-        conn.setStopBits(cmbBitParada.getSelectedIndex()+1);
-        conn.setParity(cmbParidade.getSelectedIndex());
-        conn.setFlowControl(cmbControleFluxo.getSelectedIndex());
-        conn.setConfigName(configName);
-        conn.setSerialMaquina(JFPrincipal.getIdentificador());
-        conn.setTimeOut(1000);
-        if(nova){
-            if(dao.adicionarNovaConfigSerial(conn)){
-                regs = true;
+        try {                    
+            boolean nova,regs;
+            ConfigSerialPort conn = new ConfigSerialPort();  
+            conn = dao.buscaDadosConfigSerial(configName,JFPrincipal.getIdentificador());        
+            nova = conn.getSerialMaquina().trim().equals("");        
+            conn.setSerialPortName(cmbPorta.getSelectedItem().toString());
+            conn.setDataRate(Integer.parseInt(cmbBaudRate.getSelectedItem().toString()));
+            conn.setDataBits(Integer.parseInt(cmbBitsDados.getSelectedItem().toString()));        
+            conn.setStopBits(cmbBitParada.getSelectedIndex()+1);
+            conn.setParity(cmbParidade.getSelectedIndex());
+            conn.setFlowControl(cmbControleFluxo.getSelectedIndex());
+            conn.setConfigName(configName);
+            conn.setSerialMaquina(JFPrincipal.getIdentificador());
+            conn.setTimeOut(1000);
+            if(nova){
+                regs = dao.adicionarNovaConfigSerial(conn);
             }else{
-                regs = false;
+                regs = dao.AtualizarConfigSerial(conn);     
             }
-        }else{
-            if(dao.AtualizarConfigSerial(conn)){
-                regs = true;                
+            if(regs){
+                JOptionPane.showMessageDialog(rootPane,"Configuração atualizada com sucesso!","Configuração atualizada",JOptionPane.OK_OPTION);
             }else{
-                regs = false;                
-            }     
-        }
-        if(regs){
-            JOptionPane.showMessageDialog(rootPane,"Configuração atualizada com sucesso!","Configuração atualizada",JOptionPane.OK_OPTION);
-        }else{
-            JOptionPane.showMessageDialog(rootPane,"Falha ao atualizar os dados da configuração, por favor tente novamente.","Falha...",JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(rootPane,"Falha ao atualizar os dados da configuração, por favor tente novamente.","Falha...",JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (HeadlessException | NumberFormatException e) {
+            erro.gravaErro(e);
         }
     }//GEN-LAST:event_jButtonSalvarActionPerformed
 

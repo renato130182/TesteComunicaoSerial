@@ -1,6 +1,6 @@
 package controller;
 
 public interface InterfaceCarretel {
-
-    public void buscaDadosCarretel();
+    LogErro erro = new LogErro();
+    public void buscaDadosCarretel()throws Exception;
 }

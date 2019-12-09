@@ -5,6 +5,7 @@
  */
 package dao;
 
+import controller.LogErro;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,6 +18,7 @@ import model.ProdutoCarretel;
  */
 public class ProdutoCarretelDAO {
     private String sql;
+    LogErro erro = new LogErro();
     
     public ProdutoCarretel buscaDadosProdutoCarretel(String produto, String carretel,String maquina){
         ProdutoCarretel prodCar = new ProdutoCarretel();
@@ -38,7 +40,7 @@ public class ProdutoCarretelDAO {
                 return prodCar;
             }
         } catch (SQLException e) {
-            System.err.println("Falha ao buscar item em producao" + e.getMessage());
+            erro.gravaErro(e);
         }
         db.desconectar();
         return null;

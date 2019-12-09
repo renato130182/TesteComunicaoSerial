@@ -5,14 +5,13 @@
  */
 package dao;
 
+import controller.LogErro;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import model.EventoMaquina;
 import model.Paradas;
 import model.ParadasMaquina;
@@ -23,6 +22,7 @@ import model.ParadasMaquina;
  */
 public class ParadasMaquinaDAO {
     private String sql; 
+    LogErro erro = new LogErro();
     
     public ParadasMaquina buscaParadasmaquina(String cod_maquina){
         ParadasMaquina paradasMaquina = new ParadasMaquina();
@@ -49,7 +49,7 @@ public class ParadasMaquinaDAO {
                 db.desconectar();
                 return paradasMaquina;
             } catch (SQLException ex) {
-                Logger.getLogger(ProgramacaoMaquinaDAO.class.getName()).log(Level.SEVERE, null, ex);
+                erro.gravaErro(ex);
             }
         }
         db.desconectar();
@@ -75,7 +75,7 @@ public class ParadasMaquinaDAO {
                     return false;
                 }                                
             } catch (SQLException ex) {
-                Logger.getLogger(LoginDAO.class.getName()).log(Level.SEVERE, null, ex);
+                erro.gravaErro(ex);
             }            
         }
         db.desconectar();
@@ -97,7 +97,7 @@ public class ParadasMaquinaDAO {
                     return id;
                 }                                
             } catch (SQLException ex) {
-                Logger.getLogger(ProgramacaoMaquinaDAO.class.getName()).log(Level.SEVERE, null, ex);
+                erro.gravaErro(ex);
             }
         }
         db.desconectar();
@@ -124,7 +124,7 @@ public class ParadasMaquinaDAO {
                     return false;
                 }                                
             } catch (SQLException ex) {
-                Logger.getLogger(LoginDAO.class.getName()).log(Level.SEVERE, null, ex);
+                erro.gravaErro(ex);
             }            
         }
         db.desconectar();
@@ -165,7 +165,7 @@ public class ParadasMaquinaDAO {
                     return false;
                 }                                
             } catch (SQLException ex) {
-                Logger.getLogger(LoginDAO.class.getName()).log(Level.SEVERE, null, ex);
+                erro.gravaErro(ex);
             }            
         }
         db.desconectar();
@@ -208,7 +208,7 @@ public class ParadasMaquinaDAO {
                 db.desconectar();
                 return paradasMaquina;
             } catch (SQLException ex) {
-                Logger.getLogger(ProgramacaoMaquinaDAO.class.getName()).log(Level.SEVERE, null, ex);
+                erro.gravaErro(ex);
             }
         }
         db.desconectar();

@@ -8,7 +8,6 @@ package controller;
 import dao.ParadasMaquinaDAO;
 import java.util.List;
 import java.util.ArrayList;
-import javax.swing.JTable;
 import model.EventoMaquina;
 import model.Paradas;
 import model.ParadasMaquina;
@@ -20,9 +19,15 @@ import model.ParadasMaquina;
 public class ControllerParadasMaquina {
     private ParadasMaquina paradasMaquina = new ParadasMaquina();
     private long ultimoEvento;
+    LogErro erro = new LogErro();
+    
     public ControllerParadasMaquina(String cod_Maquina) {
-        ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO();
-        this.paradasMaquina = daoPar.buscaParadasmaquina(cod_Maquina);
+        try {                    
+            ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO();
+            this.paradasMaquina = daoPar.buscaParadasmaquina(cod_Maquina);
+        } catch (Exception e) {
+            erro.gravaErro(e);
+        }
     }
     
     public List<String> buscaListaParadasDescricao(){
@@ -36,7 +41,7 @@ public class ControllerParadasMaquina {
             }
             return paradasDescricao;
         } catch (Exception e) {
-            e.printStackTrace();
+            erro.gravaErro(e);
         }
         return null;
     }
@@ -51,7 +56,7 @@ public class ControllerParadasMaquina {
             infoParada.add(listaParadas.get(codParada).getDescricao());
             return infoParada;
         } catch (Exception e) {
-            e.printStackTrace();
+            erro.gravaErro(e);
         }
         return null;
     }
@@ -64,9 +69,11 @@ public class ControllerParadasMaquina {
                 evt.setCod_maquina(cod_maquina);
                 evt.setMetragem(metragem);            
                 return  daoPar.incluirInicioEventoMaquina(evt);
+            }else{
+                return true;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            erro.gravaErro(e);
         }
         return false;
     }
@@ -80,7 +87,7 @@ public class ControllerParadasMaquina {
             this.ultimoEvento = evt.getIdEvento();
             return  daoPar.RegistrarRetornoEventoMaquina(evt);
         } catch (Exception e) {
-            e.printStackTrace();
+            erro.gravaErro(e);
         }
         return false;
     }
@@ -92,9 +99,9 @@ public class ControllerParadasMaquina {
     public boolean registraMotivoParadaMaquina(String codigo,String obs){
         try {
             ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO();
-            return daoPar.incluirMotivoEventoMaquina(Long.valueOf(codigo), ultimoEvento,obs);
-        } catch (Exception e) {
-            e.printStackTrace();
+            return daoPar.incluirMotivoEventoMaquina(Long.valueOf(codigo), ultimoEvento,obs);                            
+        } catch (NumberFormatException e) {
+            erro.gravaErro(e);
         }
         return false;
     }
@@ -108,6 +115,5 @@ public class ControllerParadasMaquina {
             e.printStackTrace();
         }
         return null;               
-    }
-        
+    }          
 }

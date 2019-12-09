@@ -11,8 +11,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -21,7 +19,7 @@ import java.util.logging.Logger;
 public class ManipuladorArquivo {
     private String dados;    
     private String arquivo;  
-
+    LogErro erro = new LogErro();
     public ManipuladorArquivo() {
         //System.out.println("Iniciando manipulador de arquivos");
         dados = "";
@@ -46,30 +44,26 @@ public class ManipuladorArquivo {
     }
             
         
-    public void BuscarArquivo(){
-        try {
-            
-            try (BufferedReader buffer = new BufferedReader(new FileReader(this.arquivo))) {
-                this.setDados(buffer.readLine());
-                //System.out.println("dados bufferizados: " + this.getDados()) ;
-            }
-            
+    public void BuscarArquivo(){           
+        try (BufferedReader buffer = new BufferedReader(new FileReader(this.arquivo))) {
+            this.setDados(buffer.readLine());                        
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(ManipuladorArquivo.class.getName()).log(Level.SEVERE, null, ex);
+            erro.gravaErro(ex);
         } catch (IOException ex) {
-            Logger.getLogger(ManipuladorArquivo.class.getName()).log(Level.SEVERE, null, ex);
+            erro.gravaErro(ex);
         }
     }
     
     public void escreverArquivo (){
-        try {
-            try (BufferedWriter buffWrite = new BufferedWriter(new FileWriter(this.arquivo))) {   
-                buffWrite.append(this.dados);
-                //System.out.println("caminho gravado: " + this.arquivo);    
-            }
+     
+        try {                            
+            BufferedWriter buffWrite = new BufferedWriter(new FileWriter(this.arquivo));
+            buffWrite.append(this.dados);
+        } catch (FileNotFoundException e) {
+            erro.gravaErro(e);
         } catch (IOException ex) {
-            Logger.getLogger(ManipuladorArquivo.class.getName()).log(Level.SEVERE, null, ex);
-        }
+            erro.gravaErro(ex);
+        }                    
         
     }
 

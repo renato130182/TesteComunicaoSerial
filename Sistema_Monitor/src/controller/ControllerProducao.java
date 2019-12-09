@@ -16,7 +16,7 @@ import model.Pesagem;
  */
 public class ControllerProducao {
     private List<String> listaMetragemObservacao = new ArrayList<>();
-
+    LogErro erro = new LogErro();
     public List<String> getListaMetragemObservacao() {
         return listaMetragemObservacao;
     }
@@ -33,38 +33,34 @@ public class ControllerProducao {
             try {
                 lista[i] = lista[i].replace(".", "");
                 lista[i] = lista[i].replace(",", "");
-                if(SoTemNumeros(lista[i])){
+                if(ControllerUtil.SoTemNumeros(lista[i])){
                     metros = Long.parseLong(lista[i]);                               
                     //metros = metragemOperador - metros;  descomentar para inverssão de metragens no aviso de eventos do carretel de entrada
                     dado = String.valueOf(metros) + "#" + codEmbalagem;                
                     listaMetragemObservacao.add(dado);
                 }
             } catch (NumberFormatException e){
-                e.printStackTrace();
+                erro.gravaErro(e);
             }
         }
         listaMetragemObservacao.sort(null);        
     }
-    public boolean SoTemNumeros(String texto) { 
-        if(texto.length()==0)return false;
-        for (int i = 0; i < texto.length(); i++) { 
-            if (!Character.isDigit(texto.charAt(i))) { 
-                return false; 
-            } 
-        } return true; 
-    }
+    
     
     public boolean atualizaMetragemProduzida(List<Pesagem> lista, double metragemProd, String cod_maquina){
-        ProducaoDAO daoProd = new ProducaoDAO();
-        if(daoProd.atualizaMetragemProduzida(cod_maquina, String.valueOf(metragemProd))){
-            for (int i=0;i<lista.size();i++){
-                if(!daoProd.atualizaSaldoConsumoEntrada(lista.get(i).getCodigo(),String.valueOf(metragemProd))) return false;
+        try {                    
+            ProducaoDAO daoProd = new ProducaoDAO();
+            if(daoProd.atualizaMetragemProduzida(cod_maquina, String.valueOf(metragemProd))){
+                for (int i=0;i<lista.size();i++){
+                    if(!daoProd.atualizaSaldoConsumoEntrada(lista.get(i).getCodigo(),String.valueOf(metragemProd))) return false;
+                }
+            }else{
+                return false;
             }
-        }else{
+            return true;
+        } catch (Exception e) {
+            erro.gravaErro(e);
             return false;
-        }
-        return true;
-    }
-    
-    
+        }        
+    }    
 }

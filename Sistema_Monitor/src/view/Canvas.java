@@ -4,21 +4,19 @@
  * and open the template in the editor.
  */
 package view;
+import controller.LogErro;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import org.w3c.dom.css.RGBColor;
+
 
 /**
  *
  * @author renato.soares
  */
 public class Canvas extends javax.swing.JPanel {
- 
+    LogErro erro = new LogErro();
     /**
      * Creates new form Canvas
      */
@@ -30,13 +28,17 @@ public class Canvas extends javax.swing.JPanel {
         try {
             this.logo = ImageIO.read(getClass().getResource("/images/LogoCondumigSA2019.png"));
         } catch (IOException ex) {
-            Logger.getLogger(Canvas.class.getName()).log(Level.SEVERE, null, ex);
+            erro.gravaErro(ex);
         }
     }
     @Override
     protected  void paintComponent(Graphics g){
-        super.paintComponent(g);
-        g.drawImage(logo.getScaledInstance(this.getWidth(),this.getHeight(), 0), 0, 0, null);
+        try {                    
+            super.paintComponent(g);
+            g.drawImage(logo.getScaledInstance(this.getWidth(),this.getHeight(), 0), 0, 0, null);
+        } catch (Exception e) {
+            erro.gravaErro(e);
+        }
         
     }
     /**

@@ -35,7 +35,9 @@ public class CriptoCode {
             return encripta.doFinal(dados.getBytes("UTF-8"));
            
         } catch (NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException | UnsupportedEncodingException | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
-            Logger.getLogger(CriptoCode.class.getName()).log(Level.SEVERE, null, ex);
+            LogErro erro = new LogErro();
+            erro.gravaErro(ex);
+            
         }
         return null;       
     }
@@ -48,17 +50,24 @@ public class CriptoCode {
             decripta.init(Cipher.DECRYPT_MODE,key,new IvParameterSpec(IV.getBytes("UTF-8")));
             return new String(decripta.doFinal(dados),"UTF-8");
         } catch (NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException | UnsupportedEncodingException | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
-            Logger.getLogger(CriptoCode.class.getName()).log(Level.SEVERE, null, ex);
+            LogErro erro = new LogErro();
+            erro.gravaErro(ex);
         }                            
         return null;
     }
     
     public static byte [] converterStringByte(String dados,String separador){
-        String dadosArquivo[] = dados.split(separador);
-        byte[] dadocript = new byte[dadosArquivo.length];
-        for (int i=0;i<dadosArquivo.length;i++){
-            dadocript[i] = (byte)(Integer.parseInt(dadosArquivo[i]));
+        try {                    
+            String dadosArquivo[] = dados.split(separador);
+            byte[] dadocript = new byte[dadosArquivo.length];
+            for (int i=0;i<dadosArquivo.length;i++){
+                dadocript[i] = (byte)(Integer.parseInt(dadosArquivo[i]));
+            }
+            return dadocript;
+        } catch (NumberFormatException e) {
+            LogErro erro = new LogErro();
+            erro.gravaErro(e);
+            return null;
         }
-        return dadocript;
     }
 }

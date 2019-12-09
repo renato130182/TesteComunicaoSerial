@@ -5,13 +5,13 @@
  */
 package view;
 
+import controller.LogErro;
 import dao.DadosDefaultDAO;
 import dao.MaquinaDAO;
+import java.awt.HeadlessException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 public class JFCadastroMonitor extends javax.swing.JFrame {
     DadosDefaultDAO df = new DadosDefaultDAO();
     private boolean edit=false;        
+    LogErro erro = new LogErro();
     /**
      * Creates new form JFCadastroMonitor
      */
@@ -35,7 +36,7 @@ public class JFCadastroMonitor extends javax.swing.JFrame {
             }
             jlSerial.setText(JFPrincipal.getIdentificador());
         } catch (SQLException ex) {
-            Logger.getLogger(JFCadastroMonitor.class.getName()).log(Level.SEVERE, null, ex);
+            erro.gravaErro(ex);
         }
         
     }
@@ -126,25 +127,33 @@ public class JFCadastroMonitor extends javax.swing.JFrame {
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
-        String codMaquina = df.buscaCodigoMaquina(JFPrincipal.getIdentificador());
-        if(codMaquina==null){
-            JOptionPane.showMessageDialog(rootPane, "Por favor cadastre a maquina "
-                    + "antes de continuar!!","Aguardando cadastro",JOptionPane.ERROR_MESSAGE);
-        }else{
-            this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        try {                    
+            String codMaquina = df.buscaCodigoMaquina(JFPrincipal.getIdentificador());
+            if(codMaquina==null){
+                JOptionPane.showMessageDialog(rootPane, "Por favor cadastre a maquina "
+                        + "antes de continuar!!","Aguardando cadastro",JOptionPane.ERROR_MESSAGE);
+            }else{
+                this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+            }
+        } catch (HeadlessException e) {
+            erro.gravaErro(e);
         }
     }//GEN-LAST:event_formWindowClosing
 
     private void jbRegistrarMonitorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbRegistrarMonitorActionPerformed
         // TODO add your handling code here:
-        if(!edit){
-            if(df.cadastrarMaquinaMonitor(jlSerial.getText(),jcbListaMaquinas.getSelectedItem().toString())){
-                JOptionPane.showMessageDialog(rootPane,"Cadastro realizado com sucesso!!","Cadastro",JOptionPane.INFORMATION_MESSAGE);            
+        try {                    
+            if(!edit){
+                if(df.cadastrarMaquinaMonitor(jlSerial.getText(),jcbListaMaquinas.getSelectedItem().toString())){
+                    JOptionPane.showMessageDialog(rootPane,"Cadastro realizado com sucesso!!","Cadastro",JOptionPane.INFORMATION_MESSAGE);            
+                }
+            }else{            
+                if(df.atualizarMaquinaMonitor(jlSerial.getText(),jcbListaMaquinas.getSelectedItem().toString())){
+                    JOptionPane.showMessageDialog(rootPane,"Atualização realizada com sucesso!!","Cadastro",JOptionPane.INFORMATION_MESSAGE);            
+                }
             }
-        }else{            
-            if(df.atualizarMaquinaMonitor(jlSerial.getText(),jcbListaMaquinas.getSelectedItem().toString())){
-                JOptionPane.showMessageDialog(rootPane,"Atualização realizada com sucesso!!","Cadastro",JOptionPane.INFORMATION_MESSAGE);            
-            }
+        } catch (HeadlessException e) {
+            erro.gravaErro(e);
         }
         
     }//GEN-LAST:event_jbRegistrarMonitorActionPerformed

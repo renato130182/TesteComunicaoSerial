@@ -5,12 +5,11 @@
  */
 package dao;
 
+import controller.LogErro;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import model.Producao;
 
 /**
@@ -19,7 +18,7 @@ import model.Producao;
  */
 public class ProducaoDAO {
     private String sql;
-    
+    LogErro erro = new LogErro();
     public Producao buscaItemProducao(String codMaquina){
         ConexaoDatabase db = new ConexaoDatabase();
         Producao prod = new Producao();
@@ -44,7 +43,7 @@ public class ProducaoDAO {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Falha ao buscar item em producao" + e.getMessage());
+            erro.gravaErro(e);
         }
         db.desconectar();
         return null;
@@ -67,7 +66,7 @@ public class ProducaoDAO {
                 return metragem;
             }
         } catch (SQLException e) {
-            System.err.println("Falha ao buscar item em producao" + e.getMessage());
+            erro.gravaErro(e);
         }
         db.desconectar();
         return null;
@@ -92,11 +91,10 @@ public class ProducaoDAO {
                     return false;
                 }                                
             } catch (SQLException ex) {
-                Logger.getLogger(LoginDAO.class.getName()).log(Level.SEVERE, null, ex);
+                erro.gravaErro(ex);
             }            
         }
-        db.desconectar();
-        
+        db.desconectar();        
         return false;
     }
     
@@ -118,7 +116,7 @@ public class ProducaoDAO {
                     return false;
                 }                                
             } catch (SQLException ex) {
-                Logger.getLogger(LoginDAO.class.getName()).log(Level.SEVERE, null, ex);
+                erro.gravaErro(ex);
             }            
         }
         db.desconectar();        

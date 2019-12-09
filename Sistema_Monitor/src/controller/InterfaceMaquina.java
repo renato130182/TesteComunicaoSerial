@@ -2,5 +2,5 @@ package controller;
 
 public interface InterfaceMaquina {
 
-    public void buscaDadosMaquina();
+    public void buscaDadosMaquina()throws Exception;
 }

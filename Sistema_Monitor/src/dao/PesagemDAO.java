@@ -5,14 +5,13 @@
  */
 package dao;
 
+import controller.LogErro;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import model.Pesagem;
 
 /**
@@ -21,6 +20,7 @@ import model.Pesagem;
  */
 public class PesagemDAO {
     private String sql;
+    LogErro erro = new LogErro();
     
     public List<Pesagem> buscapesagensMontagem(String codMaquina){
         List<Pesagem> lista = new ArrayList<Pesagem>();
@@ -47,7 +47,7 @@ public class PesagemDAO {
                 db.desconectar();
                 return lista;
             } catch (SQLException ex) {
-                Logger.getLogger(PesagemDAO.class.getName()).log(Level.SEVERE, null, ex);
+                erro.gravaErro(ex);
             }
         }
         db.desconectar();

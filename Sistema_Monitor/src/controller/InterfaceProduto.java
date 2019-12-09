@@ -2,5 +2,5 @@ package controller;
 
 public interface InterfaceProduto {
 
-    public void buscaDadosProduto();
+    public void buscaDadosProduto()throws Exception;
 }

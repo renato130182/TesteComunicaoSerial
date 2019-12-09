@@ -6,13 +6,12 @@
 package dao;
 
 import controller.CriptoCode;
+import controller.LogErro;
 import controller.ManipuladorArquivo;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import model.DadosConexao;
 import model.Usuario;
@@ -23,6 +22,7 @@ import model.Usuario;
  */
 public class DadosDefaultDAO {
     private String sql;
+    LogErro erro = new LogErro();
     public static String getARQDBPROD() {
         return ARQDBPROD;
     }
@@ -51,7 +51,7 @@ public class DadosDefaultDAO {
             man.escreverArquivo();
             return true;
         } catch (Exception e) {            
-            System.out.println(e.getMessage());
+            erro.gravaErro(e);
             return false;
         }
     }
@@ -73,7 +73,7 @@ public class DadosDefaultDAO {
             man.escreverArquivo();
             return true;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            erro.gravaErro(e);
             return false;
         }        
     }
@@ -103,16 +103,20 @@ public class DadosDefaultDAO {
             }
             return d;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            erro.gravaErro(e);
             return null;
         }
     }
     private void preparaDados(String msg){
-        dados = "";
-        msgCrito = CriptoCode.encrypt(msg);
-        for ( int i=0; i<msgCrito.length;i++){
-            //System.out.print(new Integer(msgCrito[i])+" ");                    
-            dados = dados + Byte.toString(msgCrito[i])+" ";
+        try {                    
+            dados = "";
+            msgCrito = CriptoCode.encrypt(msg);
+            for ( int i=0; i<msgCrito.length;i++){
+                //System.out.print(new Integer(msgCrito[i])+" ");                    
+                dados = dados + Byte.toString(msgCrito[i])+" ";
+            }
+        } catch (Exception e) {
+            erro.gravaErro(e);
         }
     }
     public String buscaCodigoMaquina(String serial){
@@ -131,7 +135,7 @@ public class DadosDefaultDAO {
                     return codMaquina;
                 }
             } catch (SQLException ex) {
-                Logger.getLogger(DadosDefaultDAO.class.getName()).log(Level.SEVERE, null, ex);
+                erro.gravaErro(ex);
             }
                     
         }
@@ -155,7 +159,7 @@ public class DadosDefaultDAO {
                 return true;
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(null, ex.getMessage(),"Erro ao registrar dados",JOptionPane.ERROR_MESSAGE);
-                Logger.getLogger(DadosDefaultDAO.class.getName()).log(Level.SEVERE, null, ex);
+                erro.gravaErro(ex);
             }
         }
         db.desconectar();
@@ -177,7 +181,7 @@ public class DadosDefaultDAO {
                 return true;
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(null, ex.getMessage(),"Erro ao atualizar dados",JOptionPane.ERROR_MESSAGE);
-                Logger.getLogger(DadosDefaultDAO.class.getName()).log(Level.SEVERE, null, ex);
+                erro.gravaErro(ex);
             }
         }
         db.desconectar();
