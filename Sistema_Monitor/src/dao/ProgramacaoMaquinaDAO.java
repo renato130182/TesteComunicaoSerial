@@ -63,12 +63,17 @@ public class ProgramacaoMaquinaDAO {
                         + "it.descricao,itc.minimo, itc.nominal,itc.maximo from condumigproducao.programacaomaquina "
                         + "prog inner join condumigproducao.item it on it.codigo = prog.codigoitem "
                         + "inner join condumigproducao .itemitemcontrole itc on itc.codigoitem = it.codigo "
-                        + "where prog.loteproducao = ? and prog.codigoitem = ? and itc. "
-                        + "codigoitemcontrole = 1 and itc.situacao = 1 order by itc.codigo desc;";
+                        + "where prog.loteproducao = ? and (prog.codigoitem = ? and (itc."
+                        + "codigoitemcontrole = 1 and itc.situacao = 1)) or "
+                        + "(prog.codigoitem = ? and (itc.codigoitemcontrole = 91 and itc.situacao = 1)) "
+                        + "order by itc.codigo desc limit 1;";
+                        
                     java.sql.Connection conec = db.getConnection();
                     PreparedStatement st = conec.prepareStatement(sql);
                     st.setString(1, lote);
                     st.setString(2, item);
+                    st.setString(3, item);
+                    
                     ResultSet res = st.executeQuery();
                     if(res.next()){
                        ProgramacaoMaquina prog = new ProgramacaoMaquina();
@@ -85,6 +90,7 @@ public class ProgramacaoMaquinaDAO {
                     }
             }
         } catch (SQLException ex) {
+            ex.printStackTrace();
             erro.gravaErro(ex);
         }
         db.desconectar();

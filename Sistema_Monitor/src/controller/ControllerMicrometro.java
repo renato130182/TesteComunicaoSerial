@@ -5,6 +5,9 @@
  */
 package controller;
 
+import dao.ConexaoDatabase;
+import dao.MicrometroDAO;
+import java.sql.Connection;
 import java.sql.Time;
 import model.Micrometro;
 
@@ -15,6 +18,7 @@ import model.Micrometro;
 public class ControllerMicrometro extends Micrometro{
     Protocolo.NazkomUDC1_default info = new Protocolo.NazkomUDC1_default();    
     LogErro erro = new LogErro();
+    
     public Micrometro setarDadosMicrometro(String Dados){
         try {                    
             info.setLeituraSerial(Dados);
@@ -26,9 +30,33 @@ public class ControllerMicrometro extends Micrometro{
             if(!info.getMetragem().trim().equals(""))this.setMetragem(Integer.parseInt(info.getMetragem()));            
             if((!info.getHora().trim().equals("")))this.setMicrometroHora(Time.valueOf(info.getHora()));
             return this;
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
             erro.gravaErro(e);
         }
         return null;
     } 
+    
+    public boolean registraRelatorioMicrometro(Micrometro dados,String codMaquina,String lote, int metros){
+        try {
+            ConexaoDatabase db = new ConexaoDatabase();
+            if(db.isInfoDB()){
+                Connection conec = db.getConnection();                
+                conec = db.getConnection();
+                MicrometroDAO dao = new MicrometroDAO(conec);
+                if(dao.registraDadosMicrometro(dados, codMaquina, lote, metros)){
+                    db.desconectar();
+                    return true;
+                }else{
+                    db.desconectar();
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return false;
+    }
+    
 }

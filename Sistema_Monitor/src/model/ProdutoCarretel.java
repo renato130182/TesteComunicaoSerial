@@ -4,7 +4,7 @@ public class ProdutoCarretel {
 
     private int metragemPadrao;
     private int metragemMaxima;
-
+    
     public ProdutoCarretel() {
         metragemMaxima = 0;
         metragemPadrao = 0;

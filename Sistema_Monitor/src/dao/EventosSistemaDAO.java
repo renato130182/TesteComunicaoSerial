@@ -146,14 +146,15 @@ public class EventosSistemaDAO {
         }
         return false;
     }
-    public boolean registraPreApontamentoEventoSistema(String codMaquina, String codParada,String obs) {
+    public boolean registraPreApontamentoEventoSistema(String codMaquina, String codParada,String obs,int codPesagem) {
         try {
             sql = "insert into bd_sistema_monitor.tb_maquina_parada_pre_apontamento "
-                    + "(cod_maquina, cod_parada,observacao) values (?,?,?)";
+                    + "(cod_maquina, cod_parada,observacao,codPesagem) values (?,?,?,?)";
             PreparedStatement st = conec.prepareStatement(sql);
             st.setString(1, codMaquina);
             st.setString(2,codParada);            
             st.setString(3, obs);
+            st.setInt(4,codPesagem);
             st.executeUpdate();
             return st.getUpdateCount()!=0;        
         } catch (SQLException e) {
@@ -165,7 +166,7 @@ public class EventosSistemaDAO {
     public List<Paradas> BuscaPreApontamentoEventoSistema(String codMauina){
         List<Paradas> paradas = new ArrayList<>();
         try {
-            sql = "SELECT cod_parada,descricao,abreviacao,pre.observacao "
+            sql = "SELECT pre.id,cod_parada,descricao,abreviacao,pre.observacao,pre.codPesagem "
                     + "FROM bd_sistema_monitor.tb_maquina_parada_pre_apontamento pre " +
                     "inner join condumigproducao.paradas par on pre.cod_parada = par.codigo " +
                     "where pre.cod_maquina = ?;";
@@ -178,6 +179,8 @@ public class EventosSistemaDAO {
                 parada.setAbreviacao(res.getString("abreviacao"));
                 parada.setDescricao(res.getString("descricao"));
                 parada.setObservacao(res.getString("observacao"));
+                parada.setIdRegistro(res.getInt("id"));
+                parada.setCodPesagem(res.getInt("codPesagem"));
                 paradas.add(parada);
             }
             return paradas;
@@ -236,5 +239,21 @@ public class EventosSistemaDAO {
             erro.gravaErro(e);
         }
         return false;
+    }
+    
+    public String buscaIdEventoSistemaUltimoMotivo(String codMaquina,int idMotivo,String codPesagem){
+        try {
+            sql = "";
+            PreparedStatement st = conec.prepareStatement(sql);            
+            ResultSet res = st.executeQuery();
+            if(res.next()){                
+                return res.getString("id");
+            }else{
+                return null;
+            }    
+        } catch (SQLException e) {
+            erro.gravaErro(e);
+        }
+        return null;
     }
 }

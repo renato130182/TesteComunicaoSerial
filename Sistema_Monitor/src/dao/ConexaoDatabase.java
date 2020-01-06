@@ -5,6 +5,8 @@
  */
 package dao;
 
+import com.pi4j.system.NetworkInfo;
+import controller.ControllerUtil;
 import controller.CriptoCode;
 import controller.LogErro;
 import controller.ManipuladorArquivo;
@@ -73,15 +75,7 @@ public class ConexaoDatabase extends DadosConexao{
     
      public java.sql.Connection getConnection() {                    
          try {
-             //Carregando driver JDBC      
-             //System.out.println("Drive: " + driverName);
-             Class.forName(driverName);
-             //Configurações da caonexão
-             /*
-             System.out.println("Url: " + url + serverName + "/" + myDatabase );
-             System.out.println("UserName: " + userName);
-             System.out.println("pwd: " + password);
-             */
+            Class.forName(driverName);
             conexao = DriverManager.getConnection(url + serverName + "/" + myDatabase ,userName,password);                
             //testando a conexão
             if(conexao != null){
@@ -91,6 +85,10 @@ public class ConexaoDatabase extends DadosConexao{
             }                                    
             return conexao;
         } catch (SQLException e){
+            if(!ControllerUtil.testaConexao(serverName)){
+                JOptionPane.showMessageDialog(null, "Falha na conexão com servidor: " + serverName + "\n" +
+                    "Por favor informe ao setor de informática","Falha na conexão",JOptionPane.ERROR_MESSAGE);                
+            }
             erro.gravaErro(e);
             return null;
         } catch (ClassNotFoundException ex) {

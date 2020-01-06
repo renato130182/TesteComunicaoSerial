@@ -8,12 +8,21 @@ public class Maquina implements InterfaceMaquina {
     private String descricao;
     private float alertaPercentualVelocidade;
     private int alertaMetrosParaArrebentamento;
-
+    private int metrosAmostraDiametro;
     public Maquina() {
         codigo="";
         descricao="";
         alertaPercentualVelocidade=0.f;
         alertaMetrosParaArrebentamento=0;
+        metrosAmostraDiametro=0;
+    }
+
+    public int getMetrosAmostraDiametro() {
+        return metrosAmostraDiametro;
+    }
+
+    public void setMetrosAmostraDiametro(int metrosAmostraDiametro) {
+        this.metrosAmostraDiametro = metrosAmostraDiametro;
     }
 
     public String getCodigo() {

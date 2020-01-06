@@ -1,0 +1,24 @@
+Data do erro: Wed Dec 18 15:48:27 BRST 2019
+Mensagem de erro: String index out of range: -84
+Causa do erro: null
+Stacktrace: java.lang.StringIndexOutOfBoundsException: String index out of range: -84
+	at java.lang.String.substring(String.java:1967)
+	at controller.ControllerUtil.testaConexao(ControllerUtil.java:44)
+	at dao.ConexaoDatabase.getConnection(ConexaoDatabase.java:88)
+	at dao.DadosDefaultDAO.buscaCodigoMaquina(DadosDefaultDAO.java:128)
+	at view.JFPrincipal.<init>(JFPrincipal.java:224)
+	at view.JFPrincipal.lambda$main$0(JFPrincipal.java:1864)
+	at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:311)
+	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:758)
+	at java.awt.EventQueue.access$500(EventQueue.java:97)
+	at java.awt.EventQueue$3.run(EventQueue.java:709)
+	at java.awt.EventQueue$3.run(EventQueue.java:703)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:74)
+	at java.awt.EventQueue.dispatchEvent(EventQueue.java:728)
+	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:205)
+	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:116)
+	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:105)
+	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:93)
+	at java.awt.EventDispatchThread.run(EventDispatchThread.java:82)

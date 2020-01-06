@@ -6,7 +6,24 @@ public class Paradas {
     private String descricao;
     private String abreviacao;
     private String observacao;
+    private int idRegistro;
+    private int codPesagem;
 
+    public int getCodPesagem() {
+        return codPesagem;
+    }
+
+    public void setCodPesagem(int codPesagem) {
+        this.codPesagem = codPesagem;
+    }
+
+    public int getIdRegistro() {
+        return idRegistro;
+    }
+
+    public void setIdRegistro(int idRegistro) {
+        this.idRegistro = idRegistro;
+    }
     public Paradas() {
         codigo = 0;
         descricao = "";

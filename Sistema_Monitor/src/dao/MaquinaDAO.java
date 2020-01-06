@@ -34,7 +34,7 @@ public class MaquinaDAO {
             
             try {
                 sql = "select maq.codigo, maq.descricao, al.metros_arrebentamento, "
-                        + "al.percentual_velocidade_parada from "
+                        + "al.percentual_velocidade_parada,al.metros_amostra_diametro from "
                         + "condumigproducao.maquina maq left join "
                         + "bd_sistema_monitor.tb_maquina_alerta al "
                         + "on al.codigo_maquina_alerta = maq.codigo "
@@ -48,6 +48,7 @@ public class MaquinaDAO {
                     maq.setDescricao(res.getString("maq.descricao"));
                     maq.setAlertaMetrosParaArrebentamento(res.getInt("metros_arrebentamento"));
                     maq.setAlertaPercentualVelocidade(res.getFloat("percentual_velocidade_parada"));
+                    maq.setMetrosAmostraDiametro(res.getInt("metros_amostra_diametro"));
                     db.desconectar();
                     return maq;
                 }else{

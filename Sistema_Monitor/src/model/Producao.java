@@ -14,6 +14,7 @@ public class Producao {
     private String itemProducao;
     private long metragemProduzida;
     private String carretelSaida;
+    
     public Producao() {
         loteProducao = "";
         itemProducao = "";

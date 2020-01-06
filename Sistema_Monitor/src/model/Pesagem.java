@@ -6,6 +6,27 @@ public class Pesagem {
     private String codEmbalagem;
     private Long metragemOperador;
     private Long saldoConsumo;
+    private String codItem;
+    private String DecItem;
+    private int qtosFios;
+    private String lote;
+
+    public String getLote() {
+        return lote;
+    }
+
+    public void setLote(String lote) {
+        this.lote = lote;
+    }
+
+    public int getQtosFios() {
+        return qtosFios;
+    }
+
+    public void setQtosFios(int qtosFios) {
+        this.qtosFios = qtosFios;
+    }
+    
     public Pesagem() {
     }
 
@@ -47,6 +68,22 @@ public class Pesagem {
 
     public void setSaldoConsumo(Long saldoConsumo) {
         this.saldoConsumo = saldoConsumo;
+    }
+
+    public String getCodItem() {
+        return codItem;
+    }
+
+    public void setCodItem(String codItem) {
+        this.codItem = codItem;
+    }
+
+    public String getDecItem() {
+        return DecItem;
+    }
+
+    public void setDecItem(String DecItem) {
+        this.DecItem = DecItem;
     }
     
 

@@ -5,7 +5,10 @@
  */
 package controller;
 
+import dao.ConexaoDatabase;
 import dao.ParadasMaquinaDAO;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
 import model.EventoMaquina;
@@ -22,9 +25,15 @@ public class ControllerParadasMaquina {
     LogErro erro = new LogErro();
     
     public ControllerParadasMaquina(String cod_Maquina) {
-        try {                    
-            ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO();
-            this.paradasMaquina = daoPar.buscaParadasmaquina(cod_Maquina);
+        try {
+            ConexaoDatabase db = new ConexaoDatabase();
+            if(db.isInfoDB()){
+                Connection conec = db.getConnection();                
+                conec = db.getConnection();
+                ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO(conec);
+                this.paradasMaquina = daoPar.buscaParadasmaquina(cod_Maquina);
+                db.desconectar();
+            }
         } catch (Exception e) {
             erro.gravaErro(e);
         }
@@ -63,15 +72,27 @@ public class ControllerParadasMaquina {
     
     public boolean registraInicioParadamaquina(long metragem, String cod_maquina){
         try {
-            ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO();      
-            if(daoPar.buscarIDEventoAberto(cod_maquina)==0){
-                EventoMaquina evt = new EventoMaquina();
-                evt.setCod_maquina(cod_maquina);
-                evt.setMetragem(metragem);            
-                return  daoPar.incluirInicioEventoMaquina(evt);
-            }else{
-                return true;
-            }
+            ConexaoDatabase db = new ConexaoDatabase();
+            if(db.isInfoDB()){
+                Connection conec = db.getConnection();                
+                conec = db.getConnection();
+                ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO(conec);      
+                if(daoPar.buscarIDEventoAberto(cod_maquina)==0){
+                    EventoMaquina evt = new EventoMaquina();
+                    evt.setCod_maquina(cod_maquina);
+                    evt.setMetragem(metragem);                                
+                    if(daoPar.incluirInicioEventoMaquina(evt)){
+                        db.desconectar();
+                        return true;
+                    }else{
+                        db.desconectar();
+                        return false;
+                    }
+                }else{
+                    db.desconectar();
+                    return true;
+                }                
+            }            
         } catch (Exception e) {
             erro.gravaErro(e);
         }
@@ -80,12 +101,17 @@ public class ControllerParadasMaquina {
     
     public boolean registraRetornoParadamaquina(long metragem, String cod_maquina){
         try {
-            ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO();      
-            EventoMaquina evt = new EventoMaquina();            
-            evt.setMetragem(metragem);            
-            evt.setIdEvento(daoPar.buscarIDEventoAberto(cod_maquina));
-            this.ultimoEvento = evt.getIdEvento();
-            return  daoPar.RegistrarRetornoEventoMaquina(evt);
+            ConexaoDatabase db = new ConexaoDatabase();
+            if(db.isInfoDB()){
+                Connection conec = db.getConnection();                
+                conec = db.getConnection();
+                ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO(conec);      
+                EventoMaquina evt = new EventoMaquina();            
+                evt.setMetragem(metragem);            
+                evt.setIdEvento(daoPar.buscarIDEventoAberto(cod_maquina));
+                this.ultimoEvento = evt.getIdEvento();
+                return  daoPar.RegistrarRetornoEventoMaquina(evt);
+            }
         } catch (Exception e) {
             erro.gravaErro(e);
         }
@@ -96,11 +122,36 @@ public class ControllerParadasMaquina {
         return ultimoEvento;
     }
     
-    public boolean registraMotivoParadaMaquina(String codigo,String obs){
+    public boolean registraMotivoParadaMaquina(String codigo,String obs,int codPesagem){
         try {
-            ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO();
-            return daoPar.incluirMotivoEventoMaquina(Long.valueOf(codigo), ultimoEvento,obs);                            
-        } catch (NumberFormatException e) {
+            ConexaoDatabase db = new ConexaoDatabase();
+            if(db.isInfoDB()){
+                Connection conec = db.getConnection();                
+                conec = db.getConnection();
+                conec.setAutoCommit(false);
+                ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO(conec);                
+                if(daoPar.incluirMotivoEventoMaquina(Long.valueOf(codigo), ultimoEvento)){
+                    if(!obs.trim().equals("")){
+                        if(!daoPar.inluirObservcacaoEvento(obs)){
+                            conec.rollback();
+                            db.desconectar();
+                            return false;
+                        }                        
+                    }
+                    if(codPesagem!=0){
+                        if(!daoPar.incluirCodPesagem(codPesagem)){
+                            conec.rollback();
+                            db.desconectar();
+                            return false;
+                        }
+                    }
+                    conec.commit();
+                    db.desconectar();
+                    return true;
+                }                            
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
             erro.gravaErro(e);
         }
         return false;
@@ -108,9 +159,15 @@ public class ControllerParadasMaquina {
     
     public ParadasMaquina buscaParadasProcessoAtual(String cod_maquina){
         try {                    
-            ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO();
-            ParadasMaquina par = daoPar.buscaParadasMaquinaProducaoAtual(cod_maquina);
-            return par;
+            ConexaoDatabase db = new ConexaoDatabase();
+            if(db.isInfoDB()){
+                Connection conec = db.getConnection();                
+                conec = db.getConnection();
+                ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO(conec);
+                ParadasMaquina par = daoPar.buscaParadasMaquinaProducaoAtual(cod_maquina);
+                db.desconectar();
+                return par;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -87,7 +87,7 @@ public class ControllerEventosSistema {
     } 
     
     public boolean verificaPreApontamento(String codParada, String codMaquina,String obs,
-            boolean msg){
+            boolean msg,int codPesagem){
         try {                    
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
@@ -96,7 +96,7 @@ public class ControllerEventosSistema {
                 conec.setAutoCommit(false);
                 EventosSistemaDAO dao = new EventosSistemaDAO(conec);
                 if(dao.ValidaPreApontamentoEventoSistema(codParada, codMaquina,msg)){
-                    if(dao.registraPreApontamentoEventoSistema(codMaquina, codParada,obs)){
+                    if(dao.registraPreApontamentoEventoSistema(codMaquina, codParada,obs,codPesagem)){
                         conec.commit();
                         db.desconectar();
                         return true;
@@ -188,5 +188,32 @@ public class ControllerEventosSistema {
             erro.gravaErro(e);
         }
         return false;                
+    }
+    
+    public boolean removerPreApontamentoPodID(Integer idPreParada){
+        try {
+            ConexaoDatabase db = new ConexaoDatabase();            
+            if(db.isInfoDB()){
+                Connection conec = db.getConnection();                
+                conec = db.getConnection();
+                conec.setAutoCommit(false);
+                EventosSistemaDAO dao = new EventosSistemaDAO(conec);                
+                if(idPreParada!=null){
+                    if(dao.removePreApontamentoEventoSistema(String.valueOf(idPreParada))){
+                        conec.commit();
+                        db.desconectar();
+                        return true;
+                    }else{
+                        conec.rollback();
+                        db.desconectar();
+                        return false;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return false;
     }
 }

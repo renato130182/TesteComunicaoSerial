@@ -1,0 +1,13 @@
+Data do erro: Wed Dec 18 15:02:49 BRST 2019
+Mensagem de erro: null
+Causa do erro: null
+Stacktrace: java.lang.NullPointerException
+	at dao.ProducaoDAO.atualizaMetragemProduzida(ProducaoDAO.java:82)
+	at controller.ControllerProducao.atualizaMetragemProduzida(ControllerProducao.java:53)
+	at view.JFPrincipal.dadosSerialMicrometro(JFPrincipal.java:2336)
+	at view.JFPrincipal.actionPerformed(JFPrincipal.java:2312)
+	at Serial.SerialTxRx.dadosRecebidos(SerialTxRx.java:55)
+	at Serial.SerialTxRx.serialEvent(SerialTxRx.java:126)
+	at gnu.io.RXTXPort.sendEvent(RXTXPort.java:732)
+	at gnu.io.RXTXPort.eventLoop(Native Method)
+	at gnu.io.RXTXPort$MonitorThread.run(RXTXPort.java:1575)
