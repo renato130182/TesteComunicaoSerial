@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
 import model.Paradas;
+import model.Usuario;
 
 /**
  *
@@ -61,7 +62,7 @@ public class EventosSistemaDAO {
     public boolean registraUsuarioEventoSistema(String usuario){
         try {
             sql = "insert into bd_sistema_monitor.tb_eventos_sistema_usuario "
-                    + "(id_eventos_sistema_log, usuario) values(?,?)";
+                    + "(id_eventos_sistema_log, codigo_operador) values(?,?)";
             PreparedStatement st = conec.prepareStatement(sql);
             st.setInt(1,this.idEventoSistema);
             st.setString(2,usuario);
@@ -146,15 +147,16 @@ public class EventosSistemaDAO {
         }
         return false;
     }
-    public boolean registraPreApontamentoEventoSistema(String codMaquina, String codParada,String obs,int codPesagem) {
+    public boolean registraPreApontamentoEventoSistema(String codMaquina, String codParada,String obs,int codPesagemSaida,int codPesagemEntrada) {
         try {
             sql = "insert into bd_sistema_monitor.tb_maquina_parada_pre_apontamento "
-                    + "(cod_maquina, cod_parada,observacao,codPesagem) values (?,?,?,?)";
+                    + "(cod_maquina, cod_parada,observacao,codPesagemSaida,codPesagemEntrada) values (?,?,?,?,?)";
             PreparedStatement st = conec.prepareStatement(sql);
             st.setString(1, codMaquina);
             st.setString(2,codParada);            
             st.setString(3, obs);
-            st.setInt(4,codPesagem);
+            st.setInt(4,codPesagemSaida);
+            st.setInt(5,codPesagemEntrada);
             st.executeUpdate();
             return st.getUpdateCount()!=0;        
         } catch (SQLException e) {
@@ -166,7 +168,7 @@ public class EventosSistemaDAO {
     public List<Paradas> BuscaPreApontamentoEventoSistema(String codMauina){
         List<Paradas> paradas = new ArrayList<>();
         try {
-            sql = "SELECT pre.id,cod_parada,descricao,abreviacao,pre.observacao,pre.codPesagem "
+            sql = "SELECT pre.id,cod_parada,descricao,abreviacao,pre.observacao,pre.codPesagemSaida,pre.codPesagemEntrada "
                     + "FROM bd_sistema_monitor.tb_maquina_parada_pre_apontamento pre " +
                     "inner join condumigproducao.paradas par on pre.cod_parada = par.codigo " +
                     "where pre.cod_maquina = ?;";
@@ -180,7 +182,8 @@ public class EventosSistemaDAO {
                 parada.setDescricao(res.getString("descricao"));
                 parada.setObservacao(res.getString("observacao"));
                 parada.setIdRegistro(res.getInt("id"));
-                parada.setCodPesagem(res.getInt("codPesagem"));
+                parada.setCodPesagemSaida(res.getInt("codPesagemSaida"));
+                parada.setCodPesagemEntrada(res.getInt("codPesagemEntrada"));
                 paradas.add(parada);
             }
             return paradas;
@@ -241,17 +244,49 @@ public class EventosSistemaDAO {
         return false;
     }
     
-    public String buscaIdEventoSistemaUltimoMotivo(String codMaquina,int idMotivo,String codPesagem){
+    public boolean setarCarretelEntradaPreParada(int codPesSaida, int codPesEntrada) {
         try {
-            sql = "";
-            PreparedStatement st = conec.prepareStatement(sql);            
-            ResultSet res = st.executeQuery();
-            if(res.next()){                
-                return res.getString("id");
-            }else{
-                return null;
-            }    
+            sql = "update  bd_sistema_monitor.tb_maquina_parada_pre_apontamento "
+                    + "set  codPesagemEntrada = ? where codPesagemSaida = ?;";
+            PreparedStatement st = conec.prepareStatement(sql);
+            st.setInt(1, codPesEntrada);            
+            st.setInt(2, codPesSaida);            
+            st.executeUpdate();
+            return st.getUpdateCount()!=0;        
         } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return false;        
+    }
+
+    public List<Usuario> buscaHistoricoLoginOperador(String loteProducao) {
+        List<Usuario> usr = new ArrayList<>();
+        try {
+            sql = "SELECT log.*,met.metragem,usr.codigo_operador,op.nome as opNome,eq.cod_encarregado,enc.nome as encNome "
+                    + "FROM bd_sistema_monitor.tb_eventos_sistema_log log "
+                    + "left join bd_sistema_monitor.tb_eventos_sistema_metragem met on log.id = met.id_evento_sistema_log "
+                    + "left join  bd_sistema_monitor.tb_eventos_sistema_usuario usr on log.id = usr.id_eventos_sistema_log "
+                    + "inner join condumigproducao.operador op on op.codigo = usr.codigo_operador "
+                    + "left join condumigproducao.equipes eq on op.codEquipe = eq.cod_equipe "
+                    + "left join condumigproducao.operador enc on enc.codigo = eq.cod_Encarregado "
+                    + "left join bd_sistema_monitor.tb_eventos_sistema_lote lote on log.id = lote.id_evento_sistema_log "
+                    + "where lote.lote = ? and cod_evento = '11'  group by usr.codigo_operador,met.metragem order by log.id;";
+            PreparedStatement st = conec.prepareStatement(sql);            
+            st.setString(1, loteProducao);            
+            ResultSet res = st.executeQuery();
+            while(res.next()){
+                Usuario tmp = new Usuario();
+                tmp.setNome(res.getString("opNome"));
+                tmp.setCodigoOperador(res.getString("codigo_operador"));
+                tmp.setDataHoraLogin(res.getString("dataHora"));
+                tmp.setCodigoEncarregado(res.getString("cod_encarregado"));
+                tmp.setNomeEncarregado( res.getString("encNome"));
+                usr.add(tmp);
+            }
+            return usr;
+        } catch (Exception e) {
+            e.printStackTrace();
             erro.gravaErro(e);
         }
         return null;

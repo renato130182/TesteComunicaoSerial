@@ -66,8 +66,9 @@ public class ProgramacaoMaquinaDAO {
                         + "where prog.loteproducao = ? and (prog.codigoitem = ? and (itc."
                         + "codigoitemcontrole = 1 and itc.situacao = 1)) or "
                         + "(prog.codigoitem = ? and (itc.codigoitemcontrole = 91 and itc.situacao = 1)) "
+                        + "or (prog.codigoitem = 400500250101 and (itc.codigoitemcontrole = 20 and itc.situacao = 1))"
                         + "order by itc.codigo desc limit 1;";
-                        
+                    System.out.println(sql);    
                     java.sql.Connection conec = db.getConnection();
                     PreparedStatement st = conec.prepareStatement(sql);
                     st.setString(1, lote);

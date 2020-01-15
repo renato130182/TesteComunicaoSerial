@@ -39,6 +39,14 @@ public class JFDTrocaCarretelEntrada extends javax.swing.JDialog {
      */
     public static final int RET_OK = 1;
     private Pesagem pesSaida;
+
+    public Pesagem getPesSaida() {
+        return pesSaida;
+    }
+
+    public Pesagem getPesEntrada() {
+        return pesEntrada;
+    }
     private Pesagem pesEntrada;
 
     public void setMetragem(int metragem) {
@@ -531,9 +539,9 @@ public class JFDTrocaCarretelEntrada extends javax.swing.JDialog {
                         validarEngenharia();
                     }else{
                         jTFNumeroPesagem.setText("");
-                        JOptionPane.showMessageDialog(rootPane,"Não foi possivel encatrar informações para \n"
+                        JOptionPane.showMessageDialog(rootPane,"Não foi possivel encotrar informações para \n"
                                 + "o numero de pesagem informado. \n"
-                                + "Por favor verifique e tente novamente!","Numero da pesagem Invalido",JOptionPane.ERROR_MESSAGE);
+                                + "Por favor verifique e tente novamente!","Numero da pesagem inválido",JOptionPane.ERROR_MESSAGE);
                         
                     }
                 }else{
@@ -668,14 +676,18 @@ public class JFDTrocaCarretelEntrada extends javax.swing.JDialog {
     }
     
     public void buscaItensAlternativosMontagem(String codItemProducao){
-        ControllerEngenhariaAlternativa eng = new ControllerEngenhariaAlternativa();
-        prods = eng.buscaListaAlternativas(this.pesSaida.getCodItem(),codItemProducao);
-        if(prods!=null){
-            for(int i=0;i<prods.size();i++){
-                DefaultTableModel model = (DefaultTableModel)jTableEngAlternativa.getModel();
-                model.addRow(new Object[]{prods.get(i).getCodigo(),prods.get(i).getDescricao()} );
+        try {                    
+            ControllerEngenhariaAlternativa eng = new ControllerEngenhariaAlternativa();
+            prods = eng.buscaListaAlternativas(this.pesSaida.getCodItem(),codItemProducao);
+            if(prods!=null){
+                for(int i=0;i<prods.size();i++){
+                    DefaultTableModel model = (DefaultTableModel)jTableEngAlternativa.getModel();
+                    model.addRow(new Object[]{prods.get(i).getCodigo(),prods.get(i).getDescricao()} );
+                }
             }
-        }        
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }           
 
     private void validarEngenharia() {

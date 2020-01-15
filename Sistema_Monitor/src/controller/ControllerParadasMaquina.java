@@ -122,7 +122,7 @@ public class ControllerParadasMaquina {
         return ultimoEvento;
     }
     
-    public boolean registraMotivoParadaMaquina(String codigo,String obs,int codPesagem){
+    public boolean registraMotivoParadaMaquina(String codigo,String obs,int codPesagemSaida,int codPesagemEntrada){
         try {
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
@@ -138,8 +138,8 @@ public class ControllerParadasMaquina {
                             return false;
                         }                        
                     }
-                    if(codPesagem!=0){
-                        if(!daoPar.incluirCodPesagem(codPesagem)){
+                    if(codPesagemSaida!=0){
+                        if(!daoPar.incluirCodPesagem(codPesagemSaida,codPesagemEntrada)){
                             conec.rollback();
                             db.desconectar();
                             return false;

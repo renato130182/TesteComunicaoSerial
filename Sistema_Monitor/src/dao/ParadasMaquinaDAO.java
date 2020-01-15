@@ -25,6 +25,7 @@ public class ParadasMaquinaDAO {
     private final LogErro erro = new LogErro();
     private final Connection conec;
     private int idMaquinaEventoParada;
+    
     public ParadasMaquinaDAO(Connection conec) {
         this.conec = conec;
     }
@@ -150,13 +151,14 @@ public class ParadasMaquinaDAO {
         return false;
     }
     
-    public boolean incluirCodPesagem(int codPesagem){
+    public boolean incluirCodPesagem(int codPesagemSaida, int codPesagemEntrada){
         try {
-            sql = "insert into bd_sistema_monitor.tb_maquina_evento_observacao "
-                        + "(id_maquina_evento_parada, observacao) values (?, ? );";
+            sql = "insert into bd_sistema_monitor.tb_maquina_evento_carretel_entrada "
+                        + "(id_maquina_evento_parada, cod_pesagem_saida,cod_pesagem_entrada) values (?, ? ,?);";
                     PreparedStatement st = conec.prepareStatement(sql);
                     st.setInt(1, this.idMaquinaEventoParada);
-                    st.setInt(2, codPesagem);
+                    st.setInt(2, codPesagemSaida);
+                    st.setInt(3, codPesagemEntrada);
                     st.executeUpdate();
                     return st.getUpdateCount()!=0;
         } catch (SQLException e) {
@@ -170,13 +172,13 @@ public class ParadasMaquinaDAO {
         List<Paradas> listaParadas = new ArrayList<>();
             try {
                 sql = "SELECT par.id as idPar, par.cod_parada_maquina as codParada, "
-                        + "pardesc.abreviacao as abrev, obs.observacao as obs  "
-                        + "FROM bd_sistema_monitor.tb_maquina_evento evt Inner join "
-                        + "bd_sistema_monitor.tb_maquina_evento_parada par on "
-                        + "evt.id = par.id_maquina_evento Inner join condumigproducao.paradas "
-                        + "pardesc on par.cod_parada_maquina = pardesc.codigo "
-                        + "left join bd_sistema_monitor.tb_maquina_evento_observacao obs "
-                        + "on par.id = obs.id_maquina_evento_parada where evt.cod_maquina = ?";
+                        + "pardesc.abreviacao as abrev, obs.observacao as obs, "
+                        + "ent.cod_pesagem_saida, ent.cod_pesagem_entrada FROM bd_sistema_monitor.tb_maquina_evento evt "
+                        + "Inner join bd_sistema_monitor.tb_maquina_evento_parada par on evt.id = par.id_maquina_evento "
+                        + "Inner join condumigproducao.paradas pardesc on par.cod_parada_maquina = pardesc.codigo "
+                        + "left join bd_sistema_monitor.tb_maquina_evento_observacao obs on par.id = obs.id_maquina_evento_parada "
+                        + "left join bd_sistema_monitor.tb_maquina_evento_carretel_entrada ent on par.id = ent.id_maquina_evento_parada "
+                        + "where evt.cod_maquina = ?;";
                 PreparedStatement st = conec.prepareStatement(sql);
                 st.setString(1, cod_maquina);
                 ResultSet res = st.executeQuery();
@@ -185,7 +187,9 @@ public class ParadasMaquinaDAO {
                    Paradas parada = new Paradas();
                    parada.setCodigo(res.getInt("codParada"));
                    parada.setAbreviacao(res.getString("abrev"));
-                   parada.setObservacao(res.getString("obs"));                   
+                   parada.setObservacao(res.getString("obs"));    
+                   parada.setCodPesagemSaida(res.getInt("cod_pesagem_saida"));
+                   parada.setCodPesagemEntrada(res.getInt("cod_pesagem_entrada"));
                    listaParadas.add(parada);
                 }
                 paradasMaquina.setListaParadas(listaParadas);
@@ -194,5 +198,6 @@ public class ParadasMaquinaDAO {
                 erro.gravaErro(ex);
             }
         return null;            
-    }    
+    }        
+    
 }

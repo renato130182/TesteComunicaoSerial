@@ -221,7 +221,7 @@ public class JFDAutorizarSenha extends javax.swing.JDialog {
             //System.out.println("Psw: " + login.getSenha());
             if(login.logar(login)){
                 ControllerEventosSistema ctr = new ControllerEventosSistema();            
-                ctr.registraEventos(13,login.getNome(),0,metragem,codMaquina ,lote);
+                ctr.registraEventos(13,login.getCodigoOperador(),0,metragem,codMaquina ,lote);
                 doClose(RET_OK);
             }else{
                 JOptionPane.showMessageDialog(rootPane, "Usuario ou Senha invalidos","Login",JOptionPane.ERROR_MESSAGE);            
@@ -257,7 +257,7 @@ public class JFDAutorizarSenha extends javax.swing.JDialog {
                     login.setCode(code);              
                     if(login.logarCode(login)){
                         ControllerEventosSistema ctr = new ControllerEventosSistema();            
-                        ctr.registraEventos(13,login.getNome(),0,metragem,codMaquina ,lote);
+                        ctr.registraEventos(13,login.getCodigoOperador(),0,metragem,codMaquina ,lote);
                         doClose(RET_OK);
                     }else{
                         login.setCode(code);

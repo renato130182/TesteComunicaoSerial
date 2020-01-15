@@ -36,6 +36,8 @@ import controller.ControllerConfigSerialPort;
 import controller.ControllerEventosSistema;
 import controller.ControllerMicrometro;
 import controller.ControllerParadasMaquina;
+import controller.ControllerProdutoMetragem;
+import controller.ControllerReservaMaquina;
 import controller.ControllerUtil;
 import controller.LogErro;
 import dao.ProdutoCarretelDAO;
@@ -116,7 +118,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                                 displaySingleMetragemCarretel.getValue() , codMaquina);
                             if(evtRegistrado){
                                 timerVelocimetro=null;
-                                throw new RuntimeException("Forçada");
+                                throw new RuntimeException("Forcada");
                             }
                         }else{
                             eventosTimer++;
@@ -127,7 +129,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                                 alerta = true;    
                                 if(!evtCarEnt){
                                     ControllerEventosSistema ctr = new ControllerEventosSistema();
-                                    evtCarEnt = ctr.registraEventos(7,login.getNome(),0,0,codMaquina,jLabelProducaoOF.getText());                                    
+                                    evtCarEnt = ctr.registraEventos(7,login.getCodigoOperador(),0,0,codMaquina,jLabelProducaoOF.getText());                                    
                                 }
                             }else{
                                 lightBulbAlertaEvento.setOn(false);
@@ -142,8 +144,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                             alerta = true;
                             if(!evtSaldoEnt1){
                                 ControllerEventosSistema ctr = new ControllerEventosSistema();
-                                evtSaldoEnt1 = ctr.registraEventos(8,login.getNome(),0,0,codMaquina,jLabelProducaoOF.getText());
-                                if(evtSaldoEnt1)ctr.verificaPreApontamento("2",codMaquina,"",false,Integer.valueOf(listaPesagens.get(0).getCodigo()));
+                                evtSaldoEnt1 = ctr.registraEventos(8,login.getCodigoOperador(),0,0,codMaquina,jLabelProducaoOF.getText());
+                                if(evtSaldoEnt1)ctr.verificaPreApontamento("2",codMaquina,"",false,Integer.valueOf(listaPesagens.get(0).getCodigo()),0);
                             }
                         }else{
                             lightBulbAlertaSaldoEntrada1.setOn(false);    
@@ -155,8 +157,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                                 alerta = true;
                                 if(!evtSaldoEnt2){
                                 ControllerEventosSistema ctr = new ControllerEventosSistema();
-                                evtSaldoEnt2 = ctr.registraEventos(8,login.getNome(),0,0,codMaquina,jLabelProducaoOF.getText());
-                                if(evtSaldoEnt2)ctr.verificaPreApontamento("2",codMaquina,"",false,Integer.valueOf(listaPesagens.get(1).getCodigo()));
+                                evtSaldoEnt2 = ctr.registraEventos(8,login.getCodigoOperador(),0,0,codMaquina,jLabelProducaoOF.getText());
+                                if(evtSaldoEnt2)ctr.verificaPreApontamento("2",codMaquina,"",false,Integer.valueOf(listaPesagens.get(1).getCodigo()),0);
                             }
                             }else{
                                 lightBulbAlertaSaldoEntrada2.setOn(false);
@@ -169,8 +171,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                             alerta = true;
                             if(!evtCarSaida){
                                 ControllerEventosSistema ctr = new ControllerEventosSistema();
-                                evtCarSaida = ctr.registraEventos(9,login.getNome(),0,0,codMaquina,jLabelProducaoOF.getText());
-                                if(evtCarSaida)ctr.verificaPreApontamento("1",codMaquina,"",false,0);
+                                evtCarSaida = ctr.registraEventos(9,login.getCodigoOperador(),0,0,codMaquina,jLabelProducaoOF.getText());
+                                if(evtCarSaida)ctr.verificaPreApontamento("1",codMaquina,"",false,0,0);
                             }
                         }else{
                             lightBulbMetragemSolicitada.setOn(false);
@@ -182,7 +184,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                             alerta = true;
                             if(!evtMetProg){
                                 ControllerEventosSistema ctr = new ControllerEventosSistema();
-                                evtMetProg = ctr.registraEventos(10,login.getNome(),0,0,codMaquina,jLabelProducaoOF.getText());
+                                evtMetProg = ctr.registraEventos(10,login.getCodigoOperador(),0,0,codMaquina,jLabelProducaoOF.getText());
                             }
                         }else{
                             lightBulbMetragemLoteProducao.setOn(false);     
@@ -1523,7 +1525,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                     null, options, options[0]); 
             if (i == JOptionPane.YES_OPTION) {
                 ControllerEventosSistema ctr = new ControllerEventosSistema();            
-                ctr.registraEventos(4,login.getNome(),0,0,codMaquina,jLabelProducaoOF.getText());           
+                ctr.registraEventos(4,login.getCodigoOperador(),0,0,codMaquina,jLabelProducaoOF.getText());           
                 abrirTelaParadas(); 
             }
         } catch (HeadlessException e) {
@@ -1624,7 +1626,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         // TODO add your handling code here:   
         try {                    
             ControllerEventosSistema ctr = new ControllerEventosSistema();        
-            ctr.registraEventos(12,login.getNome(),0,(int) displaySingleMetragemCarretel.getValue(),codMaquina,jLabelProducaoOF.getText()); 
+            ctr.registraEventos(12,login.getCodigoOperador(),0,(int) displaySingleMetragemCarretel.getValue(),codMaquina,jLabelProducaoOF.getText()); 
             jMenuItemSair.setEnabled(false);
             jMenuItemLogin.setEnabled(true);
         abrirTelaLogin();
@@ -1639,7 +1641,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             if(System.getProperty("os.name").equals("Linux")){
                 ControllerEventosSistema ctr = new ControllerEventosSistema();
                 if(login!=null){
-                    ctr.registraEventos(2,login.getNome(),0,0,codMaquina,"");
+                    ctr.registraEventos(2,login.getCodigoOperador(),0,0,codMaquina,"");
                 }else{
                     ctr.registraEventos(2,"",0,0,codMaquina,"");
                 }
@@ -1724,7 +1726,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             if(System.getProperty("os.name").equals("Linux")){
                 ControllerEventosSistema ctr = new ControllerEventosSistema();
                 if(login!=null){
-                    ctr.registraEventos(3,login.getNome(),0,0,codMaquina,"");
+                    ctr.registraEventos(3,login.getCodigoOperador(),0,0,codMaquina,"");
                 }else{
                     ctr.registraEventos(3,"",0,0,codMaquina,"");
                 }
@@ -1758,7 +1760,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
 
     private void jButtonIncluirMotivoParadaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonIncluirMotivoParadaActionPerformed
         // TODO add your handling code here:
-        int codPesagem=0;
+        int codPesagemSaida=0;
+        int codPesagemEntrada=0;
         try {                       
             int motivoEscolhido = jComboBoxParadasMaquina.getSelectedIndex();
             List<String> infoParadas = paradas.buscaInfoParadaPorCodigo(motivoEscolhido);
@@ -1775,7 +1778,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                     trc.buscaItensAlternativosMontagem(prod.getItemProducao());
                     trc.setVisible(true);
                     if(trc.getReturnStatus()==1){
-                        codPesagem=Integer.valueOf(car.getPesSaida().getCodigo());
+                        codPesagemSaida=Integer.valueOf(trc.getPesSaida().getCodigo());
+                        codPesagemEntrada=Integer.valueOf(trc.getPesEntrada().getCodigo());
                     }else{
                         return;
                     }
@@ -1784,7 +1788,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 }
             }
             ControllerEventosSistema ctr = new ControllerEventosSistema();
-            if(ctr.verificaPreApontamento(infoParadas.get(0),codMaquina,jTextAreaObsParada.getText().trim(),true,codPesagem)){
+            if(ctr.verificaPreApontamento(infoParadas.get(0),codMaquina,jTextAreaObsParada.getText().trim(),true,codPesagemSaida,codPesagemEntrada)){
                 DefaultTableModel modelo = (DefaultTableModel)jTableMotivosParada.getModel();
                 modelo.addRow(new Object[]{infoParadas.get(0),infoParadas.get(1),infoParadas.get(2),
                         jTextAreaObsParada.getText().trim()});            
@@ -1798,7 +1802,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private void jButtonRegistrarParadaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRegistrarParadaActionPerformed
         // TODO add your handling code here:        
         try {                    
-            if(!maqParada){
+            // if(!maqParada){ retornar apos testes
+            if(maqParada){ //remover ampos testes
                 if(jTableMotivosParada.getRowCount()>0){
                     registrarMotivoParadas();
                     habilitarMenu();
@@ -2056,7 +2061,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
    
     private void limparJTable(JTable tabela ){
         try {                    
-            DefaultTableModel tblRemove = (DefaultTableModel)tabela.getModel();
+            DefaultTableModel tblRemove = (DefaultTableModel)tabela.getModel();            
             while(tblRemove.getRowCount()>0){                        
                 tblRemove.removeRow(0);                 
             }
@@ -2077,49 +2082,91 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                     lista.get(i).getQuantidadeProgramada(),lista.get(i).getMetragemProgramada(),lista.get(i).getDataProgramada()});
             }
         } catch (Exception e) {
+            e.printStackTrace();
             erro.gravaErro(e);
         }
     }
     
-    private void buscarInformaçoesProducao(){
+    private boolean buscarInformaçoesProducao(){
         try {                    
             ProducaoDAO daoProd = new ProducaoDAO();
             prod = daoProd.buscaItemProducao(codMaquina);
             if(prod != null){
-
-                ProgramacaoMaquinaDAO daoProg = new ProgramacaoMaquinaDAO();
-                ProdutoCarretelDAO daoProdCar =  new ProdutoCarretelDAO();
-                prog = daoProg.buscaProgramacaoLoteItem(prod.getLoteProducao(),prod.getItemProducao());
-                if(prog != null){
-                    jLabelProducaoCodItem.setText(prod.getItemProducao());
-                    jLabelProducaoOF.setText(prod.getLoteProducao());
-                    jLabelProducaoDescricaoItem.setText(prog.getProduto().getDescricao());
-                    jLabelProducaoQtdProg.setText(Integer.toString(prog.getQuantidadeProgramada()));
-                    jLabelProducaoQtdProd.setText(Integer.toString(prog.getQuantidadeProduzida()));
-                    jLabelProducaoMetTotalProg.setText(String.valueOf(prog.getMetragemTotalProgramada()));
-                    jLabelProducaoMetCarretel.setText(String.valueOf(prog.getMetragemProgramada()));
-                    jLabelProducaoDMinimo.setText(String.valueOf(prog.getProduto().getDiametroMinimo()));
-                    jLabelProducaoDnominal.setText(String.valueOf(prog.getProduto().getDiametroNominal()));
-                    jLabelProducaoDMaximo.setText(String.valueOf(prog.getProduto().getDiametroMaximo()));
-                    jLabelProducaoMetTotalProd.setText(String.valueOf(daoProd.BuscaMetragemProduzida(prod.getLoteProducao(),prod.getItemProducao())));
-                    ProdutoMaquinaDAO daoProdMaq = new ProdutoMaquinaDAO();
-                    prodmaq = daoProdMaq.buscaVelocidadeProdutoMaquina(prod.getItemProducao(), codMaquina);
-                    prodCar = daoProdCar.buscaDadosProdutoCarretel(prod.getItemProducao(),"0131250",codMaquina);
-                    jLabelProducaoVelIdeal.setText(String.valueOf(prodmaq.getVelocidade())+ " " + prodmaq.getUnidade());
-                    buscarRegistrosObservacaoPesagem();
-                }else{
-                    JOptionPane.showMessageDialog(rootPane,"Falha ao busrcar dados da programação do item em produção, "
-                            + "Por favor informe ao setor de Produção","Falha ao buscar dados",JOptionPane.ERROR_MESSAGE);
-                    abrirTelaProgramacao();
+                if(prod.getCarretelSaida().trim().equals("")){
+                    String carretelSaida = JOptionPane.showInputDialog(rootPane,"Carretel de Entrada","Por favor digite o numero do carretel de entrada",JOptionPane.QUESTION_MESSAGE);
+                    System.out.println(carretelSaida);
+                    if(carretelSaida!=null){
+                        if(!carretelSaida.trim().equals("")){
+                            if(ControllerUtil.SoTemNumeros(carretelSaida)){
+                                //validar carretel produto metragem
+                                ControllerProdutoMetragem ctrProdMet = new ControllerProdutoMetragem();
+                                if(ctrProdMet.validaEmbagemProdutoMetragem(prod, carretelSaida, codMaquina)){
+                                    if(!daoProd.atualizaCarretelSaida(carretelSaida,codMaquina)){
+                                        JOptionPane.showMessageDialog(rootPane,"Falha ao registrar carretel de saida, por favor tente novamente","Falha de carretel de saida",JOptionPane.ERROR_MESSAGE);
+                                    }else{
+                                        prod.setCarretelSaida(carretelSaida);
+                                        buscarInformaçoesProducao();
+                                    }
+                                }else{
+                                    JOptionPane.showMessageDialog(rootPane,"Não foi encontrada uma relação para a flange da carretel digitada \n"
+                                            + "com a maquina e item em produção.\n"
+                                            + "Por favor solicite ao encarregado a conferencia destes dados em Produto x metragem no Projeto balança", "Flange de carretel não cadastrada", JOptionPane.ERROR_MESSAGE);
+                                    abrirTelaProducao();
+                                }
+                            }else{
+                                JOptionPane.showMessageDialog(rootPane,"Codigo do carretel de entrada invalido. "
+                                        + "\n Codigo deve conter apenas numeros","Codigo Inválido",
+                                        JOptionPane.ERROR_MESSAGE);
+                                abrirTelaProgramacao();
+                                return false;
+                            }
+                        }else{
+                            abrirTelaProgramacao();
+                            return false;
+                        }
+                    }else{
+                        abrirTelaProgramacao();
+                        return false;
+                    }
+                }else{    
+                    ProgramacaoMaquinaDAO daoProg = new ProgramacaoMaquinaDAO();
+                    ProdutoCarretelDAO daoProdCar =  new ProdutoCarretelDAO();
+                    prog = daoProg.buscaProgramacaoLoteItem(prod.getLoteProducao(),prod.getItemProducao());
+                    if(prog != null){
+                        jLabelProducaoCodItem.setText(prod.getItemProducao());
+                        jLabelProducaoOF.setText(prod.getLoteProducao());
+                        jLabelProducaoDescricaoItem.setText(prog.getProduto().getDescricao());
+                        jLabelProducaoQtdProg.setText(Integer.toString(prog.getQuantidadeProgramada()));
+                        jLabelProducaoQtdProd.setText(Integer.toString(prog.getQuantidadeProduzida()));
+                        jLabelProducaoMetTotalProg.setText(String.valueOf(prog.getMetragemTotalProgramada()));
+                        jLabelProducaoMetCarretel.setText(String.valueOf(prog.getMetragemProgramada()));
+                        jLabelProducaoDMinimo.setText(String.valueOf(prog.getProduto().getDiametroMinimo()));
+                        jLabelProducaoDnominal.setText(String.valueOf(prog.getProduto().getDiametroNominal()));
+                        jLabelProducaoDMaximo.setText(String.valueOf(prog.getProduto().getDiametroMaximo()));
+                        jLabelProducaoMetTotalProd.setText(String.valueOf(daoProd.BuscaMetragemProduzida(prod.getLoteProducao(),prod.getItemProducao())));
+                        ProdutoMaquinaDAO daoProdMaq = new ProdutoMaquinaDAO();
+                        prodmaq = daoProdMaq.buscaVelocidadeProdutoMaquina(prod.getItemProducao(), codMaquina);
+                        prodCar = daoProdCar.buscaDadosProdutoCarretel(prod.getItemProducao(),prod.getCarretelSaida(),codMaquina);
+                        jLabelProducaoVelIdeal.setText(String.valueOf(prodmaq.getVelocidade())+ " " + prodmaq.getUnidade());
+                        buscarRegistrosObservacaoPesagem();                    
+                        return true;
+                    }else{
+                        JOptionPane.showMessageDialog(rootPane,"Falha ao busrcar dados da programação do item em produção, "
+                                + "Por favor informe ao setor de Produção \n Itens de conrole referência: 1, 91 ou 20.","Falha ao buscar dados",JOptionPane.ERROR_MESSAGE);
+                        abrirTelaProgramacao();
+                        return false;
+                    }
                 }
             }else{
                 JOptionPane.showMessageDialog(rootPane,"Maquina sem producao, por favor realise a montagem",
                         "Maquina sem producao",JOptionPane.OK_OPTION);
                 abrirTelaProgramacao();
+                return false;
             }
         } catch (HeadlessException e) {
             erro.gravaErro(e);
         }
+        return false;
     }
     
     private void abrirTelaParadas() {
@@ -2143,6 +2190,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             card.show(jpRoot,"jpParadas");
             
         } catch (Exception e) {
+            e.printStackTrace();
             erro.gravaErro(e);
         }        
     }
@@ -2169,17 +2217,24 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                     comMicrometro.addActionListener(this);
                 }
             }
-            buscarInformaçoesProducao();
-            buscarParadasProcessoProducao();
-            ajustarMostradorVelocidade();
-            ajustarMostradoresMetragem();
-            configurarMostradoresDiametro();          
-            CardLayout card = (CardLayout) jpRoot.getLayout();
-            card.show(jpRoot,"jpProducao");
-            if(timerVelocimetro==null) {
-                iniciaTimerVelociametro();
-                this.tarefaVelocidade();
+            if(buscarInformaçoesProducao()){
+                buscarParadasProcessoProducao();
+                ajustarMostradorVelocidade();
+                ajustarMostradoresMetragem();
+                configurarMostradoresDiametro();          
+                CardLayout card = (CardLayout) jpRoot.getLayout();
+                card.show(jpRoot,"jpProducao");
+                if(timerVelocimetro==null) {
+                    iniciaTimerVelociametro();
+                    this.tarefaVelocidade();
+                }
             }
+            //Apenas para testar sem o micrometro Remover para produção
+            /*
+            JFApontamentoProducao apt = new JFApontamentoProducao(maquina,login,prodmaq,prodCar,prod,prog);
+            apt.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            apt.setVisible(true);
+            */
         } catch (Exception e) {
             erro.gravaErro(e);
         }
@@ -2302,7 +2357,11 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                             "Troca de carretel", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, 
                             null, options, options[0]); 
                     if (i == JOptionPane.YES_OPTION) {
-                        System.out.println("Apontar pesagem e trocar carretel de saida"); 
+                        System.out.println("Apontar pesagem e trocar carretel de saida");                         
+                        
+                        JFApontamentoProducao apt = new JFApontamentoProducao(maquina,login,prodmaq,prodCar,prod,prog);
+                        apt.setExtendedState(JFrame.MAXIMIZED_BOTH);
+                        apt.setVisible(true);
                     }else{
                         leituraAnterior.setMetragem(0);
                         System.out.println("Metragem leitura anterior: " + leituraAnterior.getMetragem());
@@ -2436,7 +2495,11 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                     abrirTelaProducao();           
                 }
                 ControllerEventosSistema ctr = new ControllerEventosSistema();            
-                ctr.registraEventos(11,login.getNome(),0,(int)displaySingleMetragemCarretel.getValue(),codMaquina,jLabelProducaoOF.getText()); 
+                ctr.registraEventos(11,login.getCodigoOperador(),0,(int)displaySingleMetragemCarretel.getValue(),codMaquina,jLabelProducaoOF.getText()); 
+                ControllerReservaMaquina ctrRes = new ControllerReservaMaquina();
+                if(ctrRes.registrarOperadorMaquina(login, codMaquina)){
+                    System.out.println("Tabela reserva maquina atualizada");
+                }
             } catch (Exception e) {
                 erro.gravaErro(e);
         }
@@ -2613,7 +2676,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             lista = ctr.BuscaPreApontamentos(codMaquina);
             for(int i=0;i<lista.size();i++){
                 if(!paradas.registraMotivoParadaMaquina(String.valueOf(lista.get(i).getCodigo()),
-                        lista.get(i).getObservacao(),lista.get(i).getCodPesagem())){                                        
+                        lista.get(i).getObservacao(),lista.get(i).getCodPesagemSaida(),lista.get(i).getCodPesagemEntrada())){                                        
                     JOptionPane.showMessageDialog(rootPane,"falha ao registrar motivo da parada","Falha no Registro",JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -2629,11 +2692,25 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             if(paradas==null) paradas = new ControllerParadasMaquina(codMaquina);  
             ParadasMaquina paradasProcesso = this.paradas.buscaParadasProcessoAtual(codMaquina);
             for (int i=0;i<paradasProcesso.getListaParadas().size();i++){
+                String obs ="";
+                if(paradasProcesso.getListaParadas().get(i).getCodPesagemSaida()!=0){
+                    obs = String.valueOf(paradasProcesso.getListaParadas().get(i).getCodPesagemSaida());
+                }
+                if(paradasProcesso.getListaParadas().get(i).getObservacao()!=null){
+                    if(!paradasProcesso.getListaParadas().get(i).getObservacao().trim().equals("")){
+                        if(obs.trim().equals("")){
+                            obs = paradasProcesso.getListaParadas().get(i).getObservacao();
+                        }else{
+                            obs = obs + " - " + paradasProcesso.getListaParadas().get(i).getObservacao();
+                        }
+                    }
+                }
                 table.addRow(new Object[]{String.valueOf(i + 1),paradasProcesso.getListaParadas().get(i).getCodigo(),
                     paradasProcesso.getListaParadas().get(i).getAbreviacao(), 
-                    paradasProcesso.getListaParadas().get(i).getObservacao()});
+                    obs});
             }
         } catch (Exception e) {
+            e.printStackTrace();
             erro.gravaErro(e);
         }
     }
@@ -2659,7 +2736,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             if(diametro < prog.getProduto().getDiametroMinimo()){
                 if(!evtDiaMin){
                     ControllerEventosSistema ctr = new ControllerEventosSistema();
-                    evtDiaMin = ctr.registraEventos(5,login.getNome(),diametro,
+                    evtDiaMin = ctr.registraEventos(5,login.getCodigoOperador(),diametro,
                             (int)displaySingleMetragemCarretel.getValue(),codMaquina,jLabelProducaoOF.getText());
                 }
             }else{
@@ -2668,7 +2745,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             if (diametro>prog.getProduto().getDiametroMaximo()){
                 if(!evtDiaMax){
                     ControllerEventosSistema ctr = new ControllerEventosSistema();
-                    evtDiaMax = ctr.registraEventos(6,login.getNome(),diametro,
+                    evtDiaMax = ctr.registraEventos(6,login.getCodigoOperador(),diametro,
                             (int)displaySingleMetragemCarretel.getValue(),codMaquina,jLabelProducaoOF.getText());
                 }
             }else{
@@ -2727,7 +2804,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         for (int i=0;i<preParadas.size();i++){
             if(preParadas.get(i).getCodigo()==1){
                 JOptionPane.showMessageDialog(null,"Detectada a necessidade de troca do carretel de saída \n "
-                        + "Por favor verifique.","Troca do corretel de saida.",JOptionPane.INFORMATION_MESSAGE);
+                        + "Por favor verifique.","Troca do carretel de saida.",JOptionPane.INFORMATION_MESSAGE);
             }
             if(preParadas.get(i).getCodigo()==2){
                 Object[] options = { "Sim", "Não" }; 
@@ -2739,7 +2816,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                     //System.out.println("Trocar carretel de entrada");
                     JFDTrocaCarretelEntrada trc = new JFDTrocaCarretelEntrada(this,true);
                     for(int j=0;j<listaPesagens.size();j++){
-                        if(preParadas.get(i).getCodPesagem()==Integer.valueOf(listaPesagens.get(j).getCodigo())){
+                        if(preParadas.get(i).getCodPesagemSaida()==Integer.valueOf(listaPesagens.get(j).getCodigo())){
                             trc.setPesSaida(listaPesagens.get(j));
                         }                            
                     }
@@ -2752,6 +2829,10 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                         ControllerEventosSistema ctr = new ControllerEventosSistema();
                         ctr.removerPreApontamentoPodID(preParadas.get(i).getIdRegistro());
                         preParadas.remove(i);
+                    }else{
+                        ControllerEventosSistema ctr = new ControllerEventosSistema();
+                        ctr.atualizaCarretelEntradaPreParada(Integer.valueOf(trc.getPesSaida().getCodigo()),
+                                Integer.valueOf(trc.getPesEntrada().getCodigo()));
                     }
                     //System.out.println("Saiu da troca");
                 }else{                        

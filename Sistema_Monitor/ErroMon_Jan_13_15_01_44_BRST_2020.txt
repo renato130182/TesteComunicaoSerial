@@ -1,0 +1,19 @@
+Data do erro: Mon Jan 13 15:01:44 BRST 2020
+Mensagem de erro: Column 'loteproduzido' not found.
+Causa do erro: null
+Stacktrace: java.sql.SQLException: Column 'loteproduzido' not found.
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1055)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:956)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:926)
+	at com.mysql.jdbc.ResultSetImpl.findColumn(ResultSetImpl.java:1093)
+	at com.mysql.jdbc.ResultSetImpl.getString(ResultSetImpl.java:5488)
+	at dao.ReservaPesagemDAO.buscaConsumoCobreReservaPesagem(ReservaPesagemDAO.java:50)
+	at controller.ControllerReservaPesagem.buscaConsumoCobreProducaoAtual(ControllerReservaPesagem.java:32)
+	at view.JFApontamentoProducao.buscaDadosConsumoMp(JFApontamentoProducao.java:600)
+	at view.JFApontamentoProducao.<init>(JFApontamentoProducao.java:63)
+	at view.JFPrincipal.actionPerformed(JFPrincipal.java:2310)
+	at Serial.SerialTxRx.dadosRecebidos(SerialTxRx.java:55)
+	at Serial.SerialTxRx.serialEvent(SerialTxRx.java:126)
+	at gnu.io.RXTXPort.sendEvent(RXTXPort.java:732)
+	at gnu.io.RXTXPort.eventLoop(Native Method)
+	at gnu.io.RXTXPort$MonitorThread.run(RXTXPort.java:1575)

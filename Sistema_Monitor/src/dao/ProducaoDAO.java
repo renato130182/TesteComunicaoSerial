@@ -19,6 +19,7 @@ import model.Producao;
 public class ProducaoDAO {
     private String sql;
     LogErro erro = new LogErro();
+    
     public Producao buscaItemProducao(String codMaquina){
         ConexaoDatabase db = new ConexaoDatabase();
         Producao prod = new Producao();
@@ -107,6 +108,31 @@ public class ProducaoDAO {
                 PreparedStatement st = conec.prepareStatement(sql);
                 st.setString(1, metragem);
                 st.setString(2, cod_Pesagem);
+                st.executeUpdate();
+                if(st.getUpdateCount()!=0){
+                    db.desconectar();
+                    return true;
+                }else{
+                    db.desconectar();
+                    return false;
+                }                                
+            } catch (SQLException ex) {
+                erro.gravaErro(ex);
+            }            
+        }
+        db.desconectar();        
+        return false;
+    }
+
+    public boolean atualizaCarretelSaida(String carretelSaida, String codMaquina) {
+        sql = "update bd_sistema_monitor.tb_maquina_producao set carretel_saida = ? where cod_maq = ?";        
+        ConexaoDatabase db = new ConexaoDatabase();
+        if(db.isInfoDB()){
+            Connection conec = db.getConnection();
+            try {
+                PreparedStatement st = conec.prepareStatement(sql);
+                st.setString(1, carretelSaida);
+                st.setString(2, codMaquina);
                 st.executeUpdate();
                 if(st.getUpdateCount()!=0){
                     db.desconectar();

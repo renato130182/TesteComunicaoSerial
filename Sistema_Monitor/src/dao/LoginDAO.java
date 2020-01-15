@@ -26,8 +26,9 @@ public class LoginDAO{
     }
     
     public void validarLogin(Usuario us){
-        sql = "SELECT nome,tipo FROM condumigproducao.usuario where codigo = "
-                + "? and senha = md5(?); ";
+        sql = "SELECT usr.nome,usr.tipo,op.codigo FROM condumigproducao.usuario usr "
+                + "inner join condumigproducao.operador op on op.nome = usr.nome"
+                + " where usr.codigo = ? and usr.senha = md5(?); ";
         ConexaoDatabase db = new ConexaoDatabase();
         if(db.isInfoDB()){
             Connection conec = db.getConnection();
@@ -39,6 +40,7 @@ public class LoginDAO{
                 if(res.next()){
                     us.setNome(res.getString("nome"));
                     us.setNivel(res.getString("tipo"));
+                    us.setCodigoOperador(res.getString("codigo"));
                     this.logado = true;
                 }else{
                     this.logado = false;
@@ -52,7 +54,8 @@ public class LoginDAO{
     }    
     
     public void validarCodeLogin(Usuario us){
-        sql = "SELECT nome,tipo FROM condumigproducao.usuario where coderfid = ?;";
+        sql = "SELECT usr.nome,usr.tipo,op.codigo FROM condumigproducao.usuario usr "
+                + "inner join condumigproducao.operador op on op.nome = usr.nome where usr.coderfid = ?;";
         ConexaoDatabase db = new ConexaoDatabase();
         if(db.isInfoDB()){
             Connection conec = db.getConnection();
@@ -63,6 +66,7 @@ public class LoginDAO{
                 if(res.next()){
                     us.setNome(res.getString("nome"));
                     us.setNivel(res.getString("tipo"));
+                    us.setCodigoOperador("codigo");
                     this.logado = true;
                 }else{
                     this.logado = false;

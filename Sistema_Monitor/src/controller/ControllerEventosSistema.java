@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import model.Paradas;
+import model.Usuario;
 
 /**
  *
@@ -87,7 +88,7 @@ public class ControllerEventosSistema {
     } 
     
     public boolean verificaPreApontamento(String codParada, String codMaquina,String obs,
-            boolean msg,int codPesagem){
+            boolean msg,int codPesagemSaida,int codPesagemEntrada){
         try {                    
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
@@ -96,7 +97,7 @@ public class ControllerEventosSistema {
                 conec.setAutoCommit(false);
                 EventosSistemaDAO dao = new EventosSistemaDAO(conec);
                 if(dao.ValidaPreApontamentoEventoSistema(codParada, codMaquina,msg)){
-                    if(dao.registraPreApontamentoEventoSistema(codMaquina, codParada,obs,codPesagem)){
+                    if(dao.registraPreApontamentoEventoSistema(codMaquina, codParada,obs,codPesagemSaida,codPesagemEntrada)){
                         conec.commit();
                         db.desconectar();
                         return true;
@@ -215,5 +216,48 @@ public class ControllerEventosSistema {
             erro.gravaErro(e);
         }
         return false;
+    }
+
+    public boolean atualizaCarretelEntradaPreParada(int codPesSaida,int codPesEntrada ) {
+        try {
+            ConexaoDatabase db = new ConexaoDatabase();            
+            if(db.isInfoDB()){
+                Connection conec = db.getConnection();                
+                conec = db.getConnection();
+                conec.setAutoCommit(false);
+                EventosSistemaDAO dao = new EventosSistemaDAO(conec);                              
+                if(dao.setarCarretelEntradaPreParada(codPesSaida,codPesEntrada)){
+                    conec.commit();
+                    db.desconectar();
+                    return true;
+                }else{
+                    conec.rollback();
+                    db.desconectar();
+                    return false;
+                }
+                
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return false;
+    }
+    
+    public List<Usuario> buscaListaEventosUsuarioLogin(String loteProducao){
+        try {
+            ConexaoDatabase db = new ConexaoDatabase();            
+            if(db.isInfoDB()){
+                Connection conec = db.getConnection();                
+                conec = db.getConnection();
+                conec.setAutoCommit(false);
+                EventosSistemaDAO dao = new EventosSistemaDAO(conec);                              
+                return dao.buscaHistoricoLoginOperador(loteProducao);                
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return null;
     }
 }

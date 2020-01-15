@@ -1,7 +1,16 @@
 package model;
 
 public class ProdutoCarretel {
+    
+    private Carretel carretel;
 
+    public Carretel getCarretel() {
+        return carretel;
+    }
+
+    public void setCarretel(Carretel carretel) {
+        this.carretel = carretel;
+    }
     private int metragemPadrao;
     private int metragemMaxima;
     

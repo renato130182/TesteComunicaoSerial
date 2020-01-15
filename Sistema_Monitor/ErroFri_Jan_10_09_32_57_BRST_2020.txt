@@ -1,0 +1,12 @@
+Data do erro: Fri Jan 10 09:32:57 BRST 2020
+Mensagem de erro: Uncompilable source code - Erroneous sym type: dao.EventosSistemaDAO.setarCarretelEntradaPreParada
+Causa do erro: null
+Stacktrace: java.lang.RuntimeException: Uncompilable source code - Erroneous sym type: dao.EventosSistemaDAO.setarCarretelEntradaPreParada
+	at controller.ControllerEventosSistema.atualizaCarretelEntradaPreParada(ControllerEventosSistema.java:228)
+	at view.JFPrincipal.verificaParadasInteracaoOperador(JFPrincipal.java:2778)
+	at view.JFPrincipal.verificarMotivosPreApontados(JFPrincipal.java:2734)
+	at view.JFPrincipal.abrirTelaParadas(JFPrincipal.java:2143)
+	at view.JFPrincipal.access$600(JFPrincipal.java:56)
+	at view.JFPrincipal$1.run(JFPrincipal.java:113)
+	at java.util.TimerThread.mainLoop(Timer.java:555)
+	at java.util.TimerThread.run(Timer.java:505)

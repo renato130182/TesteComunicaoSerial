@@ -64,4 +64,19 @@ public class ReservaMaquinaDAO {
         return false;
     }
     
+    public boolean atualizaOperadorTabelaReservaMaquina(String codMaquina, String CodOperador){
+        try {
+            sql = "update condumigproducao.reservamaquina set codigooperador1 = ? "
+                    + "where codigomaquina = ?;";
+            PreparedStatement st = conec.prepareStatement(sql);            
+            st.setString(1,CodOperador);
+            st.setString(2, codMaquina);             
+            st.executeUpdate();
+            return st.getUpdateCount()!=0;       
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return  false;
+    }
 }

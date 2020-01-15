@@ -15,6 +15,42 @@ public class Usuario {
     private String Senha;
     private String code;
     private String nivel;
+    private String codigoOperador;
+    private String dataHoraLogin;
+    private String codigoEncarregado;
+    private String nomeEncarregado;
+
+    public String getCodigoEncarregado() {
+        return codigoEncarregado;
+    }
+
+    public void setCodigoEncarregado(String codigoEncarregado) {
+        this.codigoEncarregado = codigoEncarregado;
+    }
+
+    public String getNomeEncarregado() {
+        return nomeEncarregado;
+    }
+
+    public void setNomeEncarregado(String nomeEncarregado) {
+        this.nomeEncarregado = nomeEncarregado;
+    }
+
+    public String getDataHoraLogin() {
+        return dataHoraLogin;
+    }
+
+    public void setDataHoraLogin(String dataHoraLogin) {
+        this.dataHoraLogin = dataHoraLogin;
+    }
+    
+    public String getCodigoOperador() {
+        return codigoOperador;
+    }
+
+    public void setCodigoOperador(String codigoOperador) {
+        this.codigoOperador = codigoOperador;
+    }
 
     public Usuario() {
         this.nome = "";

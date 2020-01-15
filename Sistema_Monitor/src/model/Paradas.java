@@ -7,14 +7,23 @@ public class Paradas {
     private String abreviacao;
     private String observacao;
     private int idRegistro;
-    private int codPesagem;
+    private int codPesagemSaida;
+    private int codPesagemEntrada;
 
-    public int getCodPesagem() {
-        return codPesagem;
+    public int getCodPesagemEntrada() {
+        return codPesagemEntrada;
     }
 
-    public void setCodPesagem(int codPesagem) {
-        this.codPesagem = codPesagem;
+    public void setCodPesagemEntrada(int codPesagemEntrada) {
+        this.codPesagemEntrada = codPesagemEntrada;
+    }
+
+    public int getCodPesagemSaida() {
+        return codPesagemSaida;
+    }
+
+    public void setCodPesagemSaida(int codPesagem) {
+        this.codPesagemSaida = codPesagem;
     }
 
     public int getIdRegistro() {
