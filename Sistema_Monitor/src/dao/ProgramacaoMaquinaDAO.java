@@ -60,7 +60,7 @@ public class ProgramacaoMaquinaDAO {
         try {            
             if(db.equals(db)){
                 sql = "select prog.quantloteprogramado, prog.quantloteproduzido, prog.metragemprogramada, "
-                        + "it.descricao,itc.minimo, itc.nominal,itc.maximo from condumigproducao.programacaomaquina "
+                        + "it.descricao,itc.minimo, itc.nominal,itc.maximo, prog.qtfiosentrada from condumigproducao.programacaomaquina "
                         + "prog inner join condumigproducao.item it on it.codigo = prog.codigoitem "
                         + "inner join condumigproducao .itemitemcontrole itc on itc.codigoitem = it.codigo "
                         + "where prog.loteproducao = ? and (prog.codigoitem = ? and (itc."
@@ -86,6 +86,7 @@ public class ProgramacaoMaquinaDAO {
                        prog.setMetragemTotalProgramada(res.getInt("metragemprogramada")*res.getInt("quantloteprogramado"));                       
                        prog.setProduto(new Produto(item,res.getString("descricao"),res.getFloat("minimo"),
                                res.getFloat("nominal"),res.getFloat("maximo")));
+                       prog.setQtdFiosEntrada(res.getInt("qtfiosentrada"));
                        db.desconectar();
                        return prog;
                     }

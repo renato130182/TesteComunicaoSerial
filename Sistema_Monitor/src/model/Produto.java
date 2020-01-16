@@ -9,7 +9,7 @@ public class Produto implements InterfaceProduto {
     private float diametroMaximo;
     private float diametroMinimo;
     private float diametroNominal;
-
+    
     public float getDiametroNominal() {
         return diametroNominal;
     }

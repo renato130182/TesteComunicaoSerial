@@ -8,12 +8,14 @@ package view;
 import controller.ControllerEngenharia;
 import controller.ControllerEventosSistema;
 import controller.ControllerParadasMaquina;
+import controller.ControllerProducao;
 import controller.ControllerReservaPesagem;
 import controller.LogErro;
 import controller.Login;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
+import model.ComposicaoCobre;
 import model.Engenharia;
 import model.Maquina;
 import model.Paradas;
@@ -40,8 +42,9 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
     private ParadasMaquina paradasProcesso;
     private List<Paradas> preParadas = null;
     private List<Usuario> usr = new ArrayList<>();
-    //private List<Engenharia> engenharia=null;
+    private List<ComposicaoCobre> compCobre = new ArrayList<>();
     private List<ReservaPesagem> reservaPesagem = new ArrayList<>();
+    
     /**
      * Creates new form JFApontamentoProducao
      * @param maquina
@@ -603,6 +606,9 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
                     this.reservaPesagem.get(i).getCodigoEmbalagem(),this.reservaPesagem.get(i).getIdMatPrima(),
                     this.reservaPesagem.get(i).getQuantidade(),this.reservaPesagem.get(i).getUnidade()});       
             }
+            ControllerProducao ctrProd = new ControllerProducao();            
+            compCobre = ctrProd.montaComposicaoCobre(reservaPesagem,(int)prod.getMetragemProduzida(),prog.getQtdFiosEntrada());
+
         } catch (Exception e) {
             e.printStackTrace();
             erro.gravaErro(e);
@@ -618,8 +624,8 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
                 if(this.usr.size()>0){
                      DefaultTableModel table = (DefaultTableModel) jTableHistoricoOperador.getModel();
                      for (int i=0;i<this.usr.size();i++){
-                         table.addRow(new Object[]{this.usr.get(i).getCodigoOperador(),this.usr.get(i).getNome(),
-                         this.usr.get(i).getDataHoraLogin(),this.usr.get(i).getNomeEncarregado() });
+                        table.addRow(new Object[]{this.usr.get(i).getCodigoOperador(),this.usr.get(i).getNome(),
+                            this.usr.get(i).getDataHoraLogin(),this.usr.get(i).getNomeEncarregado() });
                      }
                 }
             }

@@ -10,6 +10,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import model.ComposicaoCobre;
 import model.Producao;
 
 /**
@@ -147,5 +150,33 @@ public class ProducaoDAO {
         }
         db.desconectar();        
         return false;
+    }
+    
+    public List<ComposicaoCobre> buscaComposicaoCobrePesagem(int codPesagem){
+        ConexaoDatabase db = new ConexaoDatabase();
+        List<ComposicaoCobre> compCobre = new ArrayList<>();
+        
+        try {
+            if(db.isInfoDB()){
+                sql = "SELECT * FROM condumigproducao.compcobrepesagem where idPesagem = ?;";
+                Connection conec = db.getConnection();
+                PreparedStatement st = conec.prepareStatement(sql);
+                st.setInt(1, codPesagem);            
+                ResultSet res = st.executeQuery();
+                while(res.next()){
+                    ComposicaoCobre cobre = new ComposicaoCobre();
+                    cobre.setIdPesagem(codPesagem);
+                    cobre.setLaminadora(res.getString("laminadora"));
+                    cobre.setPorcentagem(res.getDouble("porcentagem"));
+                    compCobre.add(cobre);
+                }
+                return compCobre;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        db.desconectar();
+        return null;
     }
 }

@@ -9,7 +9,15 @@ public class ProgramacaoMaquina {
     private long metragemProgramada;
     private String dataProgramada;
     private Produto produto;
-    
+    private int qtdFiosEntrada;
+
+    public int getQtdFiosEntrada() {
+        return qtdFiosEntrada;
+    }
+
+    public void setQtdFiosEntrada(int qtdFiosEntrada) {
+        this.qtdFiosEntrada = qtdFiosEntrada;
+    }
 
     public ProgramacaoMaquina() {
     }

@@ -2230,11 +2230,11 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 }
             }
             //Apenas para testar sem o micrometro Remover para produção
-            /*
+            
             JFApontamentoProducao apt = new JFApontamentoProducao(maquina,login,prodmaq,prodCar,prod,prog);
             apt.setExtendedState(JFrame.MAXIMIZED_BOTH);
             apt.setVisible(true);
-            */
+            
         } catch (Exception e) {
             erro.gravaErro(e);
         }

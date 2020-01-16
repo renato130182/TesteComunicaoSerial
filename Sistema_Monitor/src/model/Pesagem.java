@@ -1,5 +1,7 @@
 package model;
 
+import java.util.List;
+
 public class Pesagem {
     private String codigo;
     private String observacao;
@@ -10,7 +12,16 @@ public class Pesagem {
     private String DecItem;
     private int qtosFios;
     private String lote;
+    private List<ComposicaoCobre> compCobre;
 
+    public List<ComposicaoCobre> getCompCobre() {
+        return compCobre;
+    }
+
+    public void setCompCobre(List<ComposicaoCobre> compCobre) {
+        this.compCobre = compCobre;
+    }
+          
     public String getLote() {
         return lote;
     }
