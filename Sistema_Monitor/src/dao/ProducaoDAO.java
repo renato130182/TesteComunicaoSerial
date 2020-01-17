@@ -22,161 +22,203 @@ import model.Producao;
 public class ProducaoDAO {
     private String sql;
     LogErro erro = new LogErro();
+    private final Connection conec;
+
+    public ProducaoDAO(Connection conec) {
+        this.conec = conec;
+    }
     
-    public Producao buscaItemProducao(String codMaquina){
-        ConexaoDatabase db = new ConexaoDatabase();
+    
+    public Producao buscaItemProducao(String codMaquina){       
         Producao prod = new Producao();
         try {            
-            if(db.isInfoDB()){
-                sql ="SELECT res.codigoitemprod,res.loteproducao,prd.met_produzida,prd.carretel_saida "
-                        + "FROM condumigproducao.reservamaquina res inner join bd_sistema_monitor.tb_maquina_producao "
-                        + "prd on prd.cod_maq = res.codigomaquina where res.codigomaquina = ? group by res.codigomaquina;";
-                Connection conec = db.getConnection();
-                PreparedStatement st = conec.prepareStatement(sql);
-                st.setString(1, codMaquina);
-                ResultSet res = st.executeQuery();
-                if(res.next()){
-                    prod.setItemProducao(res.getString("codigoitemprod"));
-                    prod.setLoteProducao(res.getString("loteproducao"));
-                    prod.setCarretelSaida(res.getString("carretel_saida"));
-                    prod.setMetragemProduzida(res.getLong("met_produzida"));
-                    db.desconectar();
-                    return prod;                    
-                }else{
-                    System.out.println("Não ha item em produção.");
-                }
-            }
+            sql ="SELECT res.codigoitemprod,res.loteproducao,prd.met_produzida,prd.carretel_saida "
+                    + "FROM condumigproducao.reservamaquina res inner join bd_sistema_monitor.tb_maquina_producao "
+                    + "prd on prd.cod_maq = res.codigomaquina where res.codigomaquina = ? group by res.codigomaquina;";                
+            PreparedStatement st = this.conec.prepareStatement(sql);
+            st.setString(1, codMaquina);
+            ResultSet res = st.executeQuery();
+            if(res.next()){
+                prod.setItemProducao(res.getString("codigoitemprod"));
+                prod.setLoteProducao(res.getString("loteproducao"));
+                prod.setCarretelSaida(res.getString("carretel_saida"));
+                prod.setMetragemProduzida(res.getLong("met_produzida"));
+
+                return prod;                    
+            }else{
+                System.out.println("Não ha item em produção.");
+            }            
         } catch (SQLException e) {
             erro.gravaErro(e);
-        }
-        db.desconectar();
+        }        
         return null;
     }
     
-    public Long BuscaMetragemProduzida (String lote, String item){
-        Long metragem;
-        ConexaoDatabase db = new ConexaoDatabase();
+    public Long buscaMetragemProduzida (String lote, String item){
+        Long metragem;        
         try {
             sql = "SELECT sum(metragemoperador) as met FROM condumigproducao.pesagem "
-                    + "where loteproduzido = ? and codigoitem = ?;";
-            Connection conec = db.getConnection();
-            PreparedStatement st = conec.prepareStatement(sql);
+                    + "where loteproduzido = ? and codigoitem = ?;";            
+            PreparedStatement st = this.conec.prepareStatement(sql);
             st.setString(1, lote);
             st.setString(2, item);
             ResultSet res = st.executeQuery();
             if(res.next()){
                 metragem = res.getLong("met");
-                db.desconectar();
                 return metragem;
             }
         } catch (SQLException e) {
             erro.gravaErro(e);
         }
-        db.desconectar();
         return null;
     }
     
     public boolean atualizaMetragemProduzida (String maquina, String metragem){
-        sql = "update bd_sistema_monitor.tb_maquina_producao set met_produzida "
-                + "= met_produzida + ? where cod_maq = ?;";        
-        ConexaoDatabase db = new ConexaoDatabase();
-        if(db.isInfoDB()){
-            Connection conec = db.getConnection();
-            try {
-                PreparedStatement st = conec.prepareStatement(sql);
-                st.setString(1, metragem);
-                st.setString(2, maquina);
-                st.executeUpdate();
-                if(st.getUpdateCount()!=0){
-                    db.desconectar();
-                    return true;
-                }else{
-                    db.desconectar();
-                    return false;
-                }                                
-            } catch (SQLException ex) {
-                erro.gravaErro(ex);
-            }            
-        }
-        db.desconectar();        
+        
+        try {
+            sql = "update bd_sistema_monitor.tb_maquina_producao set met_produzida "
+                + "= met_produzida + ? where cod_maq = ?;";                
+            PreparedStatement st = this.conec.prepareStatement(sql);
+            st.setString(1, metragem);
+            st.setString(2, maquina);
+            st.executeUpdate();
+            return st.getUpdateCount()!=0;                                
+        } catch (SQLException ex) {
+            erro.gravaErro(ex);
+        }                    
         return false;
     }
     
-    public boolean atualizaSaldoConsumoEntrada (String cod_Pesagem, String metragem){
-        sql = "update condumigproducao.pesagem set saldoconsumo = (saldoconsumo - ?) where codigo = ?";        
-        ConexaoDatabase db = new ConexaoDatabase();
-        if(db.isInfoDB()){
-            Connection conec = db.getConnection();
-            try {
-                PreparedStatement st = conec.prepareStatement(sql);
-                st.setString(1, metragem);
-                st.setString(2, cod_Pesagem);
-                st.executeUpdate();
-                if(st.getUpdateCount()!=0){
-                    db.desconectar();
-                    return true;
-                }else{
-                    db.desconectar();
-                    return false;
-                }                                
-            } catch (SQLException ex) {
-                erro.gravaErro(ex);
-            }            
-        }
-        db.desconectar();        
+    public boolean atualizaSaldoConsumoEntrada (String cod_Pesagem, String metragem){        
+        try {
+            sql = "update condumigproducao.pesagem set saldoconsumo = (saldoconsumo - ?) where codigo = ?";                
+            PreparedStatement st = this.conec.prepareStatement(sql);
+            st.setString(1, metragem);
+            st.setString(2, cod_Pesagem);
+            st.executeUpdate();
+        return st.getUpdateCount()!=0;                                
+        } catch (SQLException ex) {
+            erro.gravaErro(ex);
+        }            
         return false;
     }
 
     public boolean atualizaCarretelSaida(String carretelSaida, String codMaquina) {
-        sql = "update bd_sistema_monitor.tb_maquina_producao set carretel_saida = ? where cod_maq = ?";        
-        ConexaoDatabase db = new ConexaoDatabase();
-        if(db.isInfoDB()){
-            Connection conec = db.getConnection();
-            try {
-                PreparedStatement st = conec.prepareStatement(sql);
-                st.setString(1, carretelSaida);
-                st.setString(2, codMaquina);
-                st.executeUpdate();
-                if(st.getUpdateCount()!=0){
-                    db.desconectar();
-                    return true;
-                }else{
-                    db.desconectar();
-                    return false;
-                }                                
-            } catch (SQLException ex) {
-                erro.gravaErro(ex);
-            }            
+
+        try {
+            sql = "update bd_sistema_monitor.tb_maquina_producao set carretel_saida = ? where cod_maq = ?";        
+            PreparedStatement st = this.conec.prepareStatement(sql);
+            st.setString(1, carretelSaida);
+            st.setString(2, codMaquina);
+            st.executeUpdate();
+            return st.getUpdateCount()!=0;                                
+        } catch (SQLException ex) {
+            erro.gravaErro(ex);
         }
-        db.desconectar();        
         return false;
     }
     
     public List<ComposicaoCobre> buscaComposicaoCobrePesagem(int codPesagem){
-        ConexaoDatabase db = new ConexaoDatabase();
-        List<ComposicaoCobre> compCobre = new ArrayList<>();
-        
+        List<ComposicaoCobre> compCobre = new ArrayList<>();        
         try {
-            if(db.isInfoDB()){
-                sql = "SELECT * FROM condumigproducao.compcobrepesagem where idPesagem = ?;";
-                Connection conec = db.getConnection();
-                PreparedStatement st = conec.prepareStatement(sql);
-                st.setInt(1, codPesagem);            
-                ResultSet res = st.executeQuery();
-                while(res.next()){
-                    ComposicaoCobre cobre = new ComposicaoCobre();
-                    cobre.setIdPesagem(codPesagem);
-                    cobre.setLaminadora(res.getString("laminadora"));
-                    cobre.setPorcentagem(res.getDouble("porcentagem"));
-                    compCobre.add(cobre);
-                }
-                return compCobre;
+            sql = "SELECT * FROM condumigproducao.compcobrepesagem where idPesagem = ?;";
+            PreparedStatement st = this.conec.prepareStatement(sql);
+            st.setInt(1, codPesagem);            
+            ResultSet res = st.executeQuery();
+            while(res.next()){
+                ComposicaoCobre cobre = new ComposicaoCobre();
+                cobre.setIdPesagem(codPesagem);
+                cobre.setLaminadora(res.getString("laminadora"));
+                cobre.setPorcentagem(res.getDouble("porcentagem"));
+                compCobre.add(cobre);
+            }
+            return compCobre;            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return null;
+    }
+
+    public boolean validaItemAlongamento(String codItem) {
+        try {
+            sql = "SELECT * FROM item_Alongamento WHERE codigoItem = ?;";
+            PreparedStatement st = this.conec.prepareStatement(sql);
+            st.setString(1, codItem);            
+            ResultSet res = st.executeQuery();
+            return res.next();
+                   
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return false;
+    }
+
+    public int buscaFatorPerdaItem(String itemProducao) {
+        try {
+            sql = "SELECT porc_perda FROM perdaproc where codigoItem = ?;";
+            PreparedStatement st = this.conec.prepareStatement(sql);
+            st.setString(1, itemProducao);            
+            ResultSet res = st.executeQuery();
+            if(res.next()){
+                return res.getInt("porc_perda");
+            }
+                   
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return 0;
+    }
+
+    public int buscaPerdaProcessualCodPesagem(int idMatPrima) {
+        try {
+            sql = "SELECT perda FROM pesagem WHERE codigo = ? AND laminadora not like 'EX%';";
+            PreparedStatement st = this.conec.prepareStatement(sql);
+            st.setInt(1, idMatPrima);            
+            ResultSet res = st.executeQuery();
+            if(res.next()){
+                return res.getInt("perda");
+            }                   
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return 0;
+    }
+
+    public int buscaMenorFichaAberto(int codigoProgramacao) {
+        try {
+            sql = "SELECT min(ficha),id as ficha FROM condumigproducao.fichamontagem "
+                    + "where codProgramacao = ? and isnull(idPesagem);";
+            PreparedStatement st = this.conec.prepareStatement(sql);
+            st.setInt(1, codigoProgramacao);            
+            ResultSet res = st.executeQuery();
+            if(res.next()){
+                return res.getInt("id");
             }
         } catch (SQLException e) {
             e.printStackTrace();
             erro.gravaErro(e);
         }
-        db.desconectar();
-        return null;
+        return 0;
+
+    }
+
+    public boolean marcarFichaApontada(int codPesagem,int id) {
+        try {
+            sql = "update condumigproducao.fichamontagem  set situacao = 1, "
+                    + "idPesagem = ?, observacao = 'Sistema Monitor' where id = ?;";        
+            PreparedStatement st = this.conec.prepareStatement(sql);
+            st.setInt(1, codPesagem);
+            st.setInt(2, id);
+            st.executeUpdate();
+            return st.getUpdateCount()!=0;                                
+        } catch (SQLException ex) {
+            erro.gravaErro(ex);
+        }
+        return false;
+        
     }
 }

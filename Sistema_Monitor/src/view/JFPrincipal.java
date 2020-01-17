@@ -2089,8 +2089,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     
     private boolean buscarInformaçoesProducao(){
         try {                    
-            ProducaoDAO daoProd = new ProducaoDAO();
-            prod = daoProd.buscaItemProducao(codMaquina);
+            ControllerProducao ctrProd = new ControllerProducao();
+            this.prod = ctrProd.buscaDadosMaquinaProducao(codMaquina);            
             if(prod != null){
                 if(prod.getCarretelSaida().trim().equals("")){
                     String carretelSaida = JOptionPane.showInputDialog(rootPane,"Carretel de Entrada","Por favor digite o numero do carretel de entrada",JOptionPane.QUESTION_MESSAGE);
@@ -2101,7 +2101,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                                 //validar carretel produto metragem
                                 ControllerProdutoMetragem ctrProdMet = new ControllerProdutoMetragem();
                                 if(ctrProdMet.validaEmbagemProdutoMetragem(prod, carretelSaida, codMaquina)){
-                                    if(!daoProd.atualizaCarretelSaida(carretelSaida,codMaquina)){
+                                    if(!ctrProd.atualizaCarretelSaida(carretelSaida,codMaquina)){
                                         JOptionPane.showMessageDialog(rootPane,"Falha ao registrar carretel de saida, por favor tente novamente","Falha de carretel de saida",JOptionPane.ERROR_MESSAGE);
                                     }else{
                                         prod.setCarretelSaida(carretelSaida);
@@ -2143,7 +2143,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                         jLabelProducaoDMinimo.setText(String.valueOf(prog.getProduto().getDiametroMinimo()));
                         jLabelProducaoDnominal.setText(String.valueOf(prog.getProduto().getDiametroNominal()));
                         jLabelProducaoDMaximo.setText(String.valueOf(prog.getProduto().getDiametroMaximo()));
-                        jLabelProducaoMetTotalProd.setText(String.valueOf(daoProd.BuscaMetragemProduzida(prod.getLoteProducao(),prod.getItemProducao())));
+                        jLabelProducaoMetTotalProd.setText(String.valueOf(ctrProd.buscaMetragemProduzida(prod.getLoteProducao(),prod.getItemProducao())));
                         ProdutoMaquinaDAO daoProdMaq = new ProdutoMaquinaDAO();
                         prodmaq = daoProdMaq.buscaVelocidadeProdutoMaquina(prod.getItemProducao(), codMaquina);
                         prodCar = daoProdCar.buscaDadosProdutoCarretel(prod.getItemProducao(),prod.getCarretelSaida(),codMaquina);

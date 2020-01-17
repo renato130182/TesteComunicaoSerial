@@ -7,6 +7,7 @@ package view;
 
 import controller.ControllerEngenharia;
 import controller.ControllerEventosSistema;
+import controller.ControllerInspecaoMaterial;
 import controller.ControllerParadasMaquina;
 import controller.ControllerProducao;
 import controller.ControllerReservaPesagem;
@@ -14,6 +15,7 @@ import controller.LogErro;
 import controller.Login;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import model.ComposicaoCobre;
 import model.Engenharia;
@@ -44,6 +46,8 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
     private List<Usuario> usr = new ArrayList<>();
     private List<ComposicaoCobre> compCobre = new ArrayList<>();
     private List<ReservaPesagem> reservaPesagem = new ArrayList<>();
+    private int perdaEstimada=0;
+    private int numPesagem=123456;
     
     /**
      * Creates new form JFApontamentoProducao
@@ -67,6 +71,9 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
         buscarParadasProcessoProducao();
         buscaDadosConsumoMp();
         buscaHistoricoOperadores();
+        calcularPerdaProcessual();
+        verificarDadosInspecaoAmostra();
+        verificarFichasControle();
     }
 
     /**
@@ -631,6 +638,48 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
             }
             
         } catch (Exception e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+    }
+
+    private void calcularPerdaProcessual() {
+        if(!prod.getItemProducao().substring(0,3).equals("4001")){
+            ControllerProducao ctr = new ControllerProducao();
+            if(prod.getItemProducao().substring(0,3).equals("4002")){
+                this.perdaEstimada = ctr.buscaFatorPerdaItem(prod.getItemProducao());
+            }else{
+                if(ctr.verificaItemAlongamento(prod.getItemProducao())){
+                    this.perdaEstimada = 0;
+                }else{
+                    this.perdaEstimada = ctr.buscaPerdaEstimadaMateriaPrima(reservaPesagem);
+                }
+            }
+        }
+    }
+    
+    private void verificarDadosInspecaoAmostra(){
+
+        
+        ControllerInspecaoMaterial ctrInsp = new ControllerInspecaoMaterial();
+        int tipoInspecao = ctrInsp.buscaTipoInspecaoItem(prod.getItemProducao());
+        if(tipoInspecao!=99){
+            if(ctrInsp.validaRegistroAmostra(tipoInspecao,numPesagem,prod.getLoteProducao(),
+                    prod.getItemProducao(),login.getCodigoOperador())){
+                System.out.println("registros de inspeção OK!!!");
+            }else{
+                JOptionPane.showMessageDialog(rootPane,"Falha validar registro de inspeção", "Erro durante processamento", JOptionPane.ERROR_MESSAGE);
+            }                
+        }else{
+            JOptionPane.showMessageDialog(rootPane,"Falha ao buscar tipo de inspeção", "Erro durante processamento", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void verificarFichasControle(){
+        try {
+            ControllerProducao ctrPrd = new ControllerProducao();
+            ctrPrd.RegistrarApontamentoFichaControle(prog.getCodigoProgramacao(),numPesagem);
+        } catch (Exception e) {            
             e.printStackTrace();
             erro.gravaErro(e);
         }

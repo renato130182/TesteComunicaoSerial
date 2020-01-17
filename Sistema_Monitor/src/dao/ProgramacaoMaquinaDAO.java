@@ -27,7 +27,7 @@ public class ProgramacaoMaquinaDAO {
         ConexaoDatabase db = new ConexaoDatabase();
         if(db.equals(db)){
             try {
-                sql = "select prog.codigoitem, item.descricao, prog.loteproducao, "
+                sql = "select prog.codigo,prog.codigoitem, item.descricao, prog.loteproducao, "
                         + "prog.datacadastro,prog.quantloteprogramado,prog.metragemprogramada "
                         + ",prog.datacadastro from condumigproducao.programacaomaquina prog inner join "
                         + "condumigproducao.item on item.codigo = prog.codigoitem  "
@@ -45,6 +45,7 @@ public class ProgramacaoMaquinaDAO {
                    prog.setQuantidadeProgramada(res.getInt("prog.quantloteprogramado"));
                    prog.setMetragemProgramada(res.getLong("prog.metragemprogramada"));
                    prog.setDataProgramada(res.getString("prog.datacadastro"));
+                   prog.setCodigoProgramacao(res.getInt("prog.codigo"));
                    lista.add(prog);
                 }
                 conec.close();
@@ -59,7 +60,7 @@ public class ProgramacaoMaquinaDAO {
         ConexaoDatabase db = new ConexaoDatabase();
         try {            
             if(db.equals(db)){
-                sql = "select prog.quantloteprogramado, prog.quantloteproduzido, prog.metragemprogramada, "
+                sql = "select prog.codigo,prog.quantloteprogramado, prog.quantloteproduzido, prog.metragemprogramada, "
                         + "it.descricao,itc.minimo, itc.nominal,itc.maximo, prog.qtfiosentrada from condumigproducao.programacaomaquina "
                         + "prog inner join condumigproducao.item it on it.codigo = prog.codigoitem "
                         + "inner join condumigproducao .itemitemcontrole itc on itc.codigoitem = it.codigo "
@@ -87,6 +88,7 @@ public class ProgramacaoMaquinaDAO {
                        prog.setProduto(new Produto(item,res.getString("descricao"),res.getFloat("minimo"),
                                res.getFloat("nominal"),res.getFloat("maximo")));
                        prog.setQtdFiosEntrada(res.getInt("qtfiosentrada"));
+                       prog.setCodigoProgramacao(res.getInt("prog.codigo"));
                        db.desconectar();
                        return prog;
                     }

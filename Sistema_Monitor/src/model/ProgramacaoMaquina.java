@@ -10,6 +10,15 @@ public class ProgramacaoMaquina {
     private String dataProgramada;
     private Produto produto;
     private int qtdFiosEntrada;
+    private int codigoProgramacao;
+
+    public int getCodigoProgramacao() {
+        return codigoProgramacao;
+    }
+
+    public void setCodigoProgramacao(int codigoProgramacao) {
+        this.codigoProgramacao = codigoProgramacao;
+    }
 
     public int getQtdFiosEntrada() {
         return qtdFiosEntrada;
