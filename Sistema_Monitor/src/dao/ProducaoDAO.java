@@ -196,7 +196,7 @@ public class ProducaoDAO {
             st.setInt(1, codigoProgramacao);            
             ResultSet res = st.executeQuery();
             if(res.next()){
-                return res.getInt("id");
+                return res.getInt("ficha");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -220,5 +220,40 @@ public class ProducaoDAO {
         }
         return false;
         
+    }
+
+    public String[] buscaDataHoraFimProducao(String codMaquina) {
+        try {
+            sql = "SELECT data_hora_inicio as dataFimProducao FROM bd_sistema_monitor.tb_maquina_evento "
+                    + "where id not in (select id from bd_sistema_monitor.tb_maquina_evento_apontamento) "
+                    + "and cod_maquina = ? order by id desc limit 1;";
+            PreparedStatement st = this.conec.prepareStatement(sql);
+            st.setString(1, codMaquina);            
+            ResultSet res = st.executeQuery();
+            if(res.next()){
+                String[] tmp = res.getString("dataFimProducao").split(" ");
+                return tmp;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return null;
+    }
+
+    public String buscaTipoItemProducao(String itemProducao) {
+        try {
+            sql = "SELECT tipoitem FROM condumigproducao.item where codigo = ?;";
+            PreparedStatement st = this.conec.prepareStatement(sql);
+            st.setString(1, itemProducao);            
+            ResultSet res = st.executeQuery();
+            if(res.next()){
+                return res.getString("tipoitem");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return "";
     }
 }

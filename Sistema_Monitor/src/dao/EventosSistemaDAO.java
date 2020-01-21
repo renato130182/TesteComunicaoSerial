@@ -282,10 +282,11 @@ public class EventosSistemaDAO {
                 tmp.setDataHoraLogin(res.getString("dataHora"));
                 tmp.setCodigoEncarregado(res.getString("cod_encarregado"));
                 tmp.setNomeEncarregado( res.getString("encNome"));
+                tmp.setMetProduzida(res.getInt("metragem"));
                 usr.add(tmp);
             }
             return usr;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             erro.gravaErro(e);
         }

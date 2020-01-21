@@ -80,7 +80,7 @@ public class ControllerParadasMaquina {
                 if(daoPar.buscarIDEventoAberto(cod_maquina)==0){
                     EventoMaquina evt = new EventoMaquina();
                     evt.setCod_maquina(cod_maquina);
-                    evt.setMetragem(metragem);                                
+                    evt.setMetragemEvento(metragem);                                
                     if(daoPar.incluirInicioEventoMaquina(evt)){
                         db.desconectar();
                         return true;
@@ -107,7 +107,7 @@ public class ControllerParadasMaquina {
                 conec = db.getConnection();
                 ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO(conec);      
                 EventoMaquina evt = new EventoMaquina();            
-                evt.setMetragem(metragem);            
+                evt.setMetragemEvento(metragem);            
                 evt.setIdEvento(daoPar.buscarIDEventoAberto(cod_maquina));
                 this.ultimoEvento = evt.getIdEvento();
                 return  daoPar.RegistrarRetornoEventoMaquina(evt);

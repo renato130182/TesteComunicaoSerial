@@ -10,19 +10,19 @@ package model;
  * @author renato.soares
  */
 public class ReservaPesagem {
-   private String codigoPesagem;
-   private int sequencia;
-   private String itemReserva;
-   private String loteReserva;
-   private int qtosfios;
-   private String codigoEmbalagem;
-   private double quantidade;
-   private String codigoEmbalagelTroca;
-   private String loteReservaTroca;
-   private int idPesagem;
-   private int idMatPrima;
-   private String itemDescricao;
-   private String unidade;
+    private String codigoPesagem;
+    private int sequencia;
+    private String itemReserva;
+    private String loteReserva;
+    private int qtosfios;
+    private String codigoEmbalagem;
+    private double quantidade;
+    private String codigoEmbalagelTroca;
+    private String loteReservaTroca;
+    private int idPesagem;
+    private int idMatPrima;
+    private String itemDescricao;
+    private String unidade;
 
     public String getUnidade() {
         return unidade;
@@ -31,6 +31,7 @@ public class ReservaPesagem {
     public void setUnidade(String unidade) {
         this.unidade = unidade;
     }
+    
     public String getItemDescricao() {
         return itemDescricao;
     }

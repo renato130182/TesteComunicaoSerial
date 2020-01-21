@@ -5,17 +5,27 @@
  */
 package controller;
 
+
 import dao.ConexaoDatabase;
+import dao.ParadasMaquinaDAO;
 import dao.ProducaoDAO;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import model.ComposicaoCobre;
+import model.EventoMaquina;
+import model.Maquina;
 import model.Pesagem;
 import model.Producao;
+import model.ProgramacaoMaquina;
 import model.ReservaPesagem;
+import model.Usuario;
 
 /**
  *
@@ -279,5 +289,127 @@ public class ControllerProducao {
             erro.gravaErro(e);
         }
         return true;
+    }
+
+    public boolean registrarApontamentoPesagem(Producao prod, int perdaEstimada, List<Usuario> usr, 
+            Maquina maquina, ProgramacaoMaquina prog,String obsPesagem) {
+        try {
+            ConexaoDatabase db = new ConexaoDatabase();
+            if(db.isInfoDB()){
+                Connection conec = db.getConnection();                
+                conec = db.getConnection();            
+                ProducaoDAO dao = new ProducaoDAO(conec);
+                List<String> dadosQuery = new ArrayList<>();
+                dadosQuery.add(prod.getLoteProducao() + prod.getCarretelSaida() + "0");
+                String[] tmp =  dao.buscaDataHoraFimProducao(maquina.getCodigo());
+                for (int i=0;i<tmp.length;i++){
+                    dadosQuery.add(tmp[i]);
+                }
+                dadosQuery.add(usr.get(0).getCodigoOperador());
+                dadosQuery.add(prod.getCarretelSaida());                               
+                String codOperador1 = usr.get(0).getCodigoOperador();
+                String codEncarregado1 = usr.get(0).getCodigoEncarregado();
+                String codOperador2="";
+                String codEncarregado2="";
+                int metTrocaTurno=0;
+                for (int i=0;i<usr.size();i++){
+                    if(!codOperador1.equals(usr.get(i).getCodigoOperador())){
+                        codOperador2=usr.get(i).getCodigoOperador();
+                        codEncarregado2=usr.get(i).getCodigoEncarregado();
+                        metTrocaTurno=usr.get(i).getMetProduzida();
+                        break;
+                    }
+                }
+                dadosQuery.add(codOperador1);
+                dadosQuery.add(codEncarregado1);
+                dadosQuery.add(codOperador2);
+                dadosQuery.add(codEncarregado2);
+                dadosQuery.add(maquina.getCodigo());
+                dadosQuery.add(prod.getItemProducao());
+                dadosQuery.add(String.valueOf(prod.getMetragemProduzida()));
+                dadosQuery.add(String.valueOf(prod.getMetragemProduzida()));
+                dadosQuery.add(String.valueOf(metTrocaTurno));
+                dadosQuery.add(prod.getLoteProducao());
+                dadosQuery.add(String.valueOf(prog.getQtdfiosSaida()));
+                dadosQuery.add(buscaTempoGastoProducao(maquina.getCodigo()));
+                dadosQuery.add(dao.buscaTipoItemProducao(prod.getItemProducao()));
+                dadosQuery.add(obsPesagem);
+                dadosQuery.add(buscaTempoTotalParadas(maquina.getCodigo()));
+                dadosQuery.add(String.valueOf(prod.getMetragemProduzida()));
+                dadosQuery.add(String.valueOf(prod.getMetragemProduzida()));
+                dadosQuery.add(ControllerUtil.buscaMacAdrres());
+                dadosQuery.add(prog.getLaminadora());
+                dadosQuery.add(String.valueOf(perdaEstimada));
+                
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return false;
+    }
+
+    private String buscaTempoGastoProducao(String codMaquina) {
+        try {
+            ConexaoDatabase db = new ConexaoDatabase();
+            if(db.isInfoDB()){
+                Connection conec = db.getConnection();                
+                conec = db.getConnection();            
+                ParadasMaquinaDAO daoParadas = new ParadasMaquinaDAO(conec);
+                List<EventoMaquina> evt = daoParadas.buscaTempoMetragemEventosApontamento(codMaquina);
+                db.desconectar();
+                if(evt!=null){
+                    if(evt.size()>1){
+                        long tempoProd=0;
+                        for(int i=0;i<evt.size()-1;i++){
+                            String tmpInicio = evt.get(i).getDataHoraFinal();
+                            String tmpFinal = evt.get(i+1).getDataHoraInicio();
+                            tempoProd= tempoProd + ControllerUtil.calculaTempoPercorridoSegundos(tmpInicio, tmpFinal);
+                        }
+                        
+                        return String.valueOf(tempoProd/60);
+                    }   
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return "0";
+    }
+
+    private String buscaTempoTotalParadas(String codMaquina) {
+        try {
+             ConexaoDatabase db = new ConexaoDatabase();
+            if(db.isInfoDB()){
+                Connection conec = db.getConnection();                
+                conec = db.getConnection();            
+                ParadasMaquinaDAO daoParadas = new ParadasMaquinaDAO(conec);
+                List<EventoMaquina> evt = daoParadas.buscaTempoMetragemEventosApontamento(codMaquina);
+                db.desconectar();
+                if(evt!=null){
+                    if(evt.size()>1){
+                        long tempoProd=0;
+                        String tmpInicio;
+                        String tmpFinal ;
+                        for(int i=0;i<evt.size();i++){
+                            tmpInicio = evt.get(i).getDataHoraInicio();
+                            if(evt.size()-1 == i){
+                                tmpFinal = ControllerUtil.buscaDataHoraAtualBD();
+                            }else{
+                                tmpFinal = evt.get(i).getDataHoraFinal();
+                            }
+                            tempoProd= tempoProd + ControllerUtil.calculaTempoPercorridoSegundos(tmpInicio, tmpFinal);
+                        }
+                        
+                        return String.valueOf(tempoProd/60);
+                    }   
+                }
+            }            
+        } catch (Exception e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return "0";
     }
 }

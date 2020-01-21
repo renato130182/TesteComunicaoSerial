@@ -36,7 +36,6 @@ import model.Usuario;
 public class JFApontamentoProducao extends javax.swing.JFrame {
     private Login login = new Login();
     private Maquina maquina = new Maquina();
-    private ProdutoMaquina prodmaq = new ProdutoMaquina();
     private ProdutoCarretel prodCar = new ProdutoCarretel();
     private Producao prod = new Producao();
     private final LogErro erro = new LogErro();
@@ -63,7 +62,6 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
         initComponents();
         this.login = login;
         this.maquina = maquina;
-        this.prodmaq = prodmaq;
         this.prodCar = prodCar;
         this.prod = prod;
         this.prog = prog;
@@ -122,7 +120,6 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Conferência de Produção");
-        setPreferredSize(new java.awt.Dimension(1000, 750));
         setSize(new java.awt.Dimension(1000, 850));
 
         jScrollPane1.setPreferredSize(new java.awt.Dimension(902, 800));
@@ -362,8 +359,18 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
         jPanelAcoes.setBorder(javax.swing.BorderFactory.createTitledBorder("Ações:"));
 
         jButtonApontar.setText("Realizar Apontamento");
+        jButtonApontar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonApontarActionPerformed(evt);
+            }
+        });
 
         jButtonCancelar.setText("Cancelar");
+        jButtonCancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonCancelarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanelAcoesLayout = new javax.swing.GroupLayout(jPanelAcoes);
         jPanelAcoes.setLayout(jPanelAcoesLayout);
@@ -484,6 +491,20 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButtonApontarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonApontarActionPerformed
+        // TODO add your handling code here:
+        ControllerProducao ctr = new ControllerProducao();
+        if(ctr.registrarApontamentoPesagem(prod, perdaEstimada, usr, maquina, prog, jTextPane1.getText())){
+            
+        }else{
+            
+        }
+    }//GEN-LAST:event_jButtonApontarActionPerformed
+
+    private void jButtonCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCancelarActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButtonCancelarActionPerformed
         
     /**
      * @param args the command line arguments

@@ -6,11 +6,20 @@
 package controller;
 
 
+import dao.ConexaoDatabase;
+import dao.UtilDAO;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.sql.Connection;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 
 /**
@@ -18,8 +27,7 @@ import java.net.UnknownHostException;
  * @author renato.soares
  */
 public final class ControllerUtil {
-        
-        
+          
     public static final boolean SoTemNumeros(String texto) { 
         try {                    
             if(texto.length()==0)return false;
@@ -52,5 +60,57 @@ public final class ControllerUtil {
             
         }
         return false;
+    }
+    
+    public static final int calculaTempoPercorridoSegundos(String dataInicio, String dataFim) { 
+        try {                    
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date dataHoraInicial = sdf.parse(dataInicio);
+            Date dataHoraFinal = sdf.parse(dataFim);
+            long tempo = dataHoraFinal.getTime()-dataHoraInicial.getTime();
+            return (int) (tempo/1000);            
+        } catch (Exception e) {
+            LogErro erro = new LogErro();
+            erro.gravaErro(e);
+            return 0;
+        }  
+    }
+
+    public static final String buscaDataHoraAtualBD() {
+        try {
+            ConexaoDatabase db = new ConexaoDatabase();
+            if(db.isInfoDB()){
+                Connection conec = db.getConnection();                
+                conec = db.getConnection(); 
+                UtilDAO dao = new UtilDAO(conec);
+                String dado = dao.buscaDataHoraBD();
+                db.desconectar();
+                return dado;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogErro erro = new LogErro();  
+            erro.gravaErro(e);
+        }
+        return "";
+    }
+    
+    public static final String buscaMacAdrres() {
+        InetAddress ip;
+        try {
+            ip = InetAddress.getLocalHost();
+            NetworkInterface network = NetworkInterface.getByInetAddress(ip);
+            byte[] mac = network.getHardwareAddress();
+            StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < mac.length; i++) {
+			sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));		
+		}
+            return sb.toString();
+        } catch (UnknownHostException | SocketException ex) {
+            ex.printStackTrace();
+            LogErro erro = new LogErro(); 
+            erro.gravaErro(ex);
+        }
+        return "";
     }
 }

@@ -19,6 +19,15 @@ public class Usuario {
     private String dataHoraLogin;
     private String codigoEncarregado;
     private String nomeEncarregado;
+    private int metProduzida;
+
+    public int getMetProduzida() {
+        return metProduzida;
+    }
+
+    public void setMetProduzida(int metProduzida) {
+        this.metProduzida = metProduzida;
+    }
 
     public String getCodigoEncarregado() {
         return codigoEncarregado;

@@ -11,6 +11,24 @@ public class ProgramacaoMaquina {
     private Produto produto;
     private int qtdFiosEntrada;
     private int codigoProgramacao;
+    private int qtdfiosSaida;
+    private String laminadora;
+
+    public String getLaminadora() {
+        return laminadora;
+    }
+
+    public void setLaminadora(String laminadora) {
+        this.laminadora = laminadora;
+    }
+
+    public int getQtdfiosSaida() {
+        return qtdfiosSaida;
+    }
+
+    public void setQtdfiosSaida(int qtdfiosSaida) {
+        this.qtdfiosSaida = qtdfiosSaida;
+    }
 
     public int getCodigoProgramacao() {
         return codigoProgramacao;

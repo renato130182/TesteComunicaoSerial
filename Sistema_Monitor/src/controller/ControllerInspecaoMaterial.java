@@ -8,6 +8,7 @@ package controller;
 import dao.ConexaoDatabase;
 import dao.InspecaoMaterialDAO;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  *
@@ -89,7 +90,7 @@ public class ControllerInspecaoMaterial {
                 db.desconectar();
                 return false;
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             erro.gravaErro(e);
         }
@@ -120,7 +121,7 @@ public class ControllerInspecaoMaterial {
                     return true;
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             erro.gravaErro(e);                        
         }
@@ -151,7 +152,7 @@ public class ControllerInspecaoMaterial {
                     return true;
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             erro.gravaErro(e);                        
         }
