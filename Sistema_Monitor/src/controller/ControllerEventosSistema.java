@@ -28,7 +28,6 @@ public class ControllerEventosSistema {
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
                 Connection conec = db.getConnection();                
-                conec = db.getConnection();
                 conec.setAutoCommit(false);
                 EventosSistemaDAO dao = new EventosSistemaDAO(conec);
                 if(dao.registraEventoSistema(cod_Evento,codMaquina)){
@@ -93,7 +92,6 @@ public class ControllerEventosSistema {
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
                 Connection conec = db.getConnection();                
-                conec = db.getConnection();
                 conec.setAutoCommit(false);
                 EventosSistemaDAO dao = new EventosSistemaDAO(conec);
                 if(dao.ValidaPreApontamentoEventoSistema(codParada, codMaquina,msg)){
@@ -125,10 +123,10 @@ public class ControllerEventosSistema {
             List<Paradas> paradas = new ArrayList<>();
                 if(db.isInfoDB()){
                     Connection conec = db.getConnection();                
-                    conec = db.getConnection();
                     EventosSistemaDAO dao = new EventosSistemaDAO(conec);
                     paradas = dao.BuscaPreApontamentoEventoSistema(codMaquina);
                 }
+            db.desconectar();
             return paradas;
         } catch (Exception e) {
             e.printStackTrace();
@@ -143,7 +141,6 @@ public class ControllerEventosSistema {
             List<String> ids = new ArrayList<>();
             if(db.isInfoDB()){
                 Connection conec = db.getConnection();                
-                conec = db.getConnection();
                 conec.setAutoCommit(false);
                 EventosSistemaDAO dao = new EventosSistemaDAO(conec);
                 ids = dao.BuscaIdsApontamentoEventoSistema(codMaquina);
@@ -171,7 +168,6 @@ public class ControllerEventosSistema {
             ConexaoDatabase db = new ConexaoDatabase();           
             if(db.isInfoDB()){
                 Connection conec = db.getConnection();                
-                conec = db.getConnection();
                 conec.setAutoCommit(false);
                 EventosSistemaDAO dao = new EventosSistemaDAO(conec);
                 if(dao.removePreApontamentoEventoSistemaRegistrados(codMaquina)){
@@ -196,7 +192,6 @@ public class ControllerEventosSistema {
             ConexaoDatabase db = new ConexaoDatabase();            
             if(db.isInfoDB()){
                 Connection conec = db.getConnection();                
-                conec = db.getConnection();
                 conec.setAutoCommit(false);
                 EventosSistemaDAO dao = new EventosSistemaDAO(conec);                
                 if(idPreParada!=null){
@@ -223,7 +218,6 @@ public class ControllerEventosSistema {
             ConexaoDatabase db = new ConexaoDatabase();            
             if(db.isInfoDB()){
                 Connection conec = db.getConnection();                
-                conec = db.getConnection();
                 conec.setAutoCommit(false);
                 EventosSistemaDAO dao = new EventosSistemaDAO(conec);                              
                 if(dao.setarCarretelEntradaPreParada(codPesSaida,codPesEntrada)){
@@ -248,13 +242,14 @@ public class ControllerEventosSistema {
         try {
             ConexaoDatabase db = new ConexaoDatabase();            
             if(db.isInfoDB()){
-                Connection conec = db.getConnection();                
-                conec = db.getConnection();
-                conec.setAutoCommit(false);
-                EventosSistemaDAO dao = new EventosSistemaDAO(conec);                              
-                return dao.buscaHistoricoLoginOperador(loteProducao);                
+                Connection conec = db.getConnection();                             
+                EventosSistemaDAO dao = new EventosSistemaDAO(conec);  
+                List<Usuario> user = dao.buscaHistoricoLoginOperador(loteProducao);
+                db.desconectar();
+                return user;
+                
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             erro.gravaErro(e);
         }

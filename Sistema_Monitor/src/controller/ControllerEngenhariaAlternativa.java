@@ -25,7 +25,6 @@ public class ControllerEngenhariaAlternativa {
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
                 Connection conec = db.getConnection();                
-                conec = db.getConnection();
                 EngenhariaAlternativaDAO dao  = new EngenhariaAlternativaDAO(conec);
                 prods = dao.BuscaItenDescricaoEngAlternativa(codItem,codItemProducao);
                 db.desconectar();

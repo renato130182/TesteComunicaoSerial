@@ -120,7 +120,7 @@ public class DadosDefaultDAO {
         }
     }
     public String buscaCodigoMaquina(String serial){
-        String codMaquina;
+        String codMaquina=null;
         ConexaoDatabase db = new ConexaoDatabase();
         if(db.isInfoDB()){
             try {
@@ -130,10 +130,10 @@ public class DadosDefaultDAO {
                 st.setString(1,serial);                
                 ResultSet res = st.executeQuery();
                 if(res.next()){
-                    codMaquina = res.getString("codigo_maquina_monitor");
-                    db.desconectar();
-                    return codMaquina;
+                    codMaquina = res.getString("codigo_maquina_monitor");                 
                 }
+                db.desconectar();
+                return codMaquina;
             } catch (SQLException ex) {
                 erro.gravaErro(ex);
             }

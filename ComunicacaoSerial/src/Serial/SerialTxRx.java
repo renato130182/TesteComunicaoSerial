@@ -122,7 +122,7 @@ public class SerialTxRx implements SerialPortEventListener{
                         input = new BufferedReader(new InputStreamReader(serialPort.getInputStream()));
                     }                    
                     dadosSerial = input.readLine();
-                    System.out.println(dadosSerial); 
+                    //System.out.println(dadosSerial); 
                     //Sinalizar evento na porta serial
                     if(!dadosSerial.isEmpty())dadosRecebidos();
                     input=null;

@@ -42,7 +42,6 @@ public class ControllerMicrometro extends Micrometro{
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
                 Connection conec = db.getConnection();                
-                conec = db.getConnection();
                 MicrometroDAO dao = new MicrometroDAO(conec);
                 if(dao.registraDadosMicrometro(dados, codMaquina, lote, metros)){
                     db.desconectar();

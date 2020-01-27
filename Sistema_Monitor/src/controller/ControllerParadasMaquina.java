@@ -29,7 +29,6 @@ public class ControllerParadasMaquina {
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
                 Connection conec = db.getConnection();                
-                conec = db.getConnection();
                 ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO(conec);
                 this.paradasMaquina = daoPar.buscaParadasmaquina(cod_Maquina);
                 db.desconectar();
@@ -75,7 +74,6 @@ public class ControllerParadasMaquina {
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
                 Connection conec = db.getConnection();                
-                conec = db.getConnection();
                 ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO(conec);      
                 if(daoPar.buscarIDEventoAberto(cod_maquina)==0){
                     EventoMaquina evt = new EventoMaquina();
@@ -91,9 +89,11 @@ public class ControllerParadasMaquina {
                 }else{
                     db.desconectar();
                     return true;
-                }                
+                }
+                
             }            
         } catch (Exception e) {
+            e.printStackTrace();
             erro.gravaErro(e);
         }
         return false;
@@ -104,7 +104,6 @@ public class ControllerParadasMaquina {
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
                 Connection conec = db.getConnection();                
-                conec = db.getConnection();
                 ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO(conec);      
                 EventoMaquina evt = new EventoMaquina();            
                 evt.setMetragemEvento(metragem);            
@@ -127,7 +126,6 @@ public class ControllerParadasMaquina {
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
                 Connection conec = db.getConnection();                
-                conec = db.getConnection();
                 conec.setAutoCommit(false);
                 ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO(conec);                
                 if(daoPar.incluirMotivoEventoMaquina(Long.valueOf(codigo), ultimoEvento)){
@@ -162,7 +160,6 @@ public class ControllerParadasMaquina {
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
                 Connection conec = db.getConnection();                
-                conec = db.getConnection();
                 ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO(conec);
                 ParadasMaquina par = daoPar.buscaParadasMaquinaProducaoAtual(cod_maquina);
                 db.desconectar();

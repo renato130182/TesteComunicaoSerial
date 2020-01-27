@@ -7,7 +7,6 @@ package view;
 
 import controller.ControllerEngenharia;
 import controller.ControllerEventosSistema;
-import controller.ControllerInspecaoMaterial;
 import controller.ControllerParadasMaquina;
 import controller.ControllerProducao;
 import controller.ControllerReservaPesagem;
@@ -70,7 +69,6 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
         buscaDadosConsumoMp();
         buscaHistoricoOperadores();
         calcularPerdaProcessual();
-        verificarDadosInspecaoAmostra();
         verificarFichasControle();
     }
 
@@ -495,10 +493,13 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
     private void jButtonApontarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonApontarActionPerformed
         // TODO add your handling code here:
         ControllerProducao ctr = new ControllerProducao();
-        if(ctr.registrarApontamentoPesagem(prod, perdaEstimada, usr, maquina, prog, jTextPane1.getText())){
-            
+        if(ctr.registrarApontamentoPesagem(prod, perdaEstimada, usr, maquina, prog, jTextPane1.getText(),
+                reservaPesagem,paradasProcesso,compCobre,login)){
+            JOptionPane.showMessageDialog(rootPane,"Registro de apontamento realizado com sucesso!","Registro de produção",JOptionPane.INFORMATION_MESSAGE);
+            dispose();
         }else{
-            
+            JOptionPane.showMessageDialog(rootPane,"Falha ao realizar o registro de apontamento de produção \n "
+                    + "por favor tente novamente!","Registro de produção",JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_jButtonApontarActionPerformed
 
@@ -636,7 +637,7 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
             }
             ControllerProducao ctrProd = new ControllerProducao();            
             compCobre = ctrProd.montaComposicaoCobre(reservaPesagem,(int)prod.getMetragemProduzida(),prog.getQtdFiosEntrada());
-
+            
         } catch (Exception e) {
             e.printStackTrace();
             erro.gravaErro(e);
@@ -679,22 +680,7 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
         }
     }
     
-    private void verificarDadosInspecaoAmostra(){
-
-        
-        ControllerInspecaoMaterial ctrInsp = new ControllerInspecaoMaterial();
-        int tipoInspecao = ctrInsp.buscaTipoInspecaoItem(prod.getItemProducao());
-        if(tipoInspecao!=99){
-            if(ctrInsp.validaRegistroAmostra(tipoInspecao,numPesagem,prod.getLoteProducao(),
-                    prod.getItemProducao(),login.getCodigoOperador())){
-                System.out.println("registros de inspeção OK!!!");
-            }else{
-                JOptionPane.showMessageDialog(rootPane,"Falha validar registro de inspeção", "Erro durante processamento", JOptionPane.ERROR_MESSAGE);
-            }                
-        }else{
-            JOptionPane.showMessageDialog(rootPane,"Falha ao buscar tipo de inspeção", "Erro durante processamento", JOptionPane.ERROR_MESSAGE);
-        }
-    }
+ 
     
     private void verificarFichasControle(){
         try {

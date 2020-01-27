@@ -82,6 +82,7 @@ public class ParadasMaquinaDAO {
                     return id;
                 }                                
             } catch (SQLException ex) {
+                ex.printStackTrace();
                 erro.gravaErro(ex);
             }
         return 0;
@@ -173,7 +174,7 @@ public class ParadasMaquinaDAO {
             try {
                 sql = "SELECT par.id as idPar, par.cod_parada_maquina as codParada, "
                         + "pardesc.abreviacao as abrev, obs.observacao as obs, "
-                        + "ent.cod_pesagem_saida, ent.cod_pesagem_entrada FROM bd_sistema_monitor.tb_maquina_evento evt "
+                        + "ent.cod_pesagem_saida, ent.cod_pesagem_entrada,evt.id as idEvt FROM bd_sistema_monitor.tb_maquina_evento evt "
                         + "Inner join bd_sistema_monitor.tb_maquina_evento_parada par on evt.id = par.id_maquina_evento "
                         + "Inner join condumigproducao.paradas pardesc on par.cod_parada_maquina = pardesc.codigo "
                         + "left join bd_sistema_monitor.tb_maquina_evento_observacao obs on par.id = obs.id_maquina_evento_parada "
@@ -190,6 +191,7 @@ public class ParadasMaquinaDAO {
                    parada.setObservacao(res.getString("obs"));    
                    parada.setCodPesagemSaida(res.getInt("cod_pesagem_saida"));
                    parada.setCodPesagemEntrada(res.getInt("cod_pesagem_entrada"));
+                   parada.setIdRegistro(res.getInt("idEvt"));
                    listaParadas.add(parada);
                 }
                 paradasMaquina.setListaParadas(listaParadas);
@@ -223,4 +225,31 @@ public class ParadasMaquinaDAO {
         }
         return null;
     }
+    
+    public List<String> buscaDataHoraTempoEventoMaquinaPorID(int idEvento){
+        try {
+            sql = "SELECT data_hora_inicio as inicio,  if(isnull(data_hora_final),"
+                    + "TIMESTAMPDIFF(SECOND,data_hora_inicio,now()), "
+                    + "TIMESTAMPDIFF(SECOND,data_hora_inicio,data_hora_final)) as tempo,"
+                    + "(select count(id) from bd_sistema_monitor.tb_maquina_evento_parada where id_maquina_evento = ?) "
+                    + "as qtd FROM bd_sistema_monitor.tb_maquina_evento where id = ?;";
+            PreparedStatement st = conec.prepareStatement(sql);
+            st.setInt(1, idEvento);
+            st.setInt(2, idEvento);
+            ResultSet res = st.executeQuery();
+            if(res.next()){
+                List<String> dadosQuery = new ArrayList<>();
+                String dados[] = res.getString("inicio").split(" ");
+                dadosQuery.add(dados[0]);
+                dadosQuery.add(dados[1]);
+                dadosQuery.add(res.getString("tempo"));
+                dadosQuery.add(res.getString("qtd"));
+                return dadosQuery;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return null;
+    }    
 }

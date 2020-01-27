@@ -25,7 +25,6 @@ public class ControllerEngenharia {
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
                 Connection conec = db.getConnection();                
-                conec = db.getConnection();
                 EngenhariaDAO dao  = new EngenhariaDAO(conec);
                 eng = dao.buscaEngenhariaEmProducaoPVCPigmento(codMaquina,codItem);                               
                 db.desconectar();

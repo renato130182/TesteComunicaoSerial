@@ -81,7 +81,6 @@ public final class ControllerUtil {
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
                 Connection conec = db.getConnection();                
-                conec = db.getConnection(); 
                 UtilDAO dao = new UtilDAO(conec);
                 String dado = dao.buscaDataHoraBD();
                 db.desconectar();

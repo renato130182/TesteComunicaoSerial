@@ -11,7 +11,6 @@ import controller.Login;
 import dao.DadosDefaultDAO;
 import dao.MaquinaDAO;
 import dao.PesagemDAO;
-import dao.ProducaoDAO;
 import dao.ProdutoMaquinaDAO;
 import dao.ProgramacaoMaquinaDAO;
 import java.awt.CardLayout;
@@ -1802,8 +1801,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private void jButtonRegistrarParadaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRegistrarParadaActionPerformed
         // TODO add your handling code here:        
         try {                    
-            // if(!maqParada){ retornar apos testes
-            if(maqParada){ //remover ampos testes
+             if(!maqParada){ //retornar apos testes
+            //if(maqParada){ //remover ampos testes
                 if(jTableMotivosParada.getRowCount()>0){
                     registrarMotivoParadas();
                     habilitarMenu();
@@ -1890,9 +1889,15 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private void bloquearMenu(){
         menuParadas.setEnabled(false);
         menuProducao.setEnabled(false);
-        menuProgramacao.setEnabled(false );
-        menuConfiguracoes.setEnabled(false);        
-
+        menuProgramacao.setEnabled(false ); 
+        if(login.getNome().trim().equals("")){
+            menuConfiguracoes.setEnabled(false);
+        }else{
+            if(!login.getNivel().trim().equals("0")){
+                menuConfiguracoes.setEnabled(false);
+            }
+        }
+    
     }
     private void habilitarMenu() {
         
@@ -2230,11 +2235,11 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 }
             }
             //Apenas para testar sem o micrometro Remover para produção
-            
+            /*
             JFApontamentoProducao apt = new JFApontamentoProducao(maquina,login,prodmaq,prodCar,prod,prog);
             apt.setExtendedState(JFrame.MAXIMIZED_BOTH);
             apt.setVisible(true);
-            
+            */
         } catch (Exception e) {
             erro.gravaErro(e);
         }
@@ -2455,7 +2460,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 interacaoes = interacaoes + 1;
 
             }
-            media = media / interacaoes;            
+            media = media / interacaoes;       
+            System.out.println("velMedia: " + String.valueOf(media));
         } catch (Exception e) {
             erro.gravaErro(e);
         }

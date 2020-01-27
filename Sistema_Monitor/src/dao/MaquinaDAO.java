@@ -52,6 +52,7 @@ public class MaquinaDAO {
                     db.desconectar();
                     return maq;
                 }else{
+                    
                     System.out.println("Query não buscou dados da maquina");
                 }
             } catch (SQLException ex) {

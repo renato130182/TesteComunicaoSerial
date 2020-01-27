@@ -26,7 +26,6 @@ public class ControllerReservaPesagem {
              ConexaoDatabase db = new ConexaoDatabase();            
             if(db.isInfoDB()){
                 Connection conec = db.getConnection();                
-                conec = db.getConnection();
                 conec.setAutoCommit(false);
                 ReservaPesagemDAO dao = new ReservaPesagemDAO(conec);
                 resCobre=dao.buscaConsumoCobreReservaPesagem(codmaquina);
@@ -54,6 +53,7 @@ public class ControllerReservaPesagem {
                     } 
                 */
                 }
+                db.desconectar();
                 return res;
             }
         } catch (SQLException e) {

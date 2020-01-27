@@ -23,7 +23,6 @@ public class ControllerReservaMaquina {
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
                 Connection conec = db.getConnection();                
-                conec = db.getConnection();
                 conec.setAutoCommit(false);
                 ReservaMaquinaDAO dao = new ReservaMaquinaDAO(conec);
                 if(dao.buscaIDReservaMaquinaPesagem(peSaida.getCodigo())){
@@ -52,7 +51,6 @@ public class ControllerReservaMaquina {
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
                 Connection conec = db.getConnection();                
-                conec = db.getConnection();
                 conec.setAutoCommit(false);
                 ReservaMaquinaDAO dao = new ReservaMaquinaDAO(conec);
                 if(dao.atualizaOperadorTabelaReservaMaquina(codMaquina,login.getCodigoOperador())){                    

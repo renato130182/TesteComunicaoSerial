@@ -42,10 +42,11 @@ public class InspecaoMaterialDAO {
 
     public boolean adicionarControleAmostra(int codPesagem) {
         try {
-            sql ="INSERT INTO controledeamostras (codigo,dataHoraPesagem) "
-                    + "SELECT codigo ,CONCAT(datapesagem , ' ', horapesagem ) From pesagem WHERE codigo = ?;";
+            sql ="INSERT INTO controledeamostras (codigo,dataHoraPesagem) values"
+                    + " (?,(SELECT CONCAT(datapesagem , ' ', horapesagem ) From pesagem WHERE codigo = ?));";
             PreparedStatement st = conec.prepareStatement(sql);
             st.setInt(1, codPesagem);
+            st.setInt(2, codPesagem);
             st.executeUpdate();
             return st.getUpdateCount()!=0; 
         } catch (SQLException e) {

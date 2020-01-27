@@ -9,7 +9,13 @@ public class Paradas {
     private int idRegistro;
     private int codPesagemSaida;
     private int codPesagemEntrada;
-
+    
+    public Paradas() {
+        codigo = 0;
+        descricao = "";
+        abreviacao = "";
+    }
+    
     public int getCodPesagemEntrada() {
         return codPesagemEntrada;
     }
@@ -32,11 +38,6 @@ public class Paradas {
 
     public void setIdRegistro(int idRegistro) {
         this.idRegistro = idRegistro;
-    }
-    public Paradas() {
-        codigo = 0;
-        descricao = "";
-        abreviacao = "";
     }
 
     public int getCodigo() {

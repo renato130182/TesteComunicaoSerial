@@ -21,6 +21,14 @@ public class Usuario {
     private String nomeEncarregado;
     private int metProduzida;
 
+    public Usuario() {
+        this.nome = "";
+        this.Senha = "";
+        this.code = "";
+        this.usuario = "";
+    }
+
+        
     public int getMetProduzida() {
         return metProduzida;
     }
@@ -59,13 +67,6 @@ public class Usuario {
 
     public void setCodigoOperador(String codigoOperador) {
         this.codigoOperador = codigoOperador;
-    }
-
-    public Usuario() {
-        this.nome = "";
-        this.Senha = "";
-        this.code = "";
-        this.usuario = "";
     }
 
     public String getNome() {
