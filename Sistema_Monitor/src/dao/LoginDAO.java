@@ -26,9 +26,12 @@ public class LoginDAO{
     }
     
     public void validarLogin(Usuario us){
-        sql = "SELECT usr.nome,usr.tipo,op.codigo FROM condumigproducao.usuario usr "
-                + "inner join condumigproducao.operador op on op.nome = usr.nome"
-                + " where usr.codigo = ? and usr.senha = md5(?); ";
+        sql = "SELECT usr.nome,usr.tipo,op.codigo,op.encarregado ,"
+                + "enc.nome as nomeEncarregado,now() as dataHora "
+                + "FROM condumigproducao.usuario usr "
+                + "inner join condumigproducao.operador op on op.nome = usr.nome "
+                + "left join condumigproducao.operador enc on op.encarregado = enc.codigo  "
+                + "where usr.codigo = ? and usr.senha = md5(?);";
         ConexaoDatabase db = new ConexaoDatabase();
         if(db.isInfoDB()){
             Connection conec = db.getConnection();
@@ -41,6 +44,9 @@ public class LoginDAO{
                     us.setNome(res.getString("nome"));
                     us.setNivel(res.getString("tipo"));
                     us.setCodigoOperador(res.getString("codigo"));
+                    us.setCodigoEncarregado(res.getString("encarregado"));
+                    us.setNomeEncarregado(res.getString("nomeEncarregado"));
+                    us.setDataHoraLogin(res.getString("dataHora"));
                     this.logado = true;
                 }else{
                     this.logado = false;

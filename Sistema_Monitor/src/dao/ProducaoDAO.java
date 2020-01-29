@@ -396,4 +396,37 @@ public class ProducaoDAO {
         }
         return false;
     }
+
+    public boolean adicionarApontametoProgMaruina(int codigoProgramacao) {
+        try {
+            sql = "update condumigproducao.programacaomaquina set quantloteproduzido = "
+                    + "quantloteproduzido + 1 where codigo = ?;";
+            PreparedStatement st = this.conec.prepareStatement(sql);
+            st.setInt(1, codigoProgramacao);            
+            st.executeUpdate();
+            return st.getUpdateCount()!=0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return false;
+    }
+
+    public boolean registraCodPesagemRelatorioMicromero(int codPesagem, String codigo, String loteProducao) {
+        try {
+            sql = "update bd_sistema_monitor.tb_maquina_dados_micrometro set codigo_pesagem = ? "
+                    + "where cod_maquina = ? and lote = ? and isnull(codigo_pesagem);";
+            PreparedStatement st = this.conec.prepareStatement(sql);
+            st.setInt(1, codPesagem);            
+            st.setString(2, codigo);
+            st.setString(3, loteProducao);
+            st.executeUpdate();
+            return st.getUpdateCount()!=0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return false;
+        
+    }
 }

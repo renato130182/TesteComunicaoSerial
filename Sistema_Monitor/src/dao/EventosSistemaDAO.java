@@ -271,7 +271,9 @@ public class EventosSistemaDAO {
                     + "left join condumigproducao.equipes eq on op.codEquipe = eq.cod_equipe "
                     + "left join condumigproducao.operador enc on enc.codigo = eq.cod_Encarregado "
                     + "left join bd_sistema_monitor.tb_eventos_sistema_lote lote on log.id = lote.id_evento_sistema_log "
-                    + "where lote.lote = ? and cod_evento = '11'  group by usr.codigo_operador,met.metragem order by log.id;";
+                    + "where lote.lote = ? and cod_evento = '11' and log.id not in "
+                    + "(SELECT id_evento_sistema_log FROM bd_sistema_monitor.tb_eventos_sistema_apontamento) "
+                    + "group by usr.codigo_operador,met.metragem order by log.id;";
             PreparedStatement st = conec.prepareStatement(sql);            
             st.setString(1, loteProducao);            
             ResultSet res = st.executeQuery();

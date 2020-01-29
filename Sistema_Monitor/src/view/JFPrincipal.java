@@ -2234,12 +2234,6 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                     this.tarefaVelocidade();
                 }
             }
-            //Apenas para testar sem o micrometro Remover para produção
-            /*
-            JFApontamentoProducao apt = new JFApontamentoProducao(maquina,login,prodmaq,prodCar,prod,prog);
-            apt.setExtendedState(JFrame.MAXIMIZED_BOTH);
-            apt.setVisible(true);
-            */
         } catch (Exception e) {
             erro.gravaErro(e);
         }
@@ -2415,7 +2409,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                             }
                         }
                         atualizarMostradoresDiametro();
-                        gerenciarColetorAmostraDiametro(metrosProduzidos);
+                        gerenciarColetorAmostraDiametro(metrosProduzidos, (int)velMediana);
                     }
                 }else{
                     if(resumoRelatorio >= linhas){
@@ -2850,7 +2844,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         }
     }
 
-    private void gerenciarColetorAmostraDiametro(double metrosProduzidos) {
+    private void gerenciarColetorAmostraDiametro(double metrosProduzidos,int velocidade) {
         try {
             if(metrosRelatorio<=maquina.getMetrosAmostraDiametro()){
                 metrosRelatorio = metrosRelatorio + (int)metrosProduzidos;
@@ -2874,7 +2868,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 dados.setDesvio((float)(desvioMedio / relatorio.size()));
                 ControllerMicrometro ctr = new ControllerMicrometro();
                 if(ctr.registraRelatorioMicrometro(dados, codMaquina, prog.getLoteproducao(),
-                        (int) displaySingleMetragemCarretel.getValue())){
+                        (int) displaySingleMetragemCarretel.getValue(),velocidade)){
                     relatorio.clear();
                     metrosRelatorio=0;
                 }            

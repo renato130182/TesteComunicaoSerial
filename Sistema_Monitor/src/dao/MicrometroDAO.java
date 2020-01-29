@@ -24,11 +24,11 @@ public class MicrometroDAO {
         this.conec = conec;
     }
     
-    public boolean registraDadosMicrometro(Micrometro dados,String codMaquina,String lote, int metragem){
+    public boolean registraDadosMicrometro(Micrometro dados,String codMaquina,String lote, int metragem,int velocidade){
         try {
             sql = "insert into bd_sistema_monitor.tb_maquina_dados_micrometro "
-                    + "(cod_maquina, lote, diametro_minimo, diametro_medio, diametro_maximo, devio_medio, metragem)"
-                    + " values (?,?,?,?,?,?,?);";
+                    + "(cod_maquina, lote, diametro_minimo, diametro_medio, diametro_maximo, devio_medio, metragem,velocidade_media)"
+                    + " values (?,?,?,?,?,?,?,?);";
             PreparedStatement st = conec.prepareStatement(sql);            
             st.setString(1, codMaquina);
             st.setString(2,lote);
@@ -37,6 +37,7 @@ public class MicrometroDAO {
             st.setFloat(5, dados.getDiametroMaximo());
             st.setFloat(6, dados.getDesvio());
             st.setInt(7, metragem);
+            st.setInt(8, velocidade);
             st.executeUpdate();
             return st.getUpdateCount()!=0;        
         } catch (SQLException e) {

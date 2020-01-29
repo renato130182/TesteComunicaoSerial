@@ -37,13 +37,13 @@ public class ControllerMicrometro extends Micrometro{
         return null;
     } 
     
-    public boolean registraRelatorioMicrometro(Micrometro dados,String codMaquina,String lote, int metros){
+    public boolean registraRelatorioMicrometro(Micrometro dados,String codMaquina,String lote, int metros,int velocidade){
         try {
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
                 Connection conec = db.getConnection();                
                 MicrometroDAO dao = new MicrometroDAO(conec);
-                if(dao.registraDadosMicrometro(dados, codMaquina, lote, metros)){
+                if(dao.registraDadosMicrometro(dados, codMaquina, lote, metros,velocidade)){
                     db.desconectar();
                     return true;
                 }else{

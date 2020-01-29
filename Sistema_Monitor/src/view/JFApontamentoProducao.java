@@ -45,7 +45,6 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
     private List<ComposicaoCobre> compCobre = new ArrayList<>();
     private List<ReservaPesagem> reservaPesagem = new ArrayList<>();
     private int perdaEstimada=0;
-    private int numPesagem=123456;
     
     /**
      * Creates new form JFApontamentoProducao
@@ -69,7 +68,7 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
         buscaDadosConsumoMp();
         buscaHistoricoOperadores();
         calcularPerdaProcessual();
-        verificarFichasControle();
+        
     }
 
     /**
@@ -650,12 +649,16 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
             ControllerEventosSistema ctr = new ControllerEventosSistema();
             this.usr=ctr.buscaListaEventosUsuarioLogin(prod.getLoteProducao());
             if(this.usr!=null){
-                if(this.usr.size()>0){
-                     DefaultTableModel table = (DefaultTableModel) jTableHistoricoOperador.getModel();
+                DefaultTableModel table = (DefaultTableModel) jTableHistoricoOperador.getModel();
+                if(this.usr.size()>0){                                        
                      for (int i=0;i<this.usr.size();i++){
                         table.addRow(new Object[]{this.usr.get(i).getCodigoOperador(),this.usr.get(i).getNome(),
                             this.usr.get(i).getDataHoraLogin(),this.usr.get(i).getNomeEncarregado() });
                      }
+                }else{
+                    this.usr.add(login);
+                    table.addRow(new Object[]{this.usr.get(0).getCodigoOperador(),this.usr.get(0).getNome(),
+                            this.usr.get(0).getDataHoraLogin(),this.usr.get(0).getNomeEncarregado()});
                 }
             }
             
@@ -678,18 +681,5 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
                 }
             }
         }
-    }
-    
- 
-    
-    private void verificarFichasControle(){
-        try {
-            ControllerProducao ctrPrd = new ControllerProducao();
-            ctrPrd.RegistrarApontamentoFichaControle(prog.getCodigoProgramacao(),numPesagem);
-        } catch (Exception e) {            
-            e.printStackTrace();
-            erro.gravaErro(e);
-        }
-    }
-    
+    }    
 }

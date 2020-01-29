@@ -19,6 +19,15 @@ public class ReservaPesagem {
     private double quantidade;
     private String codigoEmbalagelTroca;
     private String loteReservaTroca;
+    private int codPesagemTroca;
+
+    public int getCodPesagemTroca() {
+        return codPesagemTroca;
+    }
+
+    public void setCodPesagemTroca(int codPesagemTroca) {
+        this.codPesagemTroca = codPesagemTroca;
+    }
     private int idPesagem;
     private int idMatPrima;
     private String itemDescricao;

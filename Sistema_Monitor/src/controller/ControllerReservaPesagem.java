@@ -29,14 +29,11 @@ public class ControllerReservaPesagem {
                 conec.setAutoCommit(false);
                 ReservaPesagemDAO dao = new ReservaPesagemDAO(conec);
                 resCobre=dao.buscaConsumoCobreReservaPesagem(codmaquina);
-                if(resCobre != null){
-                    boolean trocado =false;
-                    
+                if(resCobre != null){                    
                     String codigoPesagem = res.get(0).getCodigoPesagem();
                     for (int i=resCobre.size()-1;i>=0;i--){                                              
-                       double metragemTroca=0;
-                       for (int j=0;j<resCobre.size();j++){
-                           if(resCobre.get(i).getCodigoEmbalagem().equals(resCobre.get(j).getCodigoEmbalagelTroca())){
+                       for (int j=resCobre.size()-1;j>=0;j--){
+                           if(resCobre.get(i).getIdMatPrima()==resCobre.get(j).getCodPesagemTroca()){
                                resCobre.get(i).setQuantidade(resCobre.get(i).getQuantidade()-resCobre.get(j).getQuantidade());
                            }                           
                        }             

@@ -13,8 +13,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import model.Engenharia;
-import model.Produto;
-
 /**
  *
  * @author renato.soares

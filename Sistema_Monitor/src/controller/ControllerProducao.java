@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.swing.JOptionPane;
 import model.ComposicaoCobre;
 import model.EventoMaquina;
 import model.Maquina;
@@ -106,8 +105,12 @@ public class ControllerProducao {
                     }
                 }
                 for(int i=0;i<res.size();i++){
-                    double perc = res.get(i).getQuantidade()/metragemProduzida;
-                    percMetragem.add(perc);
+                    if(res.get(i).getIdMatPrima()!=0){
+                        double perc = res.get(i).getQuantidade()/metragemProduzida;
+                        percMetragem.add(perc);
+                    }else{
+                        percMetragem.add(0.0);
+                    }
                 }
                 for (int i=0;i<res.size();i++){
                     if(res.get(i).getIdMatPrima()!=0){
@@ -296,28 +299,31 @@ public class ControllerProducao {
                     if(dadosQuery.size()==25){
                         this.codPesagem = dao.registraDadosPesagem(dadosQuery);
                         if(this.codPesagem!=0){
-                            if(registrarReservaPesagem(resPes, dao)){
-                                if(resgistrarParadasPesagem(paradas,prod,dao)){
-                                    if(registrarComposicaoCobrePesagem(compCobre,dao)){
-                                        if(verificarDadosInspecaoAmostra(login,prod,conec)){
-                                            if(dao.registrarApontamentoLogSistemaMonitor(maquina.getCodigo(),this.codPesagem)){
-                                                ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO(conec); 
-                                                EventoMaquina evt = new EventoMaquina();
-                                                evt.setCod_maquina(maquina.getCodigo());
-                                                evt.setMetragemEvento(prod.getMetragemProduzida()); 
-                                                evt.setIdEvento(daoPar.buscarIDEventoAberto(maquina.getCodigo()));
-                                                //ControllerParadasMaquina ctrParadas = new ControllerParadasMaquina(maquina.getCodigo());
-                                                if(daoPar.RegistrarRetornoEventoMaquina(evt)){
-                                                //if(ctrParadas.registraRetornoParadamaquina(prod.getMetragemProduzida(),maquina.getCodigo())){
-                                                    if(dao.registrarApontamentosMaquinaEvento(this.codPesagem,maquina.getCodigo())){
-                                                        evt.setMetragemEvento(0);
-                                                        if(daoPar.incluirInicioEventoMaquina(evt)){
-                                                        //if(ctrParadas.registraInicioParadamaquina(0, maquina.getCodigo())){
-                                                            if(dao.limparTabelaMaquinaProducao(maquina.getCodigo())){
-                                                                System.out.println("Finalmente apontada"); 
-                                                                conec.commit();
-                                                                db.desconectar();
-                                                                return true;                                                                       
+                            if(dao.adicionarApontametoProgMaruina(prog.getCodigoProgramacao())){
+                                if(registrarReservaPesagem(resPes, dao)){
+                                    if(resgistrarParadasPesagem(paradas,prod,dao,conec)){
+                                        if(registrarComposicaoCobrePesagem(compCobre,dao)){
+                                            if(verificarDadosInspecaoAmostra(login,prod,conec)){
+                                                if(dao.registrarApontamentoLogSistemaMonitor(maquina.getCodigo(),this.codPesagem)){
+                                                    ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO(conec); 
+                                                    EventoMaquina evt = new EventoMaquina();
+                                                    evt.setCod_maquina(maquina.getCodigo());
+                                                    evt.setMetragemEvento(prod.getMetragemProduzida()); 
+                                                    evt.setIdEvento(daoPar.buscarIDEventoAberto(maquina.getCodigo()));
+                                                    //ControllerParadasMaquina ctrParadas = new ControllerParadasMaquina(maquina.getCodigo());
+                                                    if(daoPar.RegistrarRetornoEventoMaquina(evt)){
+                                                    //if(ctrParadas.registraRetornoParadamaquina(prod.getMetragemProduzida(),maquina.getCodigo())){
+                                                        if(dao.registrarApontamentosMaquinaEvento(this.codPesagem,maquina.getCodigo())){
+                                                            evt.setMetragemEvento(0);
+                                                            if(daoPar.incluirInicioEventoMaquina(evt)){
+                                                                if(dao.registraCodPesagemRelatorioMicromero(this.codPesagem,maquina.getCodigo(),prod.getLoteProducao())){
+                                                                    if(dao.limparTabelaMaquinaProducao(maquina.getCodigo())){
+                                                                        System.out.println("Finalmente apontada"); 
+                                                                        conec.commit();
+                                                                        db.desconectar();
+                                                                        return true;                                                                       
+                                                                    }
+                                                                }
                                                             }
                                                         }
                                                     }
@@ -469,18 +475,13 @@ public class ControllerProducao {
         return true;
     }
 
-    private boolean resgistrarParadasPesagem(ParadasMaquina paradas, Producao prod, ProducaoDAO dao) {
+    private boolean resgistrarParadasPesagem(ParadasMaquina paradas, Producao prod, ProducaoDAO dao, Connection conec) {
         try {
             String dataParada = "0000-00-00";
             int idEvento=0,tempoParada=0,qtdEvento=0;
-            int tempoMotivo=0;
-            ConexaoDatabase db = new ConexaoDatabase();
-            if(!db.isInfoDB()) return false;
-            Connection conec = db.getConnection();                              
-            ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO(conec);
-            
-            if(paradas.getListaParadas().size()>0){
-                
+            int tempoMotivo=0;                             
+            ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO(conec);            
+            if(paradas.getListaParadas().size()>0){                
                 for (int i=0;i<paradas.getListaParadas().size();i++){
                     if(idEvento!=paradas.getListaParadas().get(i).getIdRegistro()){
                         List<String> dados =  daoPar.buscaDataHoraTempoEventoMaquinaPorID(paradas.getListaParadas()
@@ -508,13 +509,10 @@ public class ControllerProducao {
                     }
                     dadosParada.add(String.valueOf(this.codPesagem));
                     if(!dao.resgistraParadaPesagem(dadosParada)){
-                        db.desconectar();
                         return false;
                     }
                 }
-                db.desconectar();
             }else{
-                db.desconectar();
                 return true;
             }
         } catch (NumberFormatException e) {
@@ -530,7 +528,7 @@ public class ControllerProducao {
             if(compCobre.size()>0){
                 for(int i=0;i<compCobre.size();i++){
                     List<String> dados = new ArrayList<>();
-                    dados.add(String.valueOf(compCobre.get(i).getIdPesagem()));
+                    dados.add(String.valueOf(this.codPesagem));
                     dados.add(String.valueOf(compCobre.get(i).getPorcentagem()));
                     dados.add(compCobre.get(i).getLaminadora());
                     if(!dao.resgistraComposicaoCobre(dados)){                        

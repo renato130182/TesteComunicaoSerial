@@ -33,18 +33,20 @@ public class ReservaPesagemDAO {
             sql = "SELECT  pesEntrada.codigoItem as itemReserva, itemEntrada.descricao,"
                     + "pesEntrada.loteproduzido as loteReserva,pesEntrada.codigoEmbalagem ,"
                     + "pesEntrada.codigo as idMatPRima,evt.metragem_evento,pesEntrada.qtosfios, "
-                    + "pesSaida.codigoembalagem as embTroca, pesSaida.loteproduzido as loteTroca "
+                    + "pesSaida.codigoembalagem as embTroca, pesSaida.loteproduzido as loteTroca,pesSaida.codigo as pesagemTroca "
                     + "FROM bd_sistema_monitor.tb_maquina_evento evt "
-                    + "inner join bd_sistema_monitor.tb_maquina_evento_carretel_entrada car on evt.id = car.id_maquina_evento_parada "
+                    + "inner join bd_sistema_monitor.tb_maquina_evento_parada evtPar on evt.id = evtPar.id_maquina_evento "
+                    + "inner join bd_sistema_monitor.tb_maquina_evento_carretel_entrada car on evtPar.id = car.id_maquina_evento_parada "
                     + "inner join condumigproducao.pesagem pesEntrada on pesEntrada.codigo = car.cod_pesagem_saida "
                     + "inner join condumigproducao.pesagem pesSaida on pesSaida.codigo = car.cod_pesagem_entrada "
                     + "left join condumigproducao.item itemEntrada on pesEntrada.codigoitem = itemEntrada.codigo "
                     + "left join condumigproducao.item itemSaida on pesSaida.codigoitem = itemSaida.codigo "
                     + "where evt.cod_maquina = ? and evt.id not in "
                     + "(select id_maquina_evento_parada from bd_sistema_monitor.tb_maquina_evento_apontamento) "
-                    + "union SELECT pes.codigoitem as itemReserva,it.descricao,pes.loteproduzido as loteReserva,pes.codigoembalagem,"
-                    + "pes.codigo as idMatPRima,(SELECT met_produzida FROM bd_sistema_monitor.tb_maquina_producao "
-                    + "where cod_maq = ?), pes.qtosfios,'','' FROM condumigproducao.reservamaquina res "
+                    + "union SELECT pes.codigoitem as itemReserva,it.descricao,pes.loteproduzido as loteReserva,"
+                    + "pes.codigoembalagem,pes.codigo as idMatPRima,"
+                    + "(SELECT met_produzida FROM bd_sistema_monitor.tb_maquina_producao where cod_maq = ?), pes.qtosfios,'','','' "
+                    + "FROM condumigproducao.reservamaquina res "
                     + "Inner join condumigproducao.pesagem pes on pes.codigo = res.pesagem "
                     + "Inner join condumigproducao.item it on it.codigo = pes.codigoitem where res.codigomaquina = ? ;";
             PreparedStatement st = conec.prepareStatement(sql);
@@ -64,9 +66,11 @@ public class ReservaPesagemDAO {
                 if(!tmp.trim().equalsIgnoreCase("null")){
                     resPes.setCodigoEmbalagelTroca(res.getString("embTroca"));
                     resPes.setLoteReservaTroca(res.getString("loteTroca"));
+                    resPes.setCodPesagemTroca(res.getInt("pesagemTroca"));
                 }else{
                     resPes.setCodigoEmbalagelTroca("");
                     resPes.setLoteReservaTroca("");
+                    resPes.setCodPesagemTroca(0);
                 }
                 resPes.setUnidade("Metros");
                 list.add(resPes);

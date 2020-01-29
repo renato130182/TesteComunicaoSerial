@@ -179,7 +179,7 @@ public class ParadasMaquinaDAO {
                         + "Inner join condumigproducao.paradas pardesc on par.cod_parada_maquina = pardesc.codigo "
                         + "left join bd_sistema_monitor.tb_maquina_evento_observacao obs on par.id = obs.id_maquina_evento_parada "
                         + "left join bd_sistema_monitor.tb_maquina_evento_carretel_entrada ent on par.id = ent.id_maquina_evento_parada "
-                        + "where evt.cod_maquina = ?;";
+                        + "where evt.cod_maquina = ? and par.id not in (select id_maquina_evento_parada from bd_sistema_monitor.tb_maquina_evento_apontamento);";
                 PreparedStatement st = conec.prepareStatement(sql);
                 st.setString(1, cod_maquina);
                 ResultSet res = st.executeQuery();
