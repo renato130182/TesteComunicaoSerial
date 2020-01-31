@@ -369,7 +369,10 @@ public class ProducaoDAO {
     public boolean registrarApontamentosMaquinaEvento(int codPesagem, String codigo) {
         try {
             sql = "insert into bd_sistema_monitor.tb_maquina_evento_apontamento (id_maquina_evento_parada, id_pesagem) "
-                    + "SELECT id,? FROM bd_sistema_monitor.tb_maquina_evento where cod_maquina = ?;";
+                    + "SELECT evtPar.id,? FROM bd_sistema_monitor.tb_maquina_evento_parada evtPar "
+                    + "inner join bd_sistema_monitor.tb_maquina_evento evt on evtPar.id_maquina_evento = evt.id  "
+                    + "where evt.cod_maquina = ? and evtPar.id not in "
+                    + "(select id_maquina_evento_parada from bd_sistema_monitor.tb_maquina_evento_apontamento);";
             PreparedStatement st = this.conec.prepareStatement(sql);
             st.setInt(1, codPesagem);
             st.setString(2, codigo);            

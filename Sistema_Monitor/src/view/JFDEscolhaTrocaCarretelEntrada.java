@@ -5,13 +5,18 @@
  */
 package view;
 
+import dao.ConexaoDatabase;
+import dao.EventosSistemaDAO;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.sql.Connection;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 import model.Pesagem;
@@ -262,11 +267,41 @@ public class JFDEscolhaTrocaCarretelEntrada extends javax.swing.JDialog {
 
     private int returnStatus = RET_CANCEL;
     
-    public void setCarreteisMontados(List<Pesagem> lista){
-        this.lista=lista;
-        DefaultTableModel table = (DefaultTableModel) jTable1.getModel();
-        for (int i=0;i<lista.size();i++){
-            table.addRow(new Object[]{lista.get(i).getCodigo(),lista.get(i).getCodEmbalagem()});
-        }        
+    public void setCarreteisMontados(List<Pesagem> lista,String codMaquina){
+        try {       
+            ConexaoDatabase db = new ConexaoDatabase();           
+            if(db.isInfoDB()){
+                Connection conec = db.getConnection();    
+                this.lista=lista;
+                EventosSistemaDAO dao = new EventosSistemaDAO(conec);
+                DefaultTableModel table = (DefaultTableModel) jTable1.getModel();
+                for (int i=0;i<lista.size();i++){
+                    if(!dao.verificaTrocaCarretelEntradaJaExecutada("2",codMaquina,false,
+                            Integer.parseInt(lista.get(i).getCodigo()))){
+                        table.addRow(new Object[]{lista.get(i).getCodigo(),lista.get(i).getCodEmbalagem()});                       
+                    }else{
+                        lista.remove(i);
+                        limparTabela(table);
+                        setCarreteisMontados(lista, codMaquina);
+                    }
+                }        
+            }else{
+                JOptionPane.showMessageDialog(rootPane,"Falha ao buscar informções para a troca.","Falha grave", JOptionPane.ERROR_MESSAGE);
+                dispose();
+            }
+        } catch (HeadlessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void limparTabela(DefaultTableModel table) {
+        try {
+            while(table.getRowCount()>0){                        
+                table.removeRow(0);                 
+            }
+                
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

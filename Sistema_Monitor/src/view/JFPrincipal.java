@@ -1766,7 +1766,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             List<String> infoParadas = paradas.buscaInfoParadaPorCodigo(motivoEscolhido);
             if(infoParadas.get(0).equals("2")){
                 JFDEscolhaTrocaCarretelEntrada car = new JFDEscolhaTrocaCarretelEntrada(this,true);
-                car.setCarreteisMontados(listaPesagens);
+                car.setCarreteisMontados(listaPesagens,maquina.getCodigo());
                 car.setVisible(true);
                 if(car.getReturnStatus()==1){                                        
                     JFDTrocaCarretelEntrada trc = new JFDTrocaCarretelEntrada(this,true);
@@ -1793,7 +1793,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                         jTextAreaObsParada.getText().trim()});            
                 jTextAreaObsParada.setText("");
             }            
-           } catch (Exception e) {
+           } catch (NumberFormatException e) {
                erro.gravaErro(e);
         }        
     }//GEN-LAST:event_jButtonIncluirMotivoParadaActionPerformed
@@ -2108,21 +2108,20 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                                 if(ctrProdMet.validaEmbagemProdutoMetragem(prod, carretelSaida, codMaquina)){
                                     if(!ctrProd.atualizaCarretelSaida(carretelSaida,codMaquina)){
                                         JOptionPane.showMessageDialog(rootPane,"Falha ao registrar carretel de saida, por favor tente novamente","Falha de carretel de saida",JOptionPane.ERROR_MESSAGE);
+                                        return false;
                                     }else{
-                                        prod.setCarretelSaida(carretelSaida);
-                                        buscarInformaçoesProducao();
+                                        prod.setCarretelSaida(carretelSaida);                                        
                                     }
                                 }else{
                                     JOptionPane.showMessageDialog(rootPane,"Não foi encontrada uma relação para a flange da carretel digitada \n"
                                             + "com a maquina e item em produção.\n"
                                             + "Por favor solicite ao encarregado a conferencia destes dados em Produto x metragem no Projeto balança", "Flange de carretel não cadastrada", JOptionPane.ERROR_MESSAGE);
-                                    abrirTelaProducao();
+                                    return false;
                                 }
                             }else{
                                 JOptionPane.showMessageDialog(rootPane,"Codigo do carretel de entrada invalido. "
                                         + "\n Codigo deve conter apenas numeros","Codigo Inválido",
-                                        JOptionPane.ERROR_MESSAGE);
-                                abrirTelaProgramacao();
+                                        JOptionPane.ERROR_MESSAGE);                                
                                 return false;
                             }
                         }else{
@@ -2133,35 +2132,35 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                         abrirTelaProgramacao();
                         return false;
                     }
-                }else{    
-                    ProgramacaoMaquinaDAO daoProg = new ProgramacaoMaquinaDAO();
-                    ProdutoCarretelDAO daoProdCar =  new ProdutoCarretelDAO();
-                    prog = daoProg.buscaProgramacaoLoteItem(prod.getLoteProducao(),prod.getItemProducao());
-                    if(prog != null){
-                        jLabelProducaoCodItem.setText(prod.getItemProducao());
-                        jLabelProducaoOF.setText(prod.getLoteProducao());
-                        jLabelProducaoDescricaoItem.setText(prog.getProduto().getDescricao());
-                        jLabelProducaoQtdProg.setText(Integer.toString(prog.getQuantidadeProgramada()));
-                        jLabelProducaoQtdProd.setText(Integer.toString(prog.getQuantidadeProduzida()));
-                        jLabelProducaoMetTotalProg.setText(String.valueOf(prog.getMetragemTotalProgramada()));
-                        jLabelProducaoMetCarretel.setText(String.valueOf(prog.getMetragemProgramada()));
-                        jLabelProducaoDMinimo.setText(String.valueOf(prog.getProduto().getDiametroMinimo()));
-                        jLabelProducaoDnominal.setText(String.valueOf(prog.getProduto().getDiametroNominal()));
-                        jLabelProducaoDMaximo.setText(String.valueOf(prog.getProduto().getDiametroMaximo()));
-                        jLabelProducaoMetTotalProd.setText(String.valueOf(ctrProd.buscaMetragemProduzida(prod.getLoteProducao(),prod.getItemProducao())));
-                        ProdutoMaquinaDAO daoProdMaq = new ProdutoMaquinaDAO();
-                        prodmaq = daoProdMaq.buscaVelocidadeProdutoMaquina(prod.getItemProducao(), codMaquina);
-                        prodCar = daoProdCar.buscaDadosProdutoCarretel(prod.getItemProducao(),prod.getCarretelSaida(),codMaquina);
-                        jLabelProducaoVelIdeal.setText(String.valueOf(prodmaq.getVelocidade())+ " " + prodmaq.getUnidade());
-                        buscarRegistrosObservacaoPesagem();                    
-                        return true;
-                    }else{
-                        JOptionPane.showMessageDialog(rootPane,"Falha ao busrcar dados da programação do item em produção, "
-                                + "Por favor informe ao setor de Produção \n Itens de conrole referência: 1, 91 ou 20.","Falha ao buscar dados",JOptionPane.ERROR_MESSAGE);
-                        abrirTelaProgramacao();
-                        return false;
-                    }
+                }    
+                ProgramacaoMaquinaDAO daoProg = new ProgramacaoMaquinaDAO();
+                ProdutoCarretelDAO daoProdCar =  new ProdutoCarretelDAO();
+                prog = daoProg.buscaProgramacaoLoteItem(prod.getLoteProducao(),prod.getItemProducao());
+                if(prog != null){
+                    jLabelProducaoCodItem.setText(prod.getItemProducao());
+                    jLabelProducaoOF.setText(prod.getLoteProducao());
+                    jLabelProducaoDescricaoItem.setText(prog.getProduto().getDescricao());
+                    jLabelProducaoQtdProg.setText(Integer.toString(prog.getQuantidadeProgramada()));
+                    jLabelProducaoQtdProd.setText(Integer.toString(prog.getQuantidadeProduzida()));
+                    jLabelProducaoMetTotalProg.setText(String.valueOf(prog.getMetragemTotalProgramada()));
+                    jLabelProducaoMetCarretel.setText(String.valueOf(prog.getMetragemProgramada()));
+                    jLabelProducaoDMinimo.setText(String.valueOf(prog.getProduto().getDiametroMinimo()));
+                    jLabelProducaoDnominal.setText(String.valueOf(prog.getProduto().getDiametroNominal()));
+                    jLabelProducaoDMaximo.setText(String.valueOf(prog.getProduto().getDiametroMaximo()));
+                    jLabelProducaoMetTotalProd.setText(String.valueOf(ctrProd.buscaMetragemProduzida(prod.getLoteProducao(),prod.getItemProducao())));
+                    ProdutoMaquinaDAO daoProdMaq = new ProdutoMaquinaDAO();
+                    prodmaq = daoProdMaq.buscaVelocidadeProdutoMaquina(prod.getItemProducao(), codMaquina);
+                    prodCar = daoProdCar.buscaDadosProdutoCarretel(prod.getItemProducao(),prod.getCarretelSaida(),codMaquina);
+                    jLabelProducaoVelIdeal.setText(String.valueOf(prodmaq.getVelocidade())+ " " + prodmaq.getUnidade());
+                    buscarRegistrosObservacaoPesagem();                    
+                    return true;
+                }else{
+                    JOptionPane.showMessageDialog(rootPane,"Falha ao busrcar dados da programação do item em produção, "
+                            + "Por favor informe ao setor de Produção \n Itens de conrole referência: 1, 91 ou 20.","Falha ao buscar dados",JOptionPane.ERROR_MESSAGE);
+                    abrirTelaProgramacao();
+                    return false;
                 }
+
             }else{
                 JOptionPane.showMessageDialog(rootPane,"Maquina sem producao, por favor realise a montagem",
                         "Maquina sem producao",JOptionPane.OK_OPTION);
@@ -2235,6 +2234,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             erro.gravaErro(e);
         }
     }
@@ -2787,7 +2787,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         try {
             ControllerEventosSistema ctr = new ControllerEventosSistema();
             preParadas = ctr.BuscaPreApontamentos(codMaquina);
-            verificaParadasInteracaoOperador(preParadas);
+            if(!verificaParadasInteracaoOperador(preParadas))verificaParadasInteracaoOperador(preParadas);
             if(preParadas!=null){
                 DefaultTableModel modelo = (DefaultTableModel)jTableMotivosParada.getModel();
                 for (int i=0;i<preParadas.size();i++){   
@@ -2800,13 +2800,13 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         }
     }
 
-    private void verificaParadasInteracaoOperador(List<Paradas> preParadas) {
+    private boolean verificaParadasInteracaoOperador(List<Paradas> preParadas) {          
         for (int i=0;i<preParadas.size();i++){
             if(preParadas.get(i).getCodigo()==1){
                 JOptionPane.showMessageDialog(null,"Detectada a necessidade de troca do carretel de saída \n "
                         + "Por favor verifique.","Troca do carretel de saida.",JOptionPane.INFORMATION_MESSAGE);
             }
-            if(preParadas.get(i).getCodigo()==2){
+            if(preParadas.get(i).getCodigo()==2 && preParadas.get(i).getCodPesagemEntrada()==0){
                 Object[] options = { "Sim", "Não" }; 
                 int q = JOptionPane.showOptionDialog(null, "Detectada a necessidade de troca do corretel de entrada \n"
                         + "Deseja realizar a troca agora?",
@@ -2829,6 +2829,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                         ControllerEventosSistema ctr = new ControllerEventosSistema();
                         ctr.removerPreApontamentoPodID(preParadas.get(i).getIdRegistro());
                         preParadas.remove(i);
+                        return false;
                     }else{
                         ControllerEventosSistema ctr = new ControllerEventosSistema();
                         ctr.atualizaCarretelEntradaPreParada(Integer.valueOf(trc.getPesSaida().getCodigo()),
@@ -2839,9 +2840,11 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                     ControllerEventosSistema ctr = new ControllerEventosSistema();
                     ctr.removerPreApontamentoPodID(preParadas.get(i).getIdRegistro());
                     preParadas.remove(i);
+                    return false;
                 }
             }
         }
+        return true;
     }
 
     private void gerenciarColetorAmostraDiametro(double metrosProduzidos,int velocidade) {

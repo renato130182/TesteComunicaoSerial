@@ -94,7 +94,7 @@ public class ControllerEventosSistema {
                 Connection conec = db.getConnection();                
                 conec.setAutoCommit(false);
                 EventosSistemaDAO dao = new EventosSistemaDAO(conec);
-                if(dao.ValidaPreApontamentoEventoSistema(codParada, codMaquina,msg)){
+                if(dao.ValidaPreApontamentoEventoSistema(codParada, codMaquina,msg,codPesagemSaida)){
                     if(dao.registraPreApontamentoEventoSistema(codMaquina, codParada,obs,codPesagemSaida,codPesagemEntrada)){
                         conec.commit();
                         db.desconectar();
@@ -145,14 +145,16 @@ public class ControllerEventosSistema {
                 EventosSistemaDAO dao = new EventosSistemaDAO(conec);
                 ids = dao.BuscaIdsApontamentoEventoSistema(codMaquina);
                 if(ids.size()>=linha){
-                    if(dao.removePreApontamentoEventoSistema(ids.get(linha))){
-                        conec.commit();
-                        db.desconectar();
-                        return true;
-                    }else{
-                        conec.rollback();
-                        db.desconectar();
-                        return false;
+                    if(dao.validaPossibilidadeRemocaoPorID(ids.get(linha))){
+                        if(dao.removePreApontamentoEventoSistema(ids.get(linha))){
+                            conec.commit();
+                            db.desconectar();
+                            return true;
+                        }else{
+                            conec.rollback();
+                            db.desconectar();
+                            return false;
+                        }                        
                     }
                 }
             }

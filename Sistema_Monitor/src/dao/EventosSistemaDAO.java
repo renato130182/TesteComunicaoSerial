@@ -117,14 +117,14 @@ public class EventosSistemaDAO {
         }
         return false;
     }
-    public boolean ValidaPreApontamentoEventoSistema(String codParada, String codMauina,
-                boolean msg){
+    public boolean ValidaPreApontamentoEventoSistema(String codParada, String codMaquina,
+                boolean msg,int pesSaida){
         try {
             sql = "SELECT par.repete FROM bd_sistema_monitor.tb_maquina_parada_pre_apontamento pre " +
                 "inner join condumigproducao.paradas par on pre.cod_parada = par.codigo " +
                 "where pre.cod_maquina = ? and pre.cod_parada = ?;";
             PreparedStatement st = conec.prepareStatement(sql);            
-            st.setString(1, codMauina);
+            st.setString(1, codMaquina);
             st.setString(2, codParada);
             ResultSet res = st.executeQuery();
             if(res.next()){
@@ -136,7 +136,11 @@ public class EventosSistemaDAO {
                     }
                     return false;
                 }else{
-                    return true;
+                    if(codParada.equals("2")){
+                        return !verificaTrocaCarretelEntradaJaExecutada(codParada, codMaquina,msg, pesSaida);
+                    }else{
+                        return true;
+                    }
                 }
             }else{
                 return true;
@@ -293,5 +297,48 @@ public class EventosSistemaDAO {
             erro.gravaErro(e);
         }
         return null;
+    }
+
+    public boolean verificaTrocaCarretelEntradaJaExecutada(String codParada, String codMaquina, boolean msg, int pesSaida) {
+        try {
+            sql = "SELECT id FROM bd_sistema_monitor.tb_maquina_parada_pre_apontamento where "
+                    + "cod_maquina = ? and codPesagemSaida = ? and cod_parada = ? ;";
+            PreparedStatement st = conec.prepareStatement(sql);            
+            st.setString(1, codMaquina);                        
+            st.setInt(2,pesSaida);
+            st.setString(3, codParada);
+            ResultSet res = st.executeQuery();
+            if(res.next()){
+              if(msg){
+                  JOptionPane.showMessageDialog(null,"Ja foi realizado o apontamento para a troca do carretel de entrada"
+                          + "indicado \n Por favor verifique e tente novamente","Troca ja realizada",JOptionPane.ERROR_MESSAGE);
+              }
+              return true;
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return false;
+    }
+
+    public boolean validaPossibilidadeRemocaoPorID(String id) {
+        try {
+            sql = "select id from bd_sistema_monitor.tb_maquina_parada_pre_apontamento where id = ? and codPesagemEntrada = 0;";
+            PreparedStatement st = conec.prepareStatement(sql);                                              
+            st.setString(1,id);
+            ResultSet res = st.executeQuery();
+            if(!res.next()){
+                  JOptionPane.showMessageDialog(null, "Não é permitica a remoção do apontamento \n"
+                        + "Troca do carretel de entrada ja realizada ","Troca do carretel de entrada",JOptionPane.ERROR_MESSAGE);
+              return false;
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return true;
     }
 }
