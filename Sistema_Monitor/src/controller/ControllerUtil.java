@@ -22,6 +22,8 @@ import java.util.logging.Logger;
 
 
 
+
+
 /**
  *
  * @author renato.soares
@@ -52,11 +54,11 @@ public final class ControllerUtil {
                 ip[i]=Integer.valueOf(servidor[i]);
             }
             InetAddress add = Inet4Address.getByAddress(new byte[]{(byte)ip[0],(byte)ip[1],(byte)ip[2],(byte)ip[3]});
-            return add.isReachable(1000);                      
+            return add.isReachable(250);                      
         } catch (IOException e) {      
-            LogErro erro = new LogErro();
-            erro.gravaErro(e);
-            e.printStackTrace();
+           // LogErro erro = new LogErro();
+            //erro.gravaErro(e);
+            //e.printStackTrace();
             
         }
         return false;
@@ -94,22 +96,38 @@ public final class ControllerUtil {
         return "";
     }
     
-    public static final String buscaMacAdrres() {
-        InetAddress ip;
-        try {
-            ip = InetAddress.getLocalHost();
-            NetworkInterface network = NetworkInterface.getByInetAddress(ip);
-            byte[] mac = network.getHardwareAddress();
-            StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < mac.length; i++) {
-			sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));		
-		}
-            return sb.toString();
-        } catch (UnknownHostException | SocketException ex) {
-            ex.printStackTrace();
-            LogErro erro = new LogErro(); 
-            erro.gravaErro(ex);
-        }
+    public static final String buscaMacAdrres()  {
+        InetAddress ip;                    
+            try {
+                if(System.getProperty("os.name").equals("Linux")){
+                    return "00:00:00:00:00:00";
+                }
+                ip = InetAddress.getLocalHost();
+                System.out.println("IP " + ip);
+                NetworkInterface network = NetworkInterface.getByInetAddress(ip);
+                byte[] mac = network.getHardwareAddress();
+                StringBuilder sb = new StringBuilder();
+                System.out.println("");
+                for (int i = 0; i < mac.length; i++) {
+                    sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+                }
+                return sb.toString();
+            } catch (UnknownHostException | SocketException ex) {
+                Logger.getLogger(ControllerUtil.class.getName()).log(Level.SEVERE, null, ex);
+            }                                 
         return "";
+    }
+
+    public static boolean bancoRespondendo() {
+        try {
+            ConexaoDatabase db = new ConexaoDatabase();
+            if(db.isInfoDB()){
+                Connection conec = db.getConnection();   
+                return conec != null;                
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }    
+        return false;
     }
 }

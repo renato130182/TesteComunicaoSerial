@@ -78,14 +78,17 @@ public class JFConfigSerialRFID extends javax.swing.JFrame {
         cmbPorta = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Configurar RFID");
+        setTitle("Configurar Serial Micrometro");
+        setAlwaysOnTop(true);
         setBackground(new java.awt.Color(204, 255, 255));
         setLocationByPlatform(true);
+        setModalExclusionType(java.awt.Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
+        setResizable(false);
 
         jPanel1.setBackground(new java.awt.Color(204, 255, 255));
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel1.setText("Configurações da comunicação serial para RFID:");
+        jLabel1.setText("Configurações da comunicação serial micrometro:");
 
         jLabel2.setText("Portas disponíveis:");
 
@@ -224,7 +227,8 @@ public class JFConfigSerialRFID extends javax.swing.JFrame {
                 regs = dao.AtualizarConfigSerial(conn);     
             }
             if(regs){
-                JOptionPane.showMessageDialog(rootPane,"Configuração atualizada com sucesso!","Configuração atualizada",JOptionPane.OK_OPTION);
+                JOptionPane.showMessageDialog(rootPane,"Configuração atualizada com sucesso!","Configuração atualizada",JOptionPane.INFORMATION_MESSAGE);
+                dispose();
             }else{
                 JOptionPane.showMessageDialog(rootPane,"Falha ao atualizar os dados da configuração, por favor tente novamente.","Falha...",JOptionPane.ERROR_MESSAGE);
             }

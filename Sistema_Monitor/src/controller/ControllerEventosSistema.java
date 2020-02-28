@@ -27,7 +27,8 @@ public class ControllerEventosSistema {
         try {                    
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
-                Connection conec = db.getConnection();                
+                Connection conec = db.getConnection();  
+                if(conec==null)return false;
                 conec.setAutoCommit(false);
                 EventosSistemaDAO dao = new EventosSistemaDAO(conec);
                 if(dao.registraEventoSistema(cod_Evento,codMaquina)){
@@ -91,7 +92,8 @@ public class ControllerEventosSistema {
         try {                    
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
-                Connection conec = db.getConnection();                
+                Connection conec = db.getConnection();   
+                if(conec==null)return false;
                 conec.setAutoCommit(false);
                 EventosSistemaDAO dao = new EventosSistemaDAO(conec);
                 if(dao.ValidaPreApontamentoEventoSistema(codParada, codMaquina,msg,codPesagemSaida)){
@@ -122,7 +124,8 @@ public class ControllerEventosSistema {
             ConexaoDatabase db = new ConexaoDatabase();
             List<Paradas> paradas = new ArrayList<>();
                 if(db.isInfoDB()){
-                    Connection conec = db.getConnection();                
+                    Connection conec = db.getConnection();     
+                    if(conec==null)return null;
                     EventosSistemaDAO dao = new EventosSistemaDAO(conec);
                     paradas = dao.BuscaPreApontamentoEventoSistema(codMaquina);
                 }
@@ -130,9 +133,9 @@ public class ControllerEventosSistema {
             return paradas;
         } catch (Exception e) {
             e.printStackTrace();
-            erro.gravaErro(e);
-            return null;
+            erro.gravaErro(e);            
         }
+        return null;
     }
     
     public boolean removerPreApontamento(Integer linha, String codMaquina){
@@ -140,7 +143,8 @@ public class ControllerEventosSistema {
             ConexaoDatabase db = new ConexaoDatabase();
             List<String> ids = new ArrayList<>();
             if(db.isInfoDB()){
-                Connection conec = db.getConnection();                
+                Connection conec = db.getConnection();      
+                if(conec==null)return false;
                 conec.setAutoCommit(false);
                 EventosSistemaDAO dao = new EventosSistemaDAO(conec);
                 ids = dao.BuscaIdsApontamentoEventoSistema(codMaquina);
@@ -169,7 +173,8 @@ public class ControllerEventosSistema {
         try {
             ConexaoDatabase db = new ConexaoDatabase();           
             if(db.isInfoDB()){
-                Connection conec = db.getConnection();                
+                Connection conec = db.getConnection();    
+                if(conec==null)return false;
                 conec.setAutoCommit(false);
                 EventosSistemaDAO dao = new EventosSistemaDAO(conec);
                 if(dao.removePreApontamentoEventoSistemaRegistrados(codMaquina)){
@@ -193,7 +198,8 @@ public class ControllerEventosSistema {
         try {
             ConexaoDatabase db = new ConexaoDatabase();            
             if(db.isInfoDB()){
-                Connection conec = db.getConnection();                
+                Connection conec = db.getConnection();     
+                if(conec==null)return false;
                 conec.setAutoCommit(false);
                 EventosSistemaDAO dao = new EventosSistemaDAO(conec);                
                 if(idPreParada!=null){
@@ -219,7 +225,8 @@ public class ControllerEventosSistema {
         try {
             ConexaoDatabase db = new ConexaoDatabase();            
             if(db.isInfoDB()){
-                Connection conec = db.getConnection();                
+                Connection conec = db.getConnection();     
+                if(conec==null)return false;
                 conec.setAutoCommit(false);
                 EventosSistemaDAO dao = new EventosSistemaDAO(conec);                              
                 if(dao.setarCarretelEntradaPreParada(codPesSaida,codPesEntrada)){
@@ -244,7 +251,8 @@ public class ControllerEventosSistema {
         try {
             ConexaoDatabase db = new ConexaoDatabase();            
             if(db.isInfoDB()){
-                Connection conec = db.getConnection();                             
+                Connection conec = db.getConnection();        
+                if(conec==null)return null;
                 EventosSistemaDAO dao = new EventosSistemaDAO(conec);  
                 List<Usuario> user = dao.buscaHistoricoLoginOperador(loteProducao);
                 db.desconectar();

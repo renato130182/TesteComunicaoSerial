@@ -21,6 +21,7 @@ public class PI4J {
     /**
      * @param args the command line arguments
      * @throws java.lang.InterruptedException
+     * @throws com.pi4j.platform.PlatformAlreadyAssignedException
      */
     public static void main(String[] args)  throws InterruptedException, PlatformAlreadyAssignedException{
         System.out.println("Minha Primeiro GPIO");

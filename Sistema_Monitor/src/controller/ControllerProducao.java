@@ -67,18 +67,22 @@ public class ControllerProducao {
         try {                   
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
-                Connection conec = db.getConnection();                
-                ProducaoDAO daoProd = new ProducaoDAO(conec);
-                if(daoProd.atualizaMetragemProduzida(cod_maquina, String.valueOf(metragemProd))){
-                    for (int i=0;i<lista.size();i++){
-                        if(!daoProd.atualizaSaldoConsumoEntrada(lista.get(i).getCodigo(),String.valueOf(metragemProd))) {
-                            db.desconectar();
-                            return false;
+                Connection conec = db.getConnection();
+                if(conec!=null){    
+                    ProducaoDAO daoProd = new ProducaoDAO(conec);
+                    if(daoProd.atualizaMetragemProduzida(cod_maquina, String.valueOf(metragemProd))){
+                        for (int i=0;i<lista.size();i++){
+                            if(!daoProd.atualizaSaldoConsumoEntrada(lista.get(i).getCodigo(),String.valueOf(metragemProd))) {
+                                db.desconectar();
+                                return false;
+                            }
                         }
                     }
+                    db.desconectar();                            
+                }else{
+                    return false;                            
                 }
-                db.desconectar();                            
-            }            
+            }                       
             return true;
         } catch (Exception e) {
             e.printStackTrace();

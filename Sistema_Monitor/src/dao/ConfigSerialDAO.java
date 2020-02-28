@@ -39,6 +39,7 @@ public class ConfigSerialDAO {
                     cfg.setStopBits(res.getInt("stopbits"));
                     cfg.setTimeOut(res.getInt("timeout"));
                     cfg.setDataRate(res.getInt("datarate"));
+                    cfg.setSerialMaquina(res.getString("serial_maquina_monitor"));
                 }else{
                     cfg.setSerialPortName("");
                 }                    

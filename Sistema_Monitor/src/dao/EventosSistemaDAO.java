@@ -325,14 +325,15 @@ public class EventosSistemaDAO {
 
     public boolean validaPossibilidadeRemocaoPorID(String id) {
         try {
-            sql = "select id from bd_sistema_monitor.tb_maquina_parada_pre_apontamento where id = ? and codPesagemEntrada = 0;";
+            sql = "select id,cod_parada,codPesagemEntrada from bd_sistema_monitor.tb_maquina_parada_pre_apontamento where id = ?;";
             PreparedStatement st = conec.prepareStatement(sql);                                              
             st.setString(1,id);
             ResultSet res = st.executeQuery();
-            if(!res.next()){
-                  JOptionPane.showMessageDialog(null, "Não é permitica a remoção do apontamento \n"
-                        + "Troca do carretel de entrada ja realizada ","Troca do carretel de entrada",JOptionPane.ERROR_MESSAGE);
-              return false;
+            if(res.next()){
+                if(res.getString("cod_parada").trim().equals("1")) return false;
+                if(!res.getString("codPesagemEntrada").trim().equals("0")) return false;                
+            }else{
+                return  false;
             }
             
         } catch (SQLException e) {

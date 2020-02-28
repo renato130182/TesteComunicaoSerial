@@ -5,11 +5,11 @@
  */
 package dao;
 
-import com.pi4j.system.NetworkInfo;
 import controller.ControllerUtil;
 import controller.CriptoCode;
 import controller.LogErro;
 import controller.ManipuladorArquivo;
+import java.awt.HeadlessException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -36,7 +36,7 @@ public class ConexaoDatabase extends DadosConexao{
                 JOptionPane.showMessageDialog(null, "Não foi possivel buscar dados para conexão,"
                         + " Arquivo .cnf não encontrado","Conexão com Banco de dados",JOptionPane.ERROR_MESSAGE);
             }
-        } catch (Exception e) {
+        } catch (HeadlessException e) {
             erro.gravaErro(e);
             infoDB= false;
         }
@@ -75,26 +75,26 @@ public class ConexaoDatabase extends DadosConexao{
     
      public java.sql.Connection getConnection() {                    
          try {
-            Class.forName(driverName);
-            conexao = DriverManager.getConnection(url + serverName + "/" + myDatabase ,userName,password);                
-            //testando a conexão
-            if(conexao != null){
-                System.out.println("Conexão realizada com banco de dados: " + this.serverName );
+            if(ControllerUtil.testaConexao(serverName)){
+                Class.forName(driverName);
+                conexao = DriverManager.getConnection(url + serverName + "/" + myDatabase ,userName,password);                
+                //testando a conexão
+                if(conexao != null){
+                    System.out.println("Conexão realizada com banco de dados: " + this.serverName );
+                }else{
+                    System.err.println("Não foi possivel realizar a conexão com banco de dados" + this.serverName);
+                    return null;
+                }                                    
+                return conexao;
             }else{
-                System.err.println("Não foi possivel realizar a conexão com banco de dados" + this.serverName);
-            }                                    
-            return conexao;
-        } catch (SQLException e){
-            if(!ControllerUtil.testaConexao(serverName)){
-                JOptionPane.showMessageDialog(null, "Falha na conexão com servidor: " + serverName + "\n" +
-                    "Por favor informe ao setor de informática","Falha na conexão",JOptionPane.ERROR_MESSAGE);                
+                System.out.println("Falha na conexão INTRANET");
+                return null;
             }
-            erro.gravaErro(e);
+        } catch (SQLException | ClassNotFoundException e){                           
+                System.out.println("Falha ao conctar com banco de dados");            
+            //erro.gravaErro(e);
             return null;
-        } catch (ClassNotFoundException ex) {
-            erro.gravaErro(ex);
         }
-    return null;
     }
     public void desconectar(){
         if(this.conexao != null){

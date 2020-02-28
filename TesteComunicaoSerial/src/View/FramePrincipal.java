@@ -12,19 +12,28 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import Serial.*;
+import com.pi4j.io.gpio.GpioController;
+import com.pi4j.io.gpio.GpioFactory;
+import com.pi4j.io.gpio.GpioPinDigitalOutput;
+import com.pi4j.io.gpio.OrangePiPin;
+import com.pi4j.io.gpio.PinState;
 import com.pi4j.platform.PlatformAlreadyAssignedException;
 /**
  *
  * @author renato.soares
  */
 public class FramePrincipal extends javax.swing.JFrame implements ActionListener{
-   SerialTxRx serialPorts = new SerialTxRx();
-   SerialTxRx conn;
-   HardwareInfo hard;
-   Protocolo.NazkomUDC1_default nazkomUdc1Default = new Protocolo.NazkomUDC1_default();
-   Protocolo.NazcomUDC1_falhas nazkomUdc1Falhas = new Protocolo.NazcomUDC1_falhas();
-   Protocolo.Zumbach_USYS10 zumbachUsys10 = new Protocolo.Zumbach_USYS10();
-   double temp=20.0;
+    SerialTxRx serialPorts = new SerialTxRx();
+    SerialTxRx conn;
+    HardwareInfo hard;
+    Protocolo.NazkomUDC1_default nazkomUdc1Default = new Protocolo.NazkomUDC1_default();
+    Protocolo.NazcomUDC1_falhas nazkomUdc1Falhas = new Protocolo.NazcomUDC1_falhas();
+    Protocolo.Zumbach_USYS10 zumbachUsys10 = new Protocolo.Zumbach_USYS10();
+    double temp=20.0;
+    private GpioPinDigitalOutput IN1 = null;
+    private GpioPinDigitalOutput IN2 = null;
+    private GpioPinDigitalOutput IN3 = null;
+    private GpioPinDigitalOutput IN4 = null;
     /**
      * Creates new form FramePrincipal
      */
@@ -44,6 +53,13 @@ public class FramePrincipal extends javax.swing.JFrame implements ActionListener
                     }
                 });
             }
+        if(System.getProperty("os.name").equals("Linux")){
+                     GpioController gpio = GpioFactory.getInstance();
+                     this.IN1 = gpio.provisionDigitalOutputPin(OrangePiPin.GPIO_24,"Rele 01",PinState.HIGH);
+                     this.IN2 = gpio.provisionDigitalOutputPin(OrangePiPin.GPIO_23,"Rele 02",PinState.HIGH);
+                     this.IN3 = gpio.provisionDigitalOutputPin(OrangePiPin.GPIO_22,"Rele 03",PinState.HIGH);
+                     this.IN4 = gpio.provisionDigitalOutputPin(OrangePiPin.GPIO_21,"Rele 04",PinState.HIGH);
+                }    
         } catch (PlatformAlreadyAssignedException e) {
             e.printStackTrace();
         }                                         
@@ -114,6 +130,11 @@ public class FramePrincipal extends javax.swing.JFrame implements ActionListener
         jLabel12 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         radial4LcdTemp = new eu.hansolo.steelseries.gauges.Radial4Lcd();
+        jButtonReles = new javax.swing.JButton();
+        jButtonRL1 = new javax.swing.JButton();
+        jButtonRele2 = new javax.swing.JButton();
+        jButtonRele3 = new javax.swing.JButton();
+        jButtonRele4 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Teste de comunicação serial");
@@ -329,34 +350,88 @@ public class FramePrincipal extends javax.swing.JFrame implements ActionListener
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jButtonReles.setText("Testar todos os reles");
+        jButtonReles.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRelesActionPerformed(evt);
+            }
+        });
+
+        jButtonRL1.setText("RL1");
+        jButtonRL1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRL1ActionPerformed(evt);
+            }
+        });
+
+        jButtonRele2.setText("RL2");
+        jButtonRele2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRele2ActionPerformed(evt);
+            }
+        });
+
+        jButtonRele3.setText("RL3");
+        jButtonRele3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRele3ActionPerformed(evt);
+            }
+        });
+
+        jButtonRele4.setText("RL4");
+        jButtonRele4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRele4ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel12)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jScrollPane2)
+                        .addComponent(jScrollPane1)
+                        .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(jLabel11)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(cmbProtocolo, javax.swing.GroupLayout.PREFERRED_SIZE, 532, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jLabel12))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jScrollPane2)
-                            .addComponent(jScrollPane1)
-                            .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel11)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(cmbProtocolo, javax.swing.GroupLayout.PREFERRED_SIZE, 532, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(10, 10, 10)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(14, 14, 14)
+                        .addComponent(jButtonRL1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButtonRele2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButtonRele3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButtonRele4))
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButtonReles, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jButtonRL1)
+                            .addComponent(jButtonRele2)
+                            .addComponent(jButtonRele3)
+                            .addComponent(jButtonRele4)))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -369,8 +444,10 @@ public class FramePrincipal extends javax.swing.JFrame implements ActionListener
                             .addComponent(cmbProtocolo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonReles))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -421,6 +498,49 @@ public class FramePrincipal extends javax.swing.JFrame implements ActionListener
         // TODO add your handling code here:
         txtInformacao.setText("");
     }//GEN-LAST:event_cmbProtocoloActionPerformed
+
+    private void jButtonRelesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRelesActionPerformed
+        // TODO add your handling code here:
+        if(System.getProperty("os.name").equals("Linux")){                            
+                        System.out.println("Testar reles");
+                        IN1.toggle();
+                        IN2.toggle();
+                        IN3.toggle();
+                        IN4.toggle();
+                        }
+    }//GEN-LAST:event_jButtonRelesActionPerformed
+
+    private void jButtonRL1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRL1ActionPerformed
+        // TODO add your handling code here:
+         if(System.getProperty("os.name").equals("Linux")){                            
+                        System.out.println("Testar rele 1");
+                        IN1.toggle();                        
+                        }
+    }//GEN-LAST:event_jButtonRL1ActionPerformed
+
+    private void jButtonRele2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRele2ActionPerformed
+        // TODO add your handling code here:
+        if(System.getProperty("os.name").equals("Linux")){                            
+                        System.out.println("Testar rele 2");
+                        IN2.toggle();                        
+                        }
+    }//GEN-LAST:event_jButtonRele2ActionPerformed
+
+    private void jButtonRele3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRele3ActionPerformed
+        // TODO add your handling code here:
+        if(System.getProperty("os.name").equals("Linux")){                            
+                        System.out.println("Testar rele 3");
+                        IN3.toggle();                        
+                        }
+    }//GEN-LAST:event_jButtonRele3ActionPerformed
+
+    private void jButtonRele4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRele4ActionPerformed
+        // TODO add your handling code here:
+        if(System.getProperty("os.name").equals("Linux")){                            
+                        System.out.println("Testar rele 4");
+                        IN4.toggle();                        
+                        }
+    }//GEN-LAST:event_jButtonRele4ActionPerformed
     
     private void parametrizarSerial(){
          if(conn!=null){
@@ -466,6 +586,11 @@ public class FramePrincipal extends javax.swing.JFrame implements ActionListener
     private javax.swing.JComboBox<String> cmbParidade;
     private javax.swing.JComboBox<String> cmbPorta;
     private javax.swing.JComboBox<String> cmbProtocolo;
+    private javax.swing.JButton jButtonRL1;
+    private javax.swing.JButton jButtonRele2;
+    private javax.swing.JButton jButtonRele3;
+    private javax.swing.JButton jButtonRele4;
+    private javax.swing.JButton jButtonReles;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;

@@ -15,6 +15,8 @@ import controller.Login;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import model.ComposicaoCobre;
 import model.Engenharia;
@@ -45,7 +47,7 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
     private List<ComposicaoCobre> compCobre = new ArrayList<>();
     private List<ReservaPesagem> reservaPesagem = new ArrayList<>();
     private int perdaEstimada=0;
-    
+    private JTable preParadasApontadas;
     /**
      * Creates new form JFApontamentoProducao
      * @param maquina
@@ -56,14 +58,15 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
      * @param prog
      */
     public JFApontamentoProducao(Maquina maquina, Login login,ProdutoMaquina prodmaq,
-            ProdutoCarretel prodCar,Producao prod,ProgramacaoMaquina prog) {
+            ProdutoCarretel prodCar,Producao prod,ProgramacaoMaquina prog, JTable preParadas) {
         initComponents();
         this.login = login;
         this.maquina = maquina;
         this.prodCar = prodCar;
         this.prod = prod;
         this.prog = prog;
-        setarDadosProducao();
+        this.preParadasApontadas=preParadas;
+        setarDadosProducao(); 
         buscarParadasProcessoProducao();
         buscaDadosConsumoMp();
         buscaHistoricoOperadores();
@@ -495,6 +498,12 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
         if(ctr.registrarApontamentoPesagem(prod, perdaEstimada, usr, maquina, prog, jTextPane1.getText(),
                 reservaPesagem,paradasProcesso,compCobre,login)){
             JOptionPane.showMessageDialog(rootPane,"Registro de apontamento realizado com sucesso!","Registro de produção",JOptionPane.INFORMATION_MESSAGE);
+            ControllerEventosSistema ctrEvt = new ControllerEventosSistema();
+            if(!ctrEvt.verificaPreApontamento("1" ,maquina.getCodigo(),"",true,0,0)){
+                JOptionPane.showMessageDialog(rootPane,"Falha ao registrar motivo da parada, por favor indique manualmentente","Registro de motivo de parada",JOptionPane.ERROR_MESSAGE);
+            }else{
+                verificarMotivosPreApontados();
+            }
             dispose();
         }else{
             JOptionPane.showMessageDialog(rootPane,"Falha ao realizar o registro de apontamento de produção \n "
@@ -682,4 +691,21 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
             }
         }
     }    
+    
+    private void verificarMotivosPreApontados() {
+        List<Paradas> preParadas = null;
+        try {
+            ControllerEventosSistema ctr = new ControllerEventosSistema();
+            preParadas = ctr.BuscaPreApontamentos(maquina.getCodigo());            
+            if(preParadas!=null){
+                DefaultTableModel modelo = (DefaultTableModel)preParadasApontadas.getModel();
+                for (int i=0;i<preParadas.size();i++){   
+                    modelo.addRow(new Object[]{preParadas.get(i).getCodigo(),preParadas.get(i).getAbreviacao()
+                            ,preParadas.get(i).getDescricao(),preParadas.get(i).getObservacao()});                    
+                }                
+            }
+        } catch (NumberFormatException e) {
+            erro.gravaErro(e);
+        }
+    }
 }

@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
+
 import model.EventoMaquina;
 import model.Paradas;
 import model.ParadasMaquina;
@@ -103,7 +104,8 @@ public class ControllerParadasMaquina {
         try {
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
-                Connection conec = db.getConnection();                
+                Connection conec = db.getConnection();   
+                if(conec==null)return false;
                 ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO(conec);      
                 EventoMaquina evt = new EventoMaquina();            
                 evt.setMetragemEvento(metragem);            
