@@ -72,7 +72,7 @@ public class JFDTrocaCarretelEntrada extends javax.swing.JDialog {
         super(parent, modal);        
         initComponents();
         limparCampos();
-        
+        jTFNumeroPesagem.requestFocus();
         // Close the dialog when Esc is pressed
         String cancelName = "cancel";
         InputMap inputMap = getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
@@ -196,11 +196,6 @@ public class JFDTrocaCarretelEntrada extends javax.swing.JDialog {
         jTFNumeroPesagemSaida.setText("000000");
         jTFNumeroPesagemSaida.setToolTipText("");
         jTFNumeroPesagemSaida.setEnabled(false);
-        jTFNumeroPesagemSaida.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                jTFNumeroPesagemSaidaFocusLost(evt);
-            }
-        });
 
         jLabel17.setText("Bobina / Fuster: ");
 
@@ -347,6 +342,11 @@ public class JFDTrocaCarretelEntrada extends javax.swing.JDialog {
         jTFNumeroPesagem.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 jTFNumeroPesagemFocusLost(evt);
+            }
+        });
+        jTFNumeroPesagem.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jTFNumeroPesagemKeyPressed(evt);
             }
         });
 
@@ -526,7 +526,17 @@ public class JFDTrocaCarretelEntrada extends javax.swing.JDialog {
     private void jTFNumeroPesagemFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTFNumeroPesagemFocusLost
         // TODO add your handling code here:
         if(jTFNumeroPesagem.getText().length()>=5){            
-            if( ControllerUtil.SoTemNumeros(jTFNumeroPesagem.getText())){
+            buscaDadosPesagem();
+        }else{
+            if(jTFNumeroPesagem.getText().length()>0){
+                jTFNumeroPesagem.setText("");
+                JOptionPane.showMessageDialog(rootPane,"Numero da pesagem inválido","Numero Invalido",JOptionPane.ERROR_MESSAGE);                
+            }
+        }
+    }//GEN-LAST:event_jTFNumeroPesagemFocusLost
+
+    private void buscaDadosPesagem(){
+        if( ControllerUtil.SoTemNumeros(jTFNumeroPesagem.getText())){
                 if(!jTFNumeroPesagem.getText().equals(pesSaida.getCodigo())){
                     PesagemDAO dao = new PesagemDAO();                
                     pesEntrada = dao.buscaPesagemCodigo(jTFNumeroPesagem.getText());
@@ -553,17 +563,13 @@ public class JFDTrocaCarretelEntrada extends javax.swing.JDialog {
                 jTFNumeroPesagem.setText("");
                 JOptionPane.showMessageDialog(rootPane,"Numero da pesagem inválido","Numero Invalido",JOptionPane.ERROR_MESSAGE);                
             }
-        }else{
-            if(jTFNumeroPesagem.getText().length()>0){
-                jTFNumeroPesagem.setText("");
-                JOptionPane.showMessageDialog(rootPane,"Numero da pesagem inválido","Numero Invalido",JOptionPane.ERROR_MESSAGE);                
-            }
-        }
-    }//GEN-LAST:event_jTFNumeroPesagemFocusLost
-
-    private void jTFNumeroPesagemSaidaFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTFNumeroPesagemSaidaFocusLost
+    }
+    private void jTFNumeroPesagemKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTFNumeroPesagemKeyPressed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTFNumeroPesagemSaidaFocusLost
+        if(evt.getKeyCode()==10){
+            buscaDadosPesagem();
+        }     
+    }//GEN-LAST:event_jTFNumeroPesagemKeyPressed
     
     private void doClose(int retStatus) {
         returnStatus = retStatus;

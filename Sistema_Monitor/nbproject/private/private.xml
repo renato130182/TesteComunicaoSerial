@@ -14,6 +14,7 @@
         <group>
             <file>file:/C:/Users/renato/Documents/GitHub/NetBeansProjects/Sistema_Monitor/src/controller/ControllerProducao.java</file>
             <file>file:/C:/Users/renato/Documents/GitHub/NetBeansProjects/Sistema_Monitor/src/controller/ControllerUtil.java</file>
+            <file>file:/C:/Users/renato/Documents/GitHub/NetBeansProjects/Sistema_Monitor/src/dao/DadosDefaultDAO.java</file>
             <file>file:/C:/Users/renato/Documents/GitHub/NetBeansProjects/Sistema_Monitor/src/view/JFPrincipal.java</file>
             <file>file:/C:/Users/renato/Documents/GitHub/NetBeansProjects/Sistema_Monitor/src/dao/ProducaoDAO.java</file>
             <file>file:/C:/Users/renato/Documents/GitHub/NetBeansProjects/Sistema_Monitor/src/dao/ConexaoDatabase.java</file>

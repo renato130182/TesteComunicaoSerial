@@ -2294,7 +2294,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             login.setNivel("");
             login.setSenha("");
             login.setCode("");
-            if(false) limparTelaLogin(); //apenas para teste, passar para true em producao
+            if(true) limparTelaLogin(); //apenas para teste, passar para true em producao
             bloquearMenu();            
             //if(parametrizarSerial(SERIAL_RFID)){
            //    if(comRFID.iniciaSerial()){
