@@ -21,9 +21,9 @@ import model.DadosConexao;
  * @author renato.soares
  */
 public class ConexaoDatabase extends DadosConexao{
-    private Connection conexao = null;
-
+    
     private static final boolean AMBPROD = false;
+    private Connection conexao = null;
     private boolean infoDB=false;
     LogErro erro = new LogErro();
     

@@ -415,7 +415,7 @@ public class ControllerProducao {
                         for(int i=0;i<evt.size()-1;i++){
                             String tmpInicio = evt.get(i).getDataHoraFinal();
                             String tmpFinal = evt.get(i+1).getDataHoraInicio();
-                            tempoProd= tempoProd + ControllerUtil.calculaTempoPercorridoSegundos(tmpInicio, tmpFinal);
+                            tempoProd+=ControllerUtil.calculaTempoPercorridoSegundos(tmpInicio, tmpFinal);
                         }
                         
                         return String.valueOf(tempoProd/60);
@@ -449,7 +449,7 @@ public class ControllerProducao {
                             }else{
                                 tmpFinal = evt.get(i).getDataHoraFinal();
                             }
-                            tempoProd= tempoProd + ControllerUtil.calculaTempoPercorridoSegundos(tmpInicio, tmpFinal);
+                            tempoProd+= ControllerUtil.calculaTempoPercorridoSegundos(tmpInicio, tmpFinal);
                         }
                         
                         return String.valueOf(tempoProd/60);
