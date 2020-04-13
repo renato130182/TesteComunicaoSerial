@@ -70,5 +70,26 @@ public class ControllerMicrometro extends Micrometro{
         }
         return false;
     }
+
+    public boolean registraLoteRelatorios(String loteproducao) {
+        try {
+            boolean registrado=false;
+            ConexaoDatabase db = new ConexaoDatabase();
+            if(db.isInfoDB()){
+                Connection conec = db.getConnection();  
+                if(conec==null)return false;
+                MicrometroDAO dao = new MicrometroDAO(conec);
+                if(dao.registrarLote(loteproducao)){
+                    registrado = true;
+                }
+                db.desconectar();
+                return registrado;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return false;
+    }
     
 }

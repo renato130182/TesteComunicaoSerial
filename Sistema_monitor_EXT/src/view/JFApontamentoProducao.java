@@ -120,6 +120,11 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Conferência de Produção");
         setSize(new java.awt.Dimension(1000, 850));
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         jScrollPane1.setPreferredSize(new java.awt.Dimension(902, 800));
         jScrollPane1.setRequestFocusEnabled(false);
@@ -497,22 +502,30 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
         if(ctr.registrarApontamentoPesagem(prod, perdaEstimada, usr, maquina, prog, jTextPane1.getText(),
                 reservaPesagem,paradasProcesso,compCobre,login)){
             JOptionPane.showMessageDialog(rootPane,"Registro de apontamento realizado com sucesso!","Registro de produção",JOptionPane.INFORMATION_MESSAGE);
+            
             ControllerEventosSistema ctrEvt = new ControllerEventosSistema();
             if(!ctrEvt.verificaPreApontamento("1" ,maquina.getCodigo(),"",true,0,0)){
                 JOptionPane.showMessageDialog(rootPane,"Falha ao registrar motivo da parada, por favor indique manualmentente","Registro de motivo de parada",JOptionPane.ERROR_MESSAGE);
             }else{
                 verificarMotivosPreApontados();
-            }
-            dispose();
+            }        
+            FecharJanelaApontamento(true);            
         }else{
             JOptionPane.showMessageDialog(rootPane,"Falha ao realizar o registro de apontamento de produção \n "
                     + "por favor tente novamente!","Registro de produção",JOptionPane.ERROR_MESSAGE);
+            
         }
     }//GEN-LAST:event_jButtonApontarActionPerformed
 
     private void jButtonCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCancelarActionPerformed
         // TODO add your handling code here:
+        FecharJanelaApontamento(false);
     }//GEN-LAST:event_jButtonCancelarActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // TODO add your handling code here:
+        FecharJanelaApontamento(false);
+    }//GEN-LAST:event_formWindowClosing
         
     /**
      * @param args the command line arguments
@@ -706,5 +719,12 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
         } catch (NumberFormatException e) {
             erro.gravaErro(e);
         }
+    }
+
+    private void FecharJanelaApontamento(boolean b) {
+        if(b){            
+            JFPrincipal.ZerarMetragemCarretelSaida();            
+        }
+        dispose();
     }
 }

@@ -122,8 +122,10 @@ public final class ControllerUtil {
         try {
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
-                Connection conec = db.getConnection();   
-                return conec != null;                
+                Connection conec = db.getConnection();
+                boolean tmp = conec!=null;
+                db.desconectar();
+                return tmp;                
             }
         }catch(Exception e){
             e.printStackTrace();

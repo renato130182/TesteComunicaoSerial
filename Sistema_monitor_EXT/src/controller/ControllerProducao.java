@@ -63,8 +63,9 @@ public class ControllerProducao {
     }
     
     
-    public boolean atualizaMetragemProduzida(List<Pesagem> lista, double metragemProd, String cod_maquina){
-        try {                   
+    public boolean atualizaMetragemProduzida(List<Pesagem> lista, double metragemProd, String cod_maquina,boolean pronta){
+        try {
+            if(!pronta)return false;
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
                 Connection conec = db.getConnection();
@@ -451,8 +452,11 @@ public class ControllerProducao {
                             }
                             tempoProd+= ControllerUtil.calculaTempoPercorridoSegundos(tmpInicio, tmpFinal);
                         }
-                        
-                        return String.valueOf(tempoProd/60);
+                                    long temp = tempoProd/60;
+                        if(temp>9999){
+                            temp=9999;
+                        }
+                        return String.valueOf(temp);
                     }   
                 }
             }            
@@ -494,6 +498,9 @@ public class ControllerProducao {
                         tempoParada= Integer.valueOf(dados.get(2));
                         qtdEvento=Integer.valueOf(dados.get(3));
                         tempoMotivo = (tempoParada/qtdEvento)/60;
+                        if(tempoMotivo>9999){
+                            tempoMotivo=9999;
+                        }
                         if(tempoMotivo==0) tempoMotivo=1;        
                         idEvento=paradas.getListaParadas().get(i).getIdRegistro();
                     }

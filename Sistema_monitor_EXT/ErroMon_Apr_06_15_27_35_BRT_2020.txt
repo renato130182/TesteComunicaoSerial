@@ -1,0 +1,14 @@
+Data do erro: Mon Apr 06 15:27:35 BRT 2020
+Mensagem de erro: null
+Causa do erro: null
+Stacktrace: java.lang.NullPointerException
+	at dao.ParadasMaquinaDAO.buscarIDEventoAberto(ParadasMaquinaDAO.java:77)
+	at controller.ControllerParadasMaquina.registraInicioParadamaquina(ControllerParadasMaquina.java:78)
+	at view.JFPrincipal.abrirTelaParadas(JFPrincipal.java:2248)
+	at view.JFPrincipal.dadosSerialMicrometro(JFPrincipal.java:2508)
+	at view.JFPrincipal.actionPerformed(JFPrincipal.java:2444)
+	at Serial.SerialTxRx.dadosRecebidos(SerialTxRx.java:55)
+	at Serial.SerialTxRx.serialEvent(SerialTxRx.java:126)
+	at gnu.io.RXTXPort.sendEvent(RXTXPort.java:732)
+	at gnu.io.RXTXPort.eventLoop(Native Method)
+	at gnu.io.RXTXPort$MonitorThread.run(RXTXPort.java:1575)

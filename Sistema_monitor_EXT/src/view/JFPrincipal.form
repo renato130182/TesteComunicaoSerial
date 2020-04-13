@@ -217,9 +217,9 @@
                       <Component id="jSeparator4" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jLabel22" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="43" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="35" max="-2" attributes="0"/>
                       <Component id="jScrollPane1" pref="798" max="32767" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -891,8 +891,8 @@
                                       </Group>
                                       <EmptySpace min="-2" max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="linearCarretelSaida" alignment="0" pref="993" max="32767" attributes="0"/>
-                                          <Component id="linearProgramacao" alignment="0" pref="993" max="32767" attributes="0"/>
+                                          <Component id="linearCarretelSaida" alignment="0" pref="793" max="32767" attributes="0"/>
+                                          <Component id="linearProgramacao" alignment="0" pref="793" max="32767" attributes="0"/>
                                           <Group type="102" alignment="0" attributes="0">
                                               <Component id="jPanelEventoEntrada" min="-2" max="-2" attributes="0"/>
                                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
@@ -1417,6 +1417,9 @@
                     <Property name="lcdDecimals" type="int" value="0"/>
                     <Property name="unitString" type="java.lang.String" value="m"/>
                   </Properties>
+                  <AuxValues>
+                    <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="10"/>
+                  </AuxValues>
 
                   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout">
                     <Property name="useNullLayout" type="boolean" value="true"/>

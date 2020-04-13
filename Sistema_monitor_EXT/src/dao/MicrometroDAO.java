@@ -46,5 +46,19 @@ public class MicrometroDAO {
         }
         return false;
     }
+
+    public boolean registrarLote(String loteproducao) {
+        try {
+            sql = "update bd_sistema_monitor.tb_maquina_dados_micrometro set lote = ? where lote = '0';";
+            PreparedStatement st = conec.prepareStatement(sql);            
+            st.setString(1, loteproducao);            
+            st.executeUpdate();
+            return st.getUpdateCount()!=0;        
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return false;
+    }
     
 }
