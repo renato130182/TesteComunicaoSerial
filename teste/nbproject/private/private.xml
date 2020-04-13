@@ -3,7 +3,14 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Renato%20Soares/Documents/NetBeansProjects/teste/src/teste/Teste.java</file>
+            <file>file:/D:/Documentos/NetBeansProjects/teste/web/WEB-INF/jsp/index.jsp</file>
+            <file>file:/D:/Documentos/NetBeansProjects/teste/src/java/com/myapp/struts/Event.java</file>
+            <file>file:/D:/Documentos/NetBeansProjects/teste/web/redirect.jsp</file>
+            <file>file:/D:/Documentos/NetBeansProjects/teste/src/java/com/myapp/struts/ApplicationConfig.java</file>
+            <file>file:/D:/Documentos/NetBeansProjects/teste/web/welcomeStruts.jsp</file>
+            <file>file:/D:/Documentos/NetBeansProjects/teste/web/index.xhtml</file>
+            <file>file:/D:/Documentos/NetBeansProjects/teste/web/WEB-INF/applicationContext.xml</file>
+            <file>file:/D:/Documentos/NetBeansProjects/teste/web/WEB-INF/dispatcher-servlet.xml</file>
         </group>
     </open-files>
 </project-private>
