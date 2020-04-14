@@ -30,6 +30,7 @@ import model.Usuario;
  * @author renato.soares
  */
 public class ControllerProducao {
+
     private List<String> listaMetragemObservacao = new ArrayList<>();
     LogErro erro = new LogErro();
     private int codPesagem=0;
@@ -65,7 +66,10 @@ public class ControllerProducao {
     
     public boolean atualizaMetragemProduzida(List<Pesagem> lista, double metragemProd, String cod_maquina,boolean pronta){
         try {
-            if(!pronta)return false;
+            if(!pronta){
+                //registraMetragemProducaoTemporaria(metragemProd, cod_maquina);
+                return false;
+            }
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
                 Connection conec = db.getConnection();
@@ -573,6 +577,63 @@ public class ControllerProducao {
             System.out.println("Falha ao buscar tipo de inspeção");
             return false;            
         }
+    }        
+
+    public void registraMetragemProducaoTemporaria(double metragemProd, String cod_maquina) {
+        try {
+            ConexaoDatabase db = new ConexaoDatabase();
+            if(db.isInfoDB()){
+                Connection conec = db.getConnection();
+                if(conec!=null){
+                    ProducaoDAO daoProd = new ProducaoDAO(conec);
+                    if(daoProd.existeCadastroProducaoTmp(cod_maquina)){
+                        daoProd.atualizaMetProducaoTemp(metragemProd,cod_maquina);
+                    }else{
+                        daoProd.criarProducaoTemp(metragemProd,cod_maquina);
+                    }
+                    db.desconectar();
+                }
+            }    
+        } catch (Exception e) {
+            
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
     }
-        
+
+    public int buscaMetProdTemp(Maquina maquina) {
+        try {
+            ConexaoDatabase db = new ConexaoDatabase();
+            if(db.isInfoDB()){
+                Connection conec = db.getConnection();
+                if(conec!=null){
+                    ProducaoDAO daoProd = new ProducaoDAO(conec);
+                    int met = daoProd.buscaMetProducaoTemporaria(maquina.getCodigo());
+                    db.desconectar();
+                    return met;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return 0;
+    }        
+    
+    public void limparRegistroProducaoTemporaria(String codMaquina){
+        try {
+            ConexaoDatabase db = new ConexaoDatabase();
+            if(db.isInfoDB()){
+                Connection conec = db.getConnection();
+                if(conec!=null){
+                    ProducaoDAO daoProd = new ProducaoDAO(conec);
+                    daoProd.limparRegistrosMetragemTemporaria(codMaquina);
+                    db.desconectar();               
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+    }
 }

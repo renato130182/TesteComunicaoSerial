@@ -12,6 +12,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import model.ComposicaoCobre;
 import model.Producao;
 import model.ReservaPesagem;
@@ -431,5 +433,83 @@ public class ProducaoDAO {
         }
         return false;
         
+    }
+
+    public boolean existeCadastroProducaoTmp(String cod_maquina) {
+        try {
+            sql = "SELECT * FROM bd_sistema_monitor.tb_maquina_producao_tmp where codigo_maquina = ?;";
+             PreparedStatement st = this.conec.prepareStatement(sql);
+             st.setString(1, cod_maquina);
+             ResultSet res = st.executeQuery();
+            return res.next();                            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return false;
+    }
+
+    public boolean atualizaMetProducaoTemp(double metragemProd, String cod_maquina) {
+        
+        try {
+            sql = "update bd_sistema_monitor.tb_maquina_producao_tmp  set met_prod = "
+                    + "met_prod + ? where codigo_maquina = ?;";
+            PreparedStatement st = this.conec.prepareStatement(sql);
+            st.setInt(1,(int)metragemProd);
+            st.setString(2, cod_maquina);            
+            st.executeUpdate();
+            return st.getUpdateCount()!=0;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            erro.gravaErro(ex);
+        }
+        return false;
+    }
+
+    public boolean criarProducaoTemp(double metragemProd, String cod_maquina) {
+        try {
+            sql = "insert into bd_sistema_monitor.tb_maquina_producao_tmp (codigo_maquina, met_prod) values (?,?);";
+            PreparedStatement st = this.conec.prepareStatement(sql);
+            st.setString(1, cod_maquina);            
+            st.setInt(2,(int)metragemProd);            
+            st.executeUpdate();
+            return st.getUpdateCount()!=0;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            erro.gravaErro(ex);
+        }
+        return false;
+    }
+
+    public int buscaMetProducaoTemporaria(String cod_maquina) {
+        try {
+            sql = "SELECT * FROM bd_sistema_monitor.tb_maquina_producao_tmp where codigo_maquina = ?;";
+            PreparedStatement st = this.conec.prepareStatement(sql);
+            st.setString(1, cod_maquina);
+            ResultSet res = st.executeQuery();
+            if(res.next()){
+                int met=0;
+                met = res.getInt("met_prod");                
+                return met;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return 0;
+    }
+    
+    public boolean limparRegistrosMetragemTemporaria(String cod_maquina){
+        try {
+            sql = "delete from bd_sistema_monitor.tb_maquina_producao_tmp where codigo_maquina = ?;";
+            PreparedStatement st = this.conec.prepareStatement(sql);
+            st.setString(1, cod_maquina);            
+            st.executeUpdate();
+            return st.getUpdateCount()!=0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return false;
     }
 }

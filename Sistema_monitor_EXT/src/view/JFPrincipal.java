@@ -95,7 +95,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private GpioPinDigitalOutput IN1 = null;
     private GpioPinDigitalOutput IN2 = null;
     private GpioPinDigitalOutput IN3 = null;
-    
+    private int metProdTmp=0;
     //private GpioPinDigitalOutput IN4 = null; Fora de uso
     /**
      * Creates new form JFPrincipal
@@ -262,10 +262,12 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 codMaquina = dados.buscaCodigoMaquina(identificador);
                 if(codMaquina!=null){                
                     maquina = maqDao.buscarDadosMaquina(codMaquina);
-                }
+                }                
                 abrirTelaLogin();                
                 ControllerEventosSistema ctr = new ControllerEventosSistema();
                 ctr.registraEventos(1,"",0,0,codMaquina,"");
+                ControllerProducao prd = new ControllerProducao();
+                metProdTmp=prd.buscaMetProdTemp(maquina);
             } catch (PlatformAlreadyAssignedException  e) {
                 e.printStackTrace();
                 erro.gravaErro(e);
@@ -422,7 +424,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         jTextField1.setText("jTextField1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("Sistema Condumig");
+        setTitle("Sistema Condumig Extrusoras");
         setExtendedState(JFPrincipal.MAXIMIZED_BOTH);
         setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         setName("framePrincipal"); // NOI18N
@@ -1224,8 +1226,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                                     .addComponent(radialLcdDiametro, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(jpProducaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(linearCarretelSaida, javax.swing.GroupLayout.DEFAULT_SIZE, 993, Short.MAX_VALUE)
-                                    .addComponent(linearProgramacao, javax.swing.GroupLayout.DEFAULT_SIZE, 993, Short.MAX_VALUE)
+                                    .addComponent(linearCarretelSaida, javax.swing.GroupLayout.DEFAULT_SIZE, 793, Short.MAX_VALUE)
+                                    .addComponent(linearProgramacao, javax.swing.GroupLayout.DEFAULT_SIZE, 793, Short.MAX_VALUE)
                                     .addGroup(jpProducaoLayout.createSequentialGroup()
                                         .addComponent(jPanelEventoEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -2328,7 +2330,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             login.setNivel("");
             login.setSenha("");
             login.setCode("");
-            if(true) limparTelaLogin(); //apenas para teste, passar para true em producao
+            if(false) limparTelaLogin(); //apenas para teste, passar para true em producao
             bloquearMenu();            
             //if(parametrizarSerial(SERIAL_RFID)){
            //    if(comRFID.iniciaSerial()){
@@ -2476,12 +2478,21 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                                                             
                     ControllerProducao prd = new ControllerProducao();
                     if(prd.atualizaMetragemProduzida(listaPesagens, (metAtual - metragemAnterior), codMaquina,maqPronta)){
-                    System.out.println("Registrada metragem prosuzida, metragem anterior alterdada: " + (metAtual - metragemAnterior));                        
+                    System.out.println("Registrada metragem produzida, metragem anterior alterdada: " + (metAtual - metragemAnterior));                        
                         //leituraAnterior = mic.setarDadosMicrometro(dados); 
                         if(falhaRegistro){     
                             metrosAguardando = (long)(metAtual-metragemAnterior);
                             falhaRegistro=false;
-                            metragemAnterior=metTemporaria;
+                            metragemAnterior=metTemporaria;                       
+                            
+                            if(metProdTmp!=0){
+                                if(prd.atualizaMetragemProduzida(listaPesagens, (metProdTmp - (metAtual - metragemAnterior)), codMaquina,maqPronta)){
+                                    prd.limparRegistroProducaoTemporaria(codMaquina);
+                                }else{
+                                    JOptionPane.showMessageDialog(rootPane,"Falha ao limpar registros de produção de metragem temporaria \n"
+                                            + "Por favor informe ao setor de informática","Falha grave",JOptionPane.ERROR_MESSAGE);
+                                }
+                            }
                         }
                         metrosProduzidos = metAtual - metragemAnterior;
                         metragemAnterior =leituraAtual.getMetragem(); 
@@ -2491,9 +2502,10 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                             System.out.println("falha nos registros");
                             //metrosProduzidos = metAtual - metragemAnterior;
                             falhaRegistro=true;
-                            metTemporaria = (int) metragemAnterior;
-                        }
+                            metTemporaria = (int) metragemAnterior;                                                        
+                        }                        
                         metrosProduzidos = metAtual - metTemporaria;
+                        if(!maqPronta)prd.registraMetragemProducaoTemporaria(metrosProduzidos, codMaquina);
                         metTemporaria=(int)metAtual;
                         System.out.println("Met. Anterior: " + metragemAnterior);
                         System.out.println("Met. Atual: " + leituraAtual.getMetragem());
@@ -2692,9 +2704,10 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 if(!maqPronta){
                     displaySingleMetragemCarretel.setValue(displaySingleMetragemCarretel.getValue() + metrosProduzidos);
                 }else{
-                    displaySingleMetragemCarretel.setValue(prd.getMetragemProduzida());                                        
+                    displaySingleMetragemCarretel.setValue(prd.getMetragemProduzida());
+                    displaySingleMetragemProgramado.setValue(displaySingleMetragemProgramado.getValue() + (metrosProduzidos + metrosAguardando));
                 }    
-                displaySingleMetragemProgramado.setValue(displaySingleMetragemProgramado.getValue() + metrosProduzidos);
+                //displaySingleMetragemProgramado.setValue(displaySingleMetragemProgramado.getValue() + metrosProduzidos);
                 prodPerc = (displaySingleMetragemProgramado.getValue() / prog.getMetragemTotalProgramada()) * 100;
                 if(prodPerc>100){
                     linearProgramacao.setValue(100);            
