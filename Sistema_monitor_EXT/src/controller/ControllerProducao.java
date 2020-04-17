@@ -320,7 +320,7 @@ public class ControllerProducao {
                                                     evt.setMetragemEvento(prod.getMetragemProduzida()); 
                                                     evt.setIdEvento(daoPar.buscarIDEventoAberto(maquina.getCodigo()));
                                                     //ControllerParadasMaquina ctrParadas = new ControllerParadasMaquina(maquina.getCodigo());
-                                                    if(daoPar.RegistrarRetornoEventoMaquina(evt)){
+                                                    if(daoPar.RegistrarRetornoEventoMaquina(evt) || evt.getIdEvento()==0){
                                                     //if(ctrParadas.registraRetornoParadamaquina(prod.getMetragemProduzida(),maquina.getCodigo())){
                                                         if(dao.registrarApontamentosMaquinaEvento(this.codPesagem,maquina.getCodigo())){
                                                             evt.setMetragemEvento(0);

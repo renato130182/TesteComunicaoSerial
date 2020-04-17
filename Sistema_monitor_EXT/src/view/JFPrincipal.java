@@ -424,7 +424,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         jTextField1.setText("jTextField1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("Sistema Condumig Extrusoras");
+        setTitle("Sistema Condumig Extrusoras 15042020");
         setExtendedState(JFPrincipal.MAXIMIZED_BOTH);
         setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         setName("framePrincipal"); // NOI18N
@@ -1865,7 +1865,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
 
     private void jButtonRegistrarParadaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRegistrarParadaActionPerformed
         // TODO add your handling code here:        
-        try {                    
+        try {                
+            if(!verificaMontagemMaquina())return;
              if(!maqParada){ //retornar apos testes
             //if(maqParada){ //remover ampos testes
                 if(jTableMotivosParada.getRowCount()>0){
@@ -2169,7 +2170,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             this.prod = ctrProd.buscaDadosMaquinaProducao(codMaquina);            
             if(prod != null){
                 if(prod.getCarretelSaida().trim().equals("")){
-                    String carretelSaida = JOptionPane.showInputDialog(rootPane,"Carretel de Entrada","Por favor digite o numero do carretel de entrada",JOptionPane.QUESTION_MESSAGE);
+                    String carretelSaida = JOptionPane.showInputDialog(rootPane,"Carretel de Saida","Por favor digite o numero do carretel de entrada",JOptionPane.QUESTION_MESSAGE);
                     System.out.println(carretelSaida);
                     if(carretelSaida!=null){
                         if(!carretelSaida.trim().equals("")){
@@ -2483,16 +2484,16 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                         if(falhaRegistro){     
                             metrosAguardando = (long)(metAtual-metragemAnterior);
                             falhaRegistro=false;
-                            metragemAnterior=metTemporaria;                       
-                            
+                            metragemAnterior=metTemporaria;                                                   
                             if(metProdTmp!=0){
-                                if(prd.atualizaMetragemProduzida(listaPesagens, (metProdTmp - (metAtual - metragemAnterior)), codMaquina,maqPronta)){
-                                    prd.limparRegistroProducaoTemporaria(codMaquina);
+                                if(prd.atualizaMetragemProduzida(listaPesagens, (metProdTmp - (metAtual - metragemAnterior)), codMaquina,maqPronta)){                                    
+                                    metProdTmp=0;
                                 }else{
                                     JOptionPane.showMessageDialog(rootPane,"Falha ao limpar registros de produção de metragem temporaria \n"
                                             + "Por favor informe ao setor de informática","Falha grave",JOptionPane.ERROR_MESSAGE);
-                                }
+                                }                               
                             }
+                            prd.limparRegistroProducaoTemporaria(codMaquina);
                         }
                         metrosProduzidos = metAtual - metragemAnterior;
                         metragemAnterior =leituraAtual.getMetragem(); 
@@ -3086,4 +3087,28 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             erro.gravaErro(e);
         }
     }        
+
+    private boolean verificaMontagemMaquina() {
+        try {
+            ControllerProducao ctrProd = new ControllerProducao();
+            this.prod = ctrProd.buscaDadosMaquinaProducao(codMaquina); 
+            ProgramacaoMaquinaDAO daoProg = new ProgramacaoMaquinaDAO();
+            prog = daoProg.buscaProgramacaoLoteItem(prod.getLoteProducao(),prod.getItemProducao());
+            double metMinima = prog.getQuantidadeProgramada()*0.9;
+            if(prog.getQuantidadeProduzida()==prog.getQuantidadeProgramada()
+                    || prod.getMetragemProduzida()>= metMinima){
+                Object[] options = { "Sim", "Não" };             
+                int i = JOptionPane.showOptionDialog(rootPane,"A programação para esta maquina esta completa \n"
+                        + "Deseja continuar a produção da OS: " + prog.getLoteproducao() + "?",
+                        "*****ATENÇÃO*****",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE,null,options,options[0]);                        
+                return i==JOptionPane.YES_OPTION;                                       
+            }else{
+                return true;
+            }                                            
+        } catch (Exception e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return false;
+    }
 }                                 
