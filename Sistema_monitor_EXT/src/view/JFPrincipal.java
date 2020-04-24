@@ -2224,6 +2224,9 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                     ProdutoMaquinaDAO daoProdMaq = new ProdutoMaquinaDAO();
                     prodmaq = daoProdMaq.buscaVelocidadeProdutoMaquina(prod.getItemProducao(), codMaquina);
                     prodCar = daoProdCar.buscaDadosProdutoCarretel(prod.getItemProducao(),prod.getCarretelSaida(),codMaquina);
+                    if(prodCar.getCarretel().getDescricao().endsWith("Sem descrição")){
+                        JOptionPane.showMessageDialog(rootPane,"");
+                    }
                     jLabelProducaoVelIdeal.setText(String.valueOf(prodmaq.getVelocidade())+ " " + prodmaq.getUnidade());
                     buscarRegistrosObservacaoPesagem();                    
                     return true;
@@ -2730,6 +2733,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 atualiMostradorParadaEntrada();                
             }
         } catch (Exception e) {
+            e.printStackTrace();
             erro.gravaErro(e);
         }
     }
@@ -3092,23 +3096,29 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         try {
             ControllerProducao ctrProd = new ControllerProducao();
             this.prod = ctrProd.buscaDadosMaquinaProducao(codMaquina); 
+            long metApontada = (long)ctrProd.buscaMetragemProduzida(prod.getLoteProducao(),prod.getItemProducao());
             ProgramacaoMaquinaDAO daoProg = new ProgramacaoMaquinaDAO();
             prog = daoProg.buscaProgramacaoLoteItem(prod.getLoteProducao(),prod.getItemProducao());
-            double metMinima = prog.getQuantidadeProgramada()*0.9;
+            double metMinima = prog.getMetragemTotalProgramada()*0.9;
             if(prog.getQuantidadeProduzida()==prog.getQuantidadeProgramada()
-                    || prod.getMetragemProduzida()>= metMinima){
+                    || (prod.getMetragemProduzida()+ metApontada) >= metMinima){
                 Object[] options = { "Sim", "Não" };             
-                int i = JOptionPane.showOptionDialog(rootPane,"A programação para esta maquina esta completa \n"
-                        + "Deseja continuar a produção da OS: " + prog.getLoteproducao() + "?",
+                int i = JOptionPane.showOptionDialog(rootPane,"A programação de produção para esta maquina esta completa. \n "
+                        + "Quantidade de carreteis PROGRAMADA: " + prog.getQuantidadeProgramada()+" \n"
+                        + "Quantidade de carreteis PRODUZIDA: " + prog.getQuantidadeProduzida() +" \n"
+                        + "Metragem PROGRAMADA: "+prog.getMetragemTotalProgramada()+ "\n"
+                        + "Metragem PRODUZIDA: " + (prod.getMetragemProduzida()+ metApontada)+ "\n"
+                        + "Deseja continuar a produção da OS: " + prog.getLoteproducao() + " - "
+                        + prog.getProduto().getDescricao(),
                         "*****ATENÇÃO*****",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE,null,options,options[0]);                        
                 return i==JOptionPane.YES_OPTION;                                       
             }else{
                 return true;
             }                                            
-        } catch (Exception e) {
+        } catch (HeadlessException e) {
             e.printStackTrace();
             erro.gravaErro(e);
         }
         return false;
     }
-}                                 
+}
