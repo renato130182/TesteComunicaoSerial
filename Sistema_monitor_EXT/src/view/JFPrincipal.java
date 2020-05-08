@@ -424,7 +424,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         jTextField1.setText("jTextField1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("Sistema Condumig Extrusoras 15042020");
+        setTitle("Sistema Condumig Extrusoras 29042020");
         setExtendedState(JFPrincipal.MAXIMIZED_BOTH);
         setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         setName("framePrincipal"); // NOI18N
@@ -1960,7 +1960,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private void bloquearMenu(){
         menuParadas.setEnabled(false);
         menuProducao.setEnabled(false);
-        jMenuItemDesligar.setVisible(false);
+        //jMenuItemDesligar.setVisible(false);
         //menuProgramacao.setEnabled(false ); 
         if(login.getNome().trim().equals("")){
             menuConfiguracoes.setEnabled(false);
@@ -2225,7 +2225,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                     prodmaq = daoProdMaq.buscaVelocidadeProdutoMaquina(prod.getItemProducao(), codMaquina);
                     prodCar = daoProdCar.buscaDadosProdutoCarretel(prod.getItemProducao(),prod.getCarretelSaida(),codMaquina);
                     if(prodCar.getCarretel().getDescricao().endsWith("Sem descrição")){
-                        JOptionPane.showMessageDialog(rootPane,"");
+                        JOptionPane.showMessageDialog(rootPane,"Falha ao buscar o PRODUTO METRAGEM para o carretel utilizado. \n"
+                                + "Por favor informe ao setor de engenharia de produção","Produto Metragem",JOptionPane.ERROR_MESSAGE);
                     }
                     jLabelProducaoVelIdeal.setText(String.valueOf(prodmaq.getVelocidade())+ " " + prodmaq.getUnidade());
                     buscarRegistrosObservacaoPesagem();                    
