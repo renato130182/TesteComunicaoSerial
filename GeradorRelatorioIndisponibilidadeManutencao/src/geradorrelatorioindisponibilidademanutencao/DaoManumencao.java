@@ -31,9 +31,7 @@ public class DaoManumencao {
         List<Manutencao> manutencao = new ArrayList<>();
          try {
             sql = "SELECT CodObjeto,CodOrdClb,CodTipTrb,DatFimClb,DatIniClb "
-                    + "FROM Calibra where  not IsNull(Calibra.CodOrdClb) And "
-                    + "(Left(CodTipTrb,2)='A1' or  Left(CodTipTrb,2)='A2') or "
-                    + "(Left(CodTipTrb,2)='C1' or Left(CodTipTrb,2)='B2')";
+                    + "FROM Calibra where  not IsNull(Calibra.CodOrdClb)";
             PreparedStatement st = conec.prepareStatement(sql);                       
             ResultSet res = st.executeQuery();
             while(res.next()){
@@ -166,8 +164,22 @@ public class DaoManumencao {
         }
         return false;
     }
-    
-    
-    
 
+    public List<Time> buscaTurnoUTL() {
+     List<Time> horario = new ArrayList<>();
+        try {
+            sql = "select entrada,saida from condumigproducao.turno t " +
+                "where codigo = '014'";
+            PreparedStatement st = conec.prepareStatement(sql);      
+            ResultSet res = st.executeQuery();
+            if(res.next()){
+                horario.add(new Time(res.getTime("entrada").getTime()));
+                horario.add(new Time(res.getTime("saida").getTime()));                
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Falha ao buscar turno de utilidades COD:014");
+        }
+        return horario;
+    }            
 }

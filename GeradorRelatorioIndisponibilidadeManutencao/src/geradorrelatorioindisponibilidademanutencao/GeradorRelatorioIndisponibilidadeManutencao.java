@@ -60,8 +60,11 @@ public class GeradorRelatorioIndisponibilidadeManutencao {
                 listaManutPrev = listarManutencaoPreventiva(listaManut);
                 List<Manutencao> listaManutCor = new ArrayList<>();
                 listaManutCor = listarManutencaoCorretivas(listaManut);
-                listaManutPrev = calcularTempoManutencao(listaManutPrev);
-                listaManutCor = calcularTempoManutencao(listaManutCor);
+                List<Manutencao> listaManutUtl = new ArrayList<>();
+                listaManutUtl = listarManutençõesUTL(listaManut);
+                listaManutPrev = calcularTempoManutencao(listaManutPrev,true);
+                listaManutCor = calcularTempoManutencao(listaManutCor,true);
+                listaManutUtl = calcularTempoManutencao(listaManutUtl,false);
                 Connection conMysql = ConexaoMysql.obterConexao();
                 DaoManumencao dao = new DaoManumencao(conMysql);
                 if(dao.registrarListaManut(listaManutCor,"man_corretiva")){
@@ -73,6 +76,11 @@ public class GeradorRelatorioIndisponibilidadeManutencao {
                     System.out.println("Manutenções preventivas cadastradas com sucesso!!");
                 }else{
                     System.out.println("Falha ao cadastrar manutenções preventivas!!");
+                }
+                if(dao.registrarListaManut(listaManutUtl,"man_utilidades")){
+                    System.out.println("Manutenções cadastradas com sucesso!!");
+                }else{
+                    System.out.println("Falha ao cadastrar manutenções corretivas!!");
                 }
                 Thread.sleep(2000);
             }else{
@@ -89,9 +97,11 @@ public class GeradorRelatorioIndisponibilidadeManutencao {
         List<Manutencao> listaManutPrev = new ArrayList<>();
         try {
             for(int i=0;i<listaManut.size();i++){
-                if(listaManut.get(i).getCodTipTrb().substring(0,2).equalsIgnoreCase("A1") ||
-                        listaManut.get(i).getCodTipTrb().substring(0,2).equalsIgnoreCase("A2")){
-                    listaManutPrev.add(listaManut.get(i));
+                if(listaManut.get(i).getCodTipTrb().length()>1){
+                    if(listaManut.get(i).getCodTipTrb().substring(0,2).equalsIgnoreCase("A1") ||
+                            listaManut.get(i).getCodTipTrb().substring(0,2).equalsIgnoreCase("A2")){
+                        listaManutPrev.add(listaManut.get(i));
+                    }
                 }
             }
         } catch (Exception e) {
@@ -104,9 +114,11 @@ public class GeradorRelatorioIndisponibilidadeManutencao {
         List<Manutencao> listaManutCor = new ArrayList<>();
         try {
             for (int i=0;i<listaManut.size();i++){
-                if(listaManut.get(i).getCodTipTrb().substring(0,2).equalsIgnoreCase("C1") ||
-                        listaManut.get(i).getCodTipTrb().substring(0,2).equalsIgnoreCase("B2")){
-                    listaManutCor.add(listaManut.get(i));
+                if(listaManut.get(i).getCodTipTrb().length()>1){
+                    if(listaManut.get(i).getCodTipTrb().substring(0,2).equalsIgnoreCase("C1") ||
+                            listaManut.get(i).getCodTipTrb().substring(0,2).equalsIgnoreCase("B2")){
+                        listaManutCor.add(listaManut.get(i));
+                    }
                 }
             }
         } catch (Exception e) {
@@ -115,14 +127,14 @@ public class GeradorRelatorioIndisponibilidadeManutencao {
         return listaManutCor;
     }
 
-    private static List<Manutencao> calcularTempoManutencao(List<Manutencao> lista)  {
+    private static List<Manutencao> calcularTempoManutencao(List<Manutencao> lista, boolean maqProd)  {
         List<Manutencao> listaManut = new ArrayList<>();
         try {
             Connection conn = ConexaoMysql.obterConexao();
             DaoManumencao dao = new DaoManumencao(conn);
             try {
                 for (int i=0;i<lista.size();i++){
-                    if(dao.validaMaquinaProducao(lista.get(i).getCodObjeto())){
+                    //if(dao.validaMaquinaProducao(lista.get(i).getCodObjeto())){
                         if(lista.get(i).getDatFimClb().equals(lista.get(i).getDatIniClb())){
                             System.out.println("Manutenção Intra Day");
                             long tempo = lista.get(i).getHoraFim().getTime()- lista.get(i).getHoraInicio().getTime();
@@ -134,8 +146,12 @@ public class GeradorRelatorioIndisponibilidadeManutencao {
                             List<Time> horario = new ArrayList<>();
                             long dias = intervaloDeDias(lista.get(i).getDatIniClb(),lista.get(i).getDatFimClb());
                             if(dias>1){
-                                horario = dao.buscaHorarioTurno(lista.get(i).getDatIniClb(),
-                                        lista.get(i).getCodObjeto());
+                                if(maqProd){
+                                    horario = dao.buscaHorarioTurno(lista.get(i).getDatIniClb(),
+                                            lista.get(i).getCodObjeto());
+                                }else{
+                                    horario = dao.buscaTurnoUTL();
+                                }
                                 if(horario.size()>0){
                                     listaManut.add(setarDadosManutencao(lista.get(i),lista.get(i).getHoraFim(),
                                             horario.get(1),lista.get(i).getDatIniClb()));
@@ -152,9 +168,12 @@ public class GeradorRelatorioIndisponibilidadeManutencao {
                                             lista.get(i).getHoraFim(),lista.get(i).getDatFimClb()));                                
                                 }
                             }else{
-                                
-                                horario = dao.buscaHorarioTurno(lista.get(i).getDatIniClb(),
-                                        lista.get(i).getCodObjeto());
+                                if(maqProd){
+                                    horario = dao.buscaHorarioTurno(lista.get(i).getDatIniClb(),
+                                            lista.get(i).getCodObjeto());
+                                }else{
+                                    horario = dao.buscaTurnoUTL();
+                                }
                                 if(horario.size()>0){
                                     System.out.println("CodOrd: " + lista.get(i).getCodOrdClb());                                    
                                     listaManut.add(setarDadosManutencao(lista.get(i),lista.get(i).getHoraFim(),
@@ -165,7 +184,7 @@ public class GeradorRelatorioIndisponibilidadeManutencao {
                                 }                            
                             }
                         }
-                    }
+                    //}
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -208,4 +227,24 @@ public class GeradorRelatorioIndisponibilidadeManutencao {
         }
         return 0;
     }    
+
+    private static List<Manutencao> listarManutençõesUTL(List<Manutencao> listaManut) {
+        List<Manutencao> listaManutUTL = new ArrayList<>();
+        try {
+            for(int i=0;i<listaManut.size();i++){
+                if(listaManut.get(i).getCodTipTrb().length()>1){
+                    if(!listaManut.get(i).getCodTipTrb().substring(0,2).equalsIgnoreCase("A1") &&
+                            !listaManut.get(i).getCodTipTrb().substring(0,2).equalsIgnoreCase("A2")){
+                        if(!listaManut.get(i).getCodTipTrb().substring(0,2).equalsIgnoreCase("C1") &&
+                            !listaManut.get(i).getCodTipTrb().substring(0,2).equalsIgnoreCase("B2")){
+                        listaManutUTL.add(listaManut.get(i));
+                    }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+       return listaManutUTL;    
+    }
 }
