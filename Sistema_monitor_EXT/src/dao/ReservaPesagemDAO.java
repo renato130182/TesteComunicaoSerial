@@ -49,6 +49,7 @@ public class ReservaPesagemDAO {
                     + "FROM condumigproducao.reservamaquina res "
                     + "Inner join condumigproducao.pesagem pes on pes.codigo = res.pesagem "
                     + "Inner join condumigproducao.item it on it.codigo = pes.codigoitem where res.codigomaquina = ? ;";
+            System.out.println(sql);
             PreparedStatement st = conec.prepareStatement(sql);
             st.setString(1, codMaquina);
             st.setString(2, codMaquina);

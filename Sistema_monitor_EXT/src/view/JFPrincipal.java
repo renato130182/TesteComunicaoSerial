@@ -68,7 +68,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private boolean evtRegistrado = true;
     private boolean iniciaLeituras = true;
     private int resumoRelatorio,linhas=14;
-    private int eventosTimer,qtdEvt=10;
+    private int eventosTimer,qtdEvt=30;
     private List<String> metrosAlerta = new ArrayList<>();
     private boolean evtCarSaida,evtMetProg,evtCarEnt,evtSaldoEnt1,evtSaldoEnt2;
     private boolean evtDiaMin,evtDiaMax;
@@ -132,9 +132,9 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                         }else{
                             if(ControllerUtil.bancoRespondendo()){
                                 eventosTimer++;
-                                qtdEvt = 10;
-                            }else{
                                 qtdEvt = 30;
+                            }else{
+                                qtdEvt = 60;
                             }
                             System.out.println("Enventos timer" + String.valueOf(eventosTimer));
                         }
@@ -424,7 +424,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         jTextField1.setText("jTextField1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("Sistema Condumig Extrusoras 29042020");
+        setTitle("Sistema Condumig Extrusoras 14052020");
         setExtendedState(JFPrincipal.MAXIMIZED_BOTH);
         setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         setName("framePrincipal"); // NOI18N

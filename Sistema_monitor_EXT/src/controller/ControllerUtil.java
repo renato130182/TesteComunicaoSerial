@@ -15,6 +15,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.sql.Connection;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
@@ -71,7 +72,7 @@ public final class ControllerUtil {
             Date dataHoraFinal = sdf.parse(dataFim);
             long tempo = dataHoraFinal.getTime()-dataHoraInicial.getTime();
             return (int) (tempo/1000);            
-        } catch (Exception e) {
+        } catch (ParseException e) {
             LogErro erro = new LogErro();
             erro.gravaErro(e);
             return 0;

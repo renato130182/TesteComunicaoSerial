@@ -205,20 +205,42 @@ public class ParadasMaquinaDAO {
     public List<EventoMaquina> buscaTempoMetragemEventosApontamento(String codMaquina){
         try {
             List<EventoMaquina> evt = new ArrayList<>();
-             sql = "SELECT * FROM bd_sistema_monitor.tb_maquina_evento where id not in "
-                     + "(select id from bd_sistema_monitor.tb_maquina_evento_apontamento) and cod_maquina = ?;";
-                PreparedStatement st = conec.prepareStatement(sql);
-                st.setString(1, codMaquina);
-                ResultSet res = st.executeQuery();
-                while(res.next()){
-                    EventoMaquina tmp =  new EventoMaquina();
-                    tmp.setDataHoraInicio(res.getString("data_hora_inicio"));
-                    tmp.setMetragemEvento(res.getLong("metragem_evento"));
-                    tmp.setDataHoraFinal(res.getString("data_hora_final"));
-                    tmp.setMetragemRetorno(res.getLong("metragem_retorno"));
-                    evt.add(tmp);
-                }
-                return evt;
+            sql = "SELECT * FROM bd_sistema_monitor.tb_maquina_evento where id in (" +
+                "SELECT id_maquina_evento FROM bd_sistema_monitor.tb_maquina_evento_parada where id not in (" +
+                "select id_maquina_evento_parada from bd_sistema_monitor.tb_maquina_evento_apontamento)) and cod_maquina = ?;";
+            PreparedStatement st = conec.prepareStatement(sql);
+            st.setString(1, codMaquina);
+            ResultSet res = st.executeQuery();
+            while(res.next()){
+                EventoMaquina tmp =  new EventoMaquina();
+                tmp.setDataHoraInicio(res.getString("data_hora_inicio"));
+                tmp.setMetragemEvento(res.getLong("metragem_evento"));
+                tmp.setDataHoraFinal(res.getString("data_hora_final"));
+                tmp.setMetragemRetorno(res.getLong("metragem_retorno"));
+                evt.add(tmp);
+            }
+            evt.add(buscadadosUltimoEventoMaquina(codMaquina));
+            return evt;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return null;
+    }
+    private EventoMaquina buscadadosUltimoEventoMaquina(String codMaquina) {
+        try {
+            sql = "SELECT * FROM bd_sistema_monitor.tb_maquina_evento where cod_maquina = ? order by id desc limit 1";
+            PreparedStatement st = conec.prepareStatement(sql);
+            st.setString(1, codMaquina);
+            ResultSet res = st.executeQuery();
+            if(res.next()){
+                EventoMaquina tmp =  new EventoMaquina();
+                tmp.setDataHoraInicio(res.getString("data_hora_inicio"));
+                tmp.setMetragemEvento(res.getLong("metragem_evento"));
+                tmp.setDataHoraFinal(res.getString("data_hora_final"));
+                tmp.setMetragemRetorno(res.getLong("metragem_retorno"));
+                return tmp;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             erro.gravaErro(e);
@@ -252,4 +274,5 @@ public class ParadasMaquinaDAO {
         }
         return null;
     }    
+    
 }
