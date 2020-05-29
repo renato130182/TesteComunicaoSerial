@@ -227,8 +227,11 @@ public class ProducaoDAO {
     public String[] buscaDataHoraFimProducao(String codMaquina) {
         try {
             sql = "SELECT data_hora_inicio as dataFimProducao FROM bd_sistema_monitor.tb_maquina_evento "
-                    + "where id not in (select id from bd_sistema_monitor.tb_maquina_evento_apontamento) "
-                    + "and cod_maquina = ? order by id desc limit 1;";
+                    + "evt where evt.id not in (SELECT id_maquina_evento "
+                    + "FROM bd_sistema_monitor.tb_maquina_evento_parada par "
+                    + "where par.id in(SELECT id_maquina_evento_parada FROM "
+                    + "bd_sistema_monitor.tb_maquina_evento_apontamento)) and "
+                    + "evt.cod_maquina = ? order by evt.id desc limit 1;";
             PreparedStatement st = this.conec.prepareStatement(sql);
             st.setString(1, codMaquina);            
             ResultSet res = st.executeQuery();

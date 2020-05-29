@@ -19,6 +19,7 @@ import controller.ControllerReservaMaquina;
 import controller.ControllerUtil;
 import controller.LogErro;
 import controller.Login;
+import dao.ConexaoDatabase;
 import dao.DadosDefaultDAO;
 import dao.MaquinaDAO;
 import dao.PesagemDAO;
@@ -416,6 +417,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         jMenuItemParadas = new javax.swing.JMenuItem();
         menuProducao = new javax.swing.JMenu();
         jMenuItemProducao = new javax.swing.JMenuItem();
+        jMenuAjusteMetragem = new javax.swing.JMenuItem();
         menuConfiguracoes = new javax.swing.JMenu();
         jMenuConfigDefault = new javax.swing.JMenuItem();
         jMenuTrocarMaquina = new javax.swing.JMenuItem();
@@ -424,7 +426,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         jTextField1.setText("jTextField1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("Sistema Condumig Extrusoras 14052020");
+        setTitle("Sistema Condumig Extrusoras 26052020");
         setExtendedState(JFPrincipal.MAXIMIZED_BOTH);
         setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         setName("framePrincipal"); // NOI18N
@@ -1514,6 +1516,16 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         });
         menuProducao.add(jMenuItemProducao);
 
+        jMenuAjusteMetragem.setText("Ajustar Metragem");
+        jMenuAjusteMetragem.setToolTipText("Ajuste de metragem produzida com a maquina em funcionamento.");
+        jMenuAjusteMetragem.setActionCommand("JMenuAjusteMetragem");
+        jMenuAjusteMetragem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuAjusteMetragemActionPerformed(evt);
+            }
+        });
+        menuProducao.add(jMenuAjusteMetragem);
+
         menuPrincipal.add(menuProducao);
 
         menuConfiguracoes.setText("Configurações");
@@ -1909,6 +1921,12 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         }
     }//GEN-LAST:event_jPasswordFieldCartaoKeyPressed
 
+    private void jMenuAjusteMetragemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuAjusteMetragemActionPerformed
+        JFDAjusteMetragemProducao ajuste = new JFDAjusteMetragemProducao(this,false,listaPesagens,codMaquina,maqPronta,jLabelProducaoOF.getText());
+        ajuste.setVisible(true);
+        abrirTelaProducao();
+    }//GEN-LAST:event_jMenuAjusteMetragemActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -2047,6 +2065,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JLabel jLabelProducaoQtdProd;
     private javax.swing.JLabel jLabelProducaoQtdProg;
     private javax.swing.JLabel jLabelProducaoVelIdeal;
+    private javax.swing.JMenuItem jMenuAjusteMetragem;
     private javax.swing.JMenuItem jMenuConfigDefault;
     private javax.swing.JMenuItem jMenuConfigSerialRFID;
     private javax.swing.JMenuItem jMenuItemDesligar;
@@ -2335,7 +2354,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             login.setNivel("");
             login.setSenha("");
             login.setCode("");
-            if(false) limparTelaLogin(); //apenas para teste, passar para true em producao
+            if(ConexaoDatabase.AMBPROD) limparTelaLogin(); //apenas para teste, passar para true em producao
             bloquearMenu();            
             //if(parametrizarSerial(SERIAL_RFID)){
            //    if(comRFID.iniciaSerial()){
@@ -2553,7 +2572,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 iniciarLeiturasSerial(dados);
             }
             
-        } catch (Exception e) {
+        } catch (HeadlessException e) {
             erro.gravaErro(e);
         }
     }

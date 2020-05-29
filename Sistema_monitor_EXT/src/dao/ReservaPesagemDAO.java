@@ -42,7 +42,7 @@ public class ReservaPesagemDAO {
                     + "left join condumigproducao.item itemEntrada on pesEntrada.codigoitem = itemEntrada.codigo "
                     + "left join condumigproducao.item itemSaida on pesSaida.codigoitem = itemSaida.codigo "
                     + "where evt.cod_maquina = ? and evt.id not in "
-                    + "(select id_maquina_evento_parada from bd_sistema_monitor.tb_maquina_evento_apontamento) "
+                    + "(SELECT id_maquina_evento FROM bd_sistema_monitor.tb_maquina_evento_parada par where par.id in(SELECT id_maquina_evento_parada FROM bd_sistema_monitor.tb_maquina_evento_apontamento)) "
                     + "union SELECT pes.codigoitem as itemReserva,it.descricao,pes.loteproduzido as loteReserva,"
                     + "pes.codigoembalagem,pes.codigo as idMatPRima,"
                     + "(SELECT met_produzida FROM bd_sistema_monitor.tb_maquina_producao where cod_maq = ?), pes.qtosfios,'','','' "

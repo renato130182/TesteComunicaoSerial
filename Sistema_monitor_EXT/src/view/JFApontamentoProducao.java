@@ -97,6 +97,7 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
         jLabelLote = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabelMetragem = new javax.swing.JLabel();
+        jTBSomarPuxador = new javax.swing.JToggleButton();
         jPanelCarretelSaida = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
         jLabelCodEmb = new javax.swing.JLabel();
@@ -188,6 +189,9 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
         jLabelMetragem.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabelMetragem.setText("jLabelMetragem");
 
+        jTBSomarPuxador.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jTBSomarPuxador.setText("Somar Puxador na metragem");
+
         javax.swing.GroupLayout jPanelItemProduzidoLayout = new javax.swing.GroupLayout(jPanelItemProduzido);
         jPanelItemProduzido.setLayout(jPanelItemProduzidoLayout);
         jPanelItemProduzidoLayout.setHorizontalGroup(
@@ -203,7 +207,7 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
                         .addComponent(jLabel6)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabelMetragem)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanelItemProduzidoLayout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -211,7 +215,10 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabelDescricao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addComponent(jLabelDescricao, javax.swing.GroupLayout.DEFAULT_SIZE, 386, Short.MAX_VALUE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jTBSomarPuxador, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         jPanelItemProduzidoLayout.setVerticalGroup(
             jPanelItemProduzidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -226,7 +233,9 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
                     .addComponent(jLabel4)
                     .addComponent(jLabelLote)
                     .addComponent(jLabel6)
-                    .addComponent(jLabelMetragem)))
+                    .addComponent(jLabelMetragem))
+                .addGap(0, 9, Short.MAX_VALUE))
+            .addComponent(jTBSomarPuxador, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         jPanelCarretelSaida.setBorder(javax.swing.BorderFactory.createTitledBorder("Carretel de saida:"));
@@ -477,7 +486,7 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanelAcoes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(153, Short.MAX_VALUE))
+                .addContainerGap(144, Short.MAX_VALUE))
         );
 
         jScrollPane1.setViewportView(jPanelRoot);
@@ -499,6 +508,9 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
     private void jButtonApontarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonApontarActionPerformed
         // TODO add your handling code here:
         ControllerProducao ctr = new ControllerProducao();
+        if(jTBSomarPuxador.isSelected()){
+            prod.setMetragemProduzida(prod.getMetragemProduzida()+50);
+        }
         if(ctr.registrarApontamentoPesagem(prod, perdaEstimada, usr, maquina, prog, jTextPane1.getText(),
                 reservaPesagem,paradasProcesso,compCobre,login)){
             JOptionPane.showMessageDialog(rootPane,"Registro de apontamento realizado com sucesso!","Registro de produção",JOptionPane.INFORMATION_MESSAGE);
@@ -562,6 +574,7 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JToggleButton jTBSomarPuxador;
     private javax.swing.JTable jTableConsumoMP;
     private javax.swing.JTable jTableHistoricoOperador;
     private javax.swing.JTable jTableParadas;

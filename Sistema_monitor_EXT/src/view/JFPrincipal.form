@@ -92,6 +92,16 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItemProducaoActionPerformed"/>
               </Events>
             </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="jMenuAjusteMetragem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Ajustar Metragem"/>
+                <Property name="toolTipText" type="java.lang.String" value="Ajuste de metragem produzida com a maquina em funcionamento."/>
+                <Property name="actionCommand" type="java.lang.String" value="JMenuAjusteMetragem"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuAjusteMetragemActionPerformed"/>
+              </Events>
+            </MenuItem>
           </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="menuConfiguracoes">
@@ -130,7 +140,7 @@
   </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="0"/>
-    <Property name="title" type="java.lang.String" value="Sistema Condumig Extrusoras 14052020"/>
+    <Property name="title" type="java.lang.String" value="Sistema Condumig Extrusoras 26052020"/>
     <Property name="extendedState" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
       <Connection code="JFPrincipal.MAXIMIZED_BOTH" type="code"/>
     </Property>
