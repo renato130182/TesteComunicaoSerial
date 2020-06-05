@@ -426,7 +426,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         jTextField1.setText("jTextField1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("Sistema Condumig Extrusoras 26052020");
+        setTitle("Sistema Condumig Extrusoras 05062020");
         setExtendedState(JFPrincipal.MAXIMIZED_BOTH);
         setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         setName("framePrincipal"); // NOI18N
