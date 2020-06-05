@@ -23,7 +23,7 @@ public class PesagemDAO {
     LogErro erro = new LogErro();
     
     public List<Pesagem> buscapesagensMontagem(String codMaquina){
-        List<Pesagem> lista = new ArrayList<Pesagem>();
+        List<Pesagem> lista = new ArrayList<>();
         ConexaoDatabase db = new ConexaoDatabase();
         if(db.equals(db)){
             try {

@@ -2405,10 +2405,11 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private void buscarRegistrosObservacaoPesagem() {
         try {                    
             String dado[];        
+            
+            ControllerProducao ctr = new ControllerProducao();            
             PesagemDAO daoPes = new PesagemDAO();
-            ControllerProducao ctr = new ControllerProducao();
-            listaPesagens = daoPes.buscapesagensMontagem(codMaquina);
-            if(listaPesagens != null){
+            listaPesagens = daoPes.buscapesagensMontagem(codMaquina);            
+            if(!listaPesagens.isEmpty()){
                 DefaultTableModel modelo = (DefaultTableModel)jTableProducaoArrebentamentos.getModel();
                 for(int i=0;i<listaPesagens.size();i++){
                     ctr.AddicionarMetragensObservacao(listaPesagens.get(i).getObservacao(),listaPesagens.get(i).getMetragemOperador(),listaPesagens.get(i).getCodEmbalagem());
@@ -2965,7 +2966,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             ControllerEventosSistema ctr = new ControllerEventosSistema();
             preParadas = ctr.BuscaPreApontamentos(codMaquina);
             if(preParadas!=null){
-                if(!verificaParadasInteracaoOperador(preParadas))verificaParadasInteracaoOperador(preParadas);
+                //Removida põs estva caisando confusão no operador
+                //if(!verificaParadasInteracaoOperador(preParadas))verificaParadasInteracaoOperador(preParadas);
                 if(preParadas!=null){
                     DefaultTableModel modelo = (DefaultTableModel)jTableMotivosParada.getModel();
                     for (int i=0;i<preParadas.size();i++){   
@@ -2982,7 +2984,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             erro.gravaErro(e);
         }
     }
-
+    /*
+    * Removido por causar confusão nos operadores    
     private boolean verificaParadasInteracaoOperador(List<Paradas> preParadas) {          
         for (int i=0;i<preParadas.size();i++){
             if(preParadas.get(i).getCodigo()==1){
@@ -3035,7 +3038,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         }
         return true;
     }
-
+    */
     private void gerenciarColetorAmostraDiametro(double metrosProduzidos,int velocidade) {
         try {
             if(metrosRelatorio<=maquina.getMetrosAmostraDiametro()){
@@ -3113,7 +3116,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     }        
 
     private boolean verificaMontagemMaquina() {
-        try {
+        try {           
             ControllerProducao ctrProd = new ControllerProducao();
             this.prod = ctrProd.buscaDadosMaquinaProducao(codMaquina); 
             long metApontada = (long)ctrProd.buscaMetragemProduzida(prod.getLoteProducao(),prod.getItemProducao());
@@ -3131,14 +3134,16 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                         + "Deseja continuar a produção da OS: " + prog.getLoteproducao() + " - "
                         + prog.getProduto().getDescricao(),
                         "*****ATENÇÃO*****",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE,null,options,options[0]);                        
-                return i==JOptionPane.YES_OPTION;                                       
-            }else{
-                return true;
-            }                                            
+                if(i!=JOptionPane.YES_OPTION){                   
+                    return false;
+                }
+            }                                       
         } catch (HeadlessException e) {
             e.printStackTrace();
             erro.gravaErro(e);
         }
-        return false;
+        PesagemDAO daoPes = new PesagemDAO();
+        listaPesagens = daoPes.buscapesagensMontagem(codMaquina);
+        return true;
     }
 }
