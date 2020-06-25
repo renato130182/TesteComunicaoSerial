@@ -60,7 +60,7 @@ import model.Usuario;
 public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     //private static final String SERIAL_RFID = "rfidserial";
     private static final String SERIAL_MICROMETRO = "micrometroserial";
-    private  static String identificador;
+    private static String identificador;
     private static String codMaquina;
     private long tempoSistema = System.currentTimeMillis(); 
     private double[] mediaVel = {0,0,0,0,0,0,0,0,0,0};  
@@ -2502,7 +2502,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                     //metrosProduzidos = metAtual - metAnterior;
                                                             
                     ControllerProducao prd = new ControllerProducao();
-                    if(prd.atualizaMetragemProduzida(listaPesagens, (metAtual - metragemAnterior), codMaquina,maqPronta)){
+                    if(prd.atualizaMetragemProduzida(listaPesagens, (metAtual - metragemAnterior), codMaquina,maqPronta,"+")){
                     System.out.println("Registrada metragem produzida, metragem anterior alterdada: " + (metAtual - metragemAnterior));                        
                         //leituraAnterior = mic.setarDadosMicrometro(dados); 
                         if(falhaRegistro){     
@@ -2510,7 +2510,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                             falhaRegistro=false;
                             metragemAnterior=metTemporaria;                                                   
                             if(metProdTmp!=0){
-                                if(prd.atualizaMetragemProduzida(listaPesagens, (metProdTmp - (metAtual - metragemAnterior)), codMaquina,maqPronta)){                                    
+                                if(prd.atualizaMetragemProduzida(listaPesagens, (metProdTmp - (metAtual - metragemAnterior)), codMaquina,maqPronta,"+")){                                    
                                     metProdTmp=0;
                                 }else{
                                     JOptionPane.showMessageDialog(rootPane,"Falha ao limpar registros de produção de metragem temporaria \n"

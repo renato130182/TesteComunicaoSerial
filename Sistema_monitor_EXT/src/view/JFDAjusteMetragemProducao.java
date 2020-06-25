@@ -86,6 +86,7 @@ public class JFDAjusteMetragemProducao extends javax.swing.JDialog {
         JTFMetragem = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         JTFAutorizacao = new javax.swing.JTextField();
+        jButtonFuncao = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Ajustar Metragem.");
@@ -111,9 +112,22 @@ public class JFDAjusteMetragemProducao extends javax.swing.JDialog {
 
         jLabel2.setText("Autorização:");
 
+        JTFAutorizacao.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                JTFAutorizacaoActionPerformed(evt);
+            }
+        });
         JTFAutorizacao.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 JTFAutorizacaoKeyPressed(evt);
+            }
+        });
+
+        jButtonFuncao.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jButtonFuncao.setText("+");
+        jButtonFuncao.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonFuncaoActionPerformed(evt);
             }
         });
 
@@ -130,28 +144,33 @@ public class JFDAjusteMetragemProducao extends javax.swing.JDialog {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(JTFMetragem, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel2)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(JTFAutorizacao, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 52, Short.MAX_VALUE)))
+                                .addComponent(JTFAutorizacao, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(JTFMetragem, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
+                        .addComponent(jButtonFuncao, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(JTFMetragem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(JTFAutorizacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel1)
+                            .addComponent(JTFMetragem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel2)
+                            .addComponent(JTFAutorizacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jButtonFuncao, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
                 .addComponent(cancelButton)
                 .addContainerGap())
         );
@@ -180,7 +199,7 @@ public class JFDAjusteMetragemProducao extends javax.swing.JDialog {
                 if(login.logarCode(login)){
                     if(login.getNivel().equals("0")){
                         ControllerProducao prd = new ControllerProducao();
-                        if(prd.atualizaMetragemProduzida(listaPesagens,Double.valueOf(JTFMetragem.getText()), codMaquina,maqPronta)){
+                        if(prd.atualizaMetragemProduzida(listaPesagens,Double.valueOf(JTFMetragem.getText()), codMaquina,maqPronta,jButtonFuncao.getText())){
                             System.out.println("Atualizar metragem produzida: " + JTFMetragem.getText());
                             ControllerEventosSistema ctr = new ControllerEventosSistema();
                             ctr.registraEventos(14,login.getCodigoOperador(),0,Integer.valueOf(JTFMetragem.getText()),codMaquina,lote);
@@ -200,6 +219,19 @@ public class JFDAjusteMetragemProducao extends javax.swing.JDialog {
             }            
         }
     }//GEN-LAST:event_JTFAutorizacaoKeyPressed
+
+    private void jButtonFuncaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonFuncaoActionPerformed
+        // TODO add your handling code here:
+        if(jButtonFuncao.getText().equals("+")){
+            jButtonFuncao.setText("-");
+        }else{
+            jButtonFuncao.setText("+");
+        }
+    }//GEN-LAST:event_jButtonFuncaoActionPerformed
+
+    private void JTFAutorizacaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JTFAutorizacaoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_JTFAutorizacaoActionPerformed
     
     private void doClose(int retStatus) {
         returnStatus = retStatus;
@@ -253,6 +285,7 @@ public class JFDAjusteMetragemProducao extends javax.swing.JDialog {
     private javax.swing.JTextField JTFAutorizacao;
     private javax.swing.JTextField JTFMetragem;
     private javax.swing.JButton cancelButton;
+    private javax.swing.JButton jButtonFuncao;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     // End of variables declaration//GEN-END:variables

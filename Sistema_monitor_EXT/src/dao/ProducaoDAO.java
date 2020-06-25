@@ -74,11 +74,11 @@ public class ProducaoDAO {
         return null;
     }
     
-    public boolean atualizaMetragemProduzida (String maquina, String metragem){
+    public boolean atualizaMetragemProduzida (String maquina, String metragem, String sinal){
         
         try {
             sql = "update bd_sistema_monitor.tb_maquina_producao set met_produzida "
-                + "= met_produzida + ? where cod_maq = ?;";                
+                + "= met_produzida "+sinal+" ? where cod_maq = ?;";                
             PreparedStatement st = this.conec.prepareStatement(sql);
             st.setString(1, metragem);
             st.setString(2, maquina);
@@ -91,9 +91,14 @@ public class ProducaoDAO {
         return false;
     }
     
-    public boolean atualizaSaldoConsumoEntrada (String cod_Pesagem, String metragem){        
+    public boolean atualizaSaldoConsumoEntrada (String cod_Pesagem, String metragem, String sinal){        
         try {
-            sql = "update condumigproducao.pesagem set saldoconsumo = (saldoconsumo - ?) where codigo = ?";                
+            if(sinal.equals("+")){
+                sinal = "-";
+            }else{
+                sinal = "+";
+            }                
+            sql = "update condumigproducao.pesagem set saldoconsumo = (saldoconsumo "+sinal+" ?) where codigo = ?";                
             PreparedStatement st = this.conec.prepareStatement(sql);
             st.setString(1, metragem);
             st.setString(2, cod_Pesagem);

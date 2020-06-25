@@ -64,7 +64,7 @@ public class ControllerProducao {
     }
     
     
-    public boolean atualizaMetragemProduzida(List<Pesagem> lista, double metragemProd, String cod_maquina,boolean pronta){
+    public boolean atualizaMetragemProduzida(List<Pesagem> lista, double metragemProd, String cod_maquina,boolean pronta, String sinal){
         try {
             if(!pronta){
                 //registraMetragemProducaoTemporaria(metragemProd, cod_maquina);
@@ -75,9 +75,9 @@ public class ControllerProducao {
                 Connection conec = db.getConnection();
                 if(conec!=null){    
                     ProducaoDAO daoProd = new ProducaoDAO(conec);
-                    if(daoProd.atualizaMetragemProduzida(cod_maquina, String.valueOf(metragemProd))){
+                    if(daoProd.atualizaMetragemProduzida(cod_maquina, String.valueOf(metragemProd),sinal)){
                         for (int i=0;i<lista.size();i++){
-                            if(!daoProd.atualizaSaldoConsumoEntrada(lista.get(i).getCodigo(),String.valueOf(metragemProd))) {
+                            if(!daoProd.atualizaSaldoConsumoEntrada(lista.get(i).getCodigo(),String.valueOf(metragemProd),sinal)) {
                                 db.desconectar();
                                 return false;
                             }
