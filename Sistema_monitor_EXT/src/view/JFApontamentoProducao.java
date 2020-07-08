@@ -585,8 +585,8 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
         try {
             jLabelCodMaquina.setText(this.maquina.getCodigo());
             jLabelMaquina.setText(this.maquina.getDescricao());
-            jLabelCodItem.setText(this.prog.getProduto().getCodigo());
-            jLabelDescricao.setText(this.prog.getProduto().getDescricao());
+            jLabelCodItem.setText(String.valueOf(this.prog.getProduto().item.getCodigo()));
+            jLabelDescricao.setText(this.prog.getProduto().item.getDescricao());
             jLabelLote.setText(this.prog.getLoteproducao());
             jLabelMetragem.setText(String.valueOf(this.prod.getMetragemProduzida()));
             jLabelCodEmb.setText(prodCar.getCarretel().getCodigo());
@@ -640,7 +640,7 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
         try {
             List<Engenharia> engenharia=null;
             ControllerEngenharia ctr = new ControllerEngenharia();
-            engenharia=ctr.buscaListaEngenhariaEmProducao(this.prog.getProduto().getCodigo(), 
+            engenharia=ctr.buscaListaEngenhariaEmProducao(String.valueOf(this.prog.getProduto().item.getCodigo()), 
                     this.maquina.getCodigo(),this.prod.getMetragemProduzida());
             
             for (int i=0;i<engenharia.size();i++){                                                              

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import model.Produto;
 import model.ProgramacaoMaquina;
+import model.Item;
 
 /**
  *
@@ -39,8 +40,8 @@ public class ProgramacaoMaquinaDAO {
                 ResultSet res = st.executeQuery();
                 while(res.next()){
                    ProgramacaoMaquina prog = new ProgramacaoMaquina();
-                   prog.setProduto( new Produto(res.getString("prog.codigoitem"),
-                           res.getString("item.descricao").trim()));
+                   prog.setProduto( new Produto(new Item(res.getLong("prog.codigoitem"),
+                           res.getString("item.descricao").trim())));
                    prog.setLoteproducao(res.getString("prog.loteproducao"));
                    prog.setQuantidadeProgramada(res.getInt("prog.quantloteprogramado"));
                    prog.setMetragemProgramada(res.getLong("prog.metragemprogramada"));
@@ -57,7 +58,7 @@ public class ProgramacaoMaquinaDAO {
         }
         return null;
     }
-    public ProgramacaoMaquina buscaProgramacaoLoteItem (String lote, String item){
+    public ProgramacaoMaquina buscaProgramacaoLoteItem (String lote, Long item){
         ConexaoDatabase db = new ConexaoDatabase();
         try {            
             if(db.equals(db)){
@@ -74,9 +75,9 @@ public class ProgramacaoMaquinaDAO {
                     java.sql.Connection conec = db.getConnection();
                     PreparedStatement st = conec.prepareStatement(sql);
                     st.setString(1, lote);
-                    st.setString(2, item);
-                    st.setString(3, item);
-                    st.setString(4, item);
+                    st.setLong(2, item);
+                    st.setLong(3, item);
+                    st.setLong(4, item);
                     ResultSet res = st.executeQuery();
                     if(res.next()){
                        ProgramacaoMaquina prog = new ProgramacaoMaquina();
@@ -86,7 +87,7 @@ public class ProgramacaoMaquinaDAO {
                        prog.setQuantidadeProgramada(res.getInt("quantloteprogramado"));
                        prog.setQuantidadeProduzida(res.getInt("quantloteproduzido"));
                        prog.setMetragemTotalProgramada(res.getInt("metragemprogramada")*res.getInt("quantloteprogramado"));                       
-                       prog.setProduto(new Produto(item,res.getString("descricao"),res.getFloat("minimo"),
+                       prog.setProduto(new Produto(new Item(item,res.getString("descricao")),res.getFloat("minimo"),
                                res.getFloat("nominal"),res.getFloat("maximo")));
                        prog.setQtdFiosEntrada(res.getInt("qtfiosentrada"));
                        prog.setQtdfiosSaida(res.getInt("qtfiossaida"));

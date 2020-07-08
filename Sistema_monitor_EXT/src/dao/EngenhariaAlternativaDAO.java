@@ -38,8 +38,8 @@ public class EngenhariaAlternativaDAO {
             ResultSet res = st.executeQuery();
             while(res.next()){
                 Produto prod = new Produto();
-                prod.setCodigo(res.getString("codItem"));
-                prod.setDescricao(res.getString("descricao"));
+                prod.item.setCodigo(res.getLong("codItem"));
+                prod.item.setDescricao(res.getString("descricao"));
                 prods.add(prod);
             }    
             

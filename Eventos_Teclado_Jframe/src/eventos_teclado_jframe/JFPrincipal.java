@@ -93,7 +93,7 @@ public class JFPrincipal extends javax.swing.JFrame {
 //        System.out.println("formKeyPressed");
 //        System.out.println("KeyChar: " + evt.getKeyChar());
 //        System.out.println("KeyCode: " + evt.getKeyCode());
-if(evt.getKeyCode()!=16) {
+        if(evt.getKeyCode()!=16) {
             if(evt.getKeyCode()!=10){
                 comando = comando + String.valueOf(evt.getKeyChar());               
             }else{                

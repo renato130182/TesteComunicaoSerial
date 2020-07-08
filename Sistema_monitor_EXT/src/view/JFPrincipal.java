@@ -69,7 +69,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private boolean evtRegistrado = true;
     private boolean iniciaLeituras = true;
     private int resumoRelatorio,linhas=14;
-    private int eventosTimer,qtdEvt=30;
+    private int eventosTimer,qtdEvt=5;
     private List<String> metrosAlerta = new ArrayList<>();
     private boolean evtCarSaida,evtMetProg,evtCarEnt,evtSaldoEnt1,evtSaldoEnt2;
     private boolean evtDiaMin,evtDiaMax;
@@ -133,7 +133,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                         }else{
                             if(ControllerUtil.bancoRespondendo()){
                                 eventosTimer++;
-                                qtdEvt = 30;
+                                qtdEvt = 5;
                             }else{
                                 qtdEvt = 60;
                             }
@@ -161,7 +161,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                             if(!evtSaldoEnt1){
                                 ControllerEventosSistema ctr = new ControllerEventosSistema();
                                 evtSaldoEnt1 = ctr.registraEventos(8,login.getCodigoOperador(),0,0,codMaquina,jLabelProducaoOF.getText());
-                                if(evtSaldoEnt1)ctr.verificaPreApontamento("2",codMaquina,"",false,Integer.valueOf(listaPesagens.get(0).getCodigo()),0);
+                                //if(evtSaldoEnt1)ctr.verificaPreApontamento("2",codMaquina,"",false,Integer.valueOf(listaPesagens.get(0).getCodigo()),0);
                             }
                         }else{
                             lightBulbAlertaSaldoEntrada1.setOn(false);    
@@ -174,7 +174,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                                 if(!evtSaldoEnt2){
                                 ControllerEventosSistema ctr = new ControllerEventosSistema();
                                 evtSaldoEnt2 = ctr.registraEventos(8,login.getCodigoOperador(),0,0,codMaquina,jLabelProducaoOF.getText());
-                                if(evtSaldoEnt2)ctr.verificaPreApontamento("2",codMaquina,"",false,Integer.valueOf(listaPesagens.get(1).getCodigo()),0);
+                                //if(evtSaldoEnt2)ctr.verificaPreApontamento("2",codMaquina,"",false,Integer.valueOf(listaPesagens.get(1).getCodigo()),0);
                             }
                             }else{
                                 lightBulbAlertaSaldoEntrada2.setOn(false);
@@ -268,7 +268,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 ControllerEventosSistema ctr = new ControllerEventosSistema();
                 ctr.registraEventos(1,"",0,0,codMaquina,"");
                 ControllerProducao prd = new ControllerProducao();
-                metProdTmp=prd.buscaMetProdTemp(maquina);
+                metProdTmp=prd.buscaMetProdTemp(maquina);                
+
             } catch (PlatformAlreadyAssignedException  e) {
                 e.printStackTrace();
                 erro.gravaErro(e);
@@ -426,7 +427,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         jTextField1.setText("jTextField1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("Sistema Condumig Extrusoras 05062020");
+        setTitle("Sistema Condumig Extrusoras 08072020");
         setExtendedState(JFPrincipal.MAXIMIZED_BOTH);
         setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         setName("framePrincipal"); // NOI18N
@@ -484,6 +485,11 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             }
         });
         jTableProgramacao.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
+        jTableProgramacao.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTableProgramacaoMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTableProgramacao);
         if (jTableProgramacao.getColumnModel().getColumnCount() > 0) {
             jTableProgramacao.getColumnModel().getColumn(4).setHeaderValue("Metragem prog.");
@@ -1927,6 +1933,23 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         abrirTelaProducao();
     }//GEN-LAST:event_jMenuAjusteMetragemActionPerformed
 
+    private void jTableProgramacaoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTableProgramacaoMouseClicked
+        // TODO add your handling code here:
+        
+        if(!maqPronta){
+            JFMontagemMaquina p = new JFMontagemMaquina(codMaquina);
+            p.setVisible(true);
+            p.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            int linha = jTableProgramacao.getSelectedRow();
+            ProgramacaoMaquinaDAO programacao =  new ProgramacaoMaquinaDAO();
+            List<ProgramacaoMaquina> lista =  new ArrayList<>();
+            lista = programacao.buscaProgramacaoMaquina(codMaquina);
+            p.setProg(lista.get(linha));                 
+            p.requestFocus();
+            
+        }
+    }//GEN-LAST:event_jTableProgramacaoMouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -2173,8 +2196,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             List<ProgramacaoMaquina> lista =  new ArrayList<>();
             lista = programacao.buscaProgramacaoMaquina(codMaquina);
             for(int i=0;i<lista.size();i++){
-                modelo.addRow(new Object[]{lista.get(i).getProduto().getCodigo(),
-                    lista.get(i).getProduto().getDescricao(),lista.get(i).getLoteproducao(),
+                modelo.addRow(new Object[]{lista.get(i).getProduto().item.getCodigo(),
+                    lista.get(i).getProduto().item.getDescricao(),lista.get(i).getLoteproducao(),
                     lista.get(i).getQuantidadeProgramada(),lista.get(i).getMetragemProgramada(),lista.get(i).getDataProgramada()});
             }
         } catch (Exception e) {
@@ -2227,11 +2250,11 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 }                  
                 ProgramacaoMaquinaDAO daoProg = new ProgramacaoMaquinaDAO();
                 ProdutoCarretelDAO daoProdCar =  new ProdutoCarretelDAO();
-                prog = daoProg.buscaProgramacaoLoteItem(prod.getLoteProducao(),prod.getItemProducao());
+                prog = daoProg.buscaProgramacaoLoteItem(prod.getLoteProducao(),Long.valueOf(prod.getItemProducao()));
                 if(prog != null){
                     jLabelProducaoCodItem.setText(prod.getItemProducao());
                     jLabelProducaoOF.setText(prod.getLoteProducao());
-                    jLabelProducaoDescricaoItem.setText(prog.getProduto().getDescricao());
+                    jLabelProducaoDescricaoItem.setText(prog.getProduto().item.getDescricao());
                     jLabelProducaoQtdProg.setText(Integer.toString(prog.getQuantidadeProgramada()));
                     jLabelProducaoQtdProd.setText(Integer.toString(prog.getQuantidadeProduzida()));
                     jLabelProducaoMetTotalProg.setText(String.valueOf(prog.getMetragemTotalProgramada()));
@@ -2687,12 +2710,18 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
 
     private void ajustarMostradoresMetragem() {
         try {
-            double metAlvo;
+            double metAlvo=0;
             double metProgramada =  prog.getMetragemProgramada();
             double metMaxima =  prodCar.getMetragemMaxima();
-            double metProduzida =  prod.getMetragemProduzida();
+            double metProduzida =  prod.getMetragemProduzida();               
             double metTotalProduzida = Double.valueOf(jLabelProducaoMetTotalProd.getText());
-            metTotalProduzida += metProduzida;
+//            
+//            validação para solução do erro:
+//            Stacktrace: java.lang.NullPointerException
+//            at view.JFPrincipal.atualizarMostradoresMetragem(JFPrincipal.java:2732)
+            if(metProduzida==0 || metMaxima==0 || metProduzida==0 || metTotalProduzida==0) return;
+//            Fim da validação
+            metTotalProduzida += metProduzida;         
             double metTotalProgramada = Double.valueOf(jLabelProducaoMetTotalProg.getText());
             if(metProgramada>metMaxima){
                metAlvo = (100);
@@ -2704,7 +2733,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             linearCarretelSaida.setThresholdVisible(true);
             if(metProduzida>metMaxima){
                 linearCarretelSaida.setValue(100);
-            }else{
+            }else{                
                 linearCarretelSaida.setValue((metProduzida/metMaxima)*100);
             }            
             displaySingleMetragemCarretel.setValue(metProduzida);
@@ -3121,7 +3150,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             this.prod = ctrProd.buscaDadosMaquinaProducao(codMaquina); 
             long metApontada = (long)ctrProd.buscaMetragemProduzida(prod.getLoteProducao(),prod.getItemProducao());
             ProgramacaoMaquinaDAO daoProg = new ProgramacaoMaquinaDAO();
-            prog = daoProg.buscaProgramacaoLoteItem(prod.getLoteProducao(),prod.getItemProducao());
+            prog = daoProg.buscaProgramacaoLoteItem(prod.getLoteProducao(),Long.valueOf(prod.getItemProducao()));
             double metMinima = prog.getMetragemTotalProgramada()*0.9;
             if(prog.getQuantidadeProduzida()==prog.getQuantidadeProgramada()
                     || (prod.getMetragemProduzida()+ metApontada) >= metMinima){
@@ -3132,7 +3161,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                         + "Metragem PROGRAMADA: "+prog.getMetragemTotalProgramada()+ "\n"
                         + "Metragem PRODUZIDA: " + (prod.getMetragemProduzida()+ metApontada)+ "\n"
                         + "Deseja continuar a produção da OS: " + prog.getLoteproducao() + " - "
-                        + prog.getProduto().getDescricao(),
+                        + prog.getProduto().item.getDescricao(),
                         "*****ATENÇÃO*****",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE,null,options,options[0]);                        
                 if(i!=JOptionPane.YES_OPTION){                   
                     return false;

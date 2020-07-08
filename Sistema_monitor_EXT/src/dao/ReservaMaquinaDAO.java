@@ -10,7 +10,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import model.Item;
 import model.Pesagem;
+import model.ReservaMaquina;
 
 /**
  *
@@ -43,7 +47,41 @@ public class ReservaMaquinaDAO {
         }
         return false;
     }
-
+    
+    public List<ReservaMaquina> buscaListaReservaMaquina(String codigoMaquina) {
+        List<ReservaMaquina> resMaq = new ArrayList<>();        
+        try {
+            sql = "select * from condumigproducao.reservamaquina where codigomaquina = ?;";
+            PreparedStatement st = conec.prepareStatement(sql);
+            st.setString(1, codigoMaquina);
+            ResultSet res = st.executeQuery();
+            while(res.next()){
+                ReservaMaquina r = new ReservaMaquina();
+                r.setcodigoReserva(res.getLong("codigo"));
+                r.setSeuqencia(res.getInt("sequencia"));
+                r.setCodigoMaquina(res.getString("codigomaquina"));
+                r.setCodigoOperador(res.getString("codigooperador1"));
+                r.setCodItemProd(res.getString("codigoitemprod"));
+                r.setLoteItemRes(res.getString("loteitemres"));
+                r.setQtosFios(res.getInt("qtosfios"));
+                r.setCodigoembalagem(res.getString("codigoembalagem"));
+                r.setCodItemRes(res.getString("codigoitemres"));
+                r.setQuantItemRes(res.getDouble("quantitemres"));
+                r.setLoteProducao(res.getString("loteproducao"));
+                r.setTipoExtrusao(res.getString("tipoextrusao"));
+                r.setPesagem(res.getInt("pesagem"));
+                
+                resMaq.add(r);
+                
+            }    
+            return resMaq;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return null;
+    }
+        
     public boolean atualizaCarretelEntrada(Pesagem pesEntrada) {
         try {
             sql = "update condumigproducao.reservamaquina set loteitemres = ?, "
@@ -78,5 +116,46 @@ public class ReservaMaquinaDAO {
             erro.gravaErro(e);
         }
         return  false;
+    }
+
+    public Item BuscaItemMP(String lote) {
+        
+        try {
+            sql = "SELECT codigoitem FROM condumigproducao.lotemateriaprima lm "
+                    + "inner join condumigproducao.materiaprima m on m.lotematprima = lm.loteinterno "
+                    + "where concat(lm.loteinterno,lm.sequencial) = ?;";
+            PreparedStatement st = conec.prepareStatement(sql);
+            st.setString(1, lote);
+            ResultSet res = st.executeQuery();
+            if(res.next()){
+                Item it = new Item();      
+                it.setCodigo(res.getLong("codigoitem"));
+                return it;
+            }                
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return null;    
+    }
+
+    public double buscaSaldoMP(String lote) {
+         try {
+            sql = "SELECT saldo FROM condumigproducao.lotemateriaprima lm "
+                    + "inner join condumigproducao.materiaprima m on m.lotematprima = lm.loteinterno "
+                    + "where concat(lm.loteinterno,lm.sequencial) = ?;";
+            PreparedStatement st = conec.prepareStatement(sql);
+            st.setString(1, lote);
+            ResultSet res = st.executeQuery();
+            if(res.next()){                
+                String saldo = res.getString("saldo");
+                saldo = saldo.replace(",",".");
+                return Double.valueOf(saldo);                        
+            }                
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return 0;    
     }
 }

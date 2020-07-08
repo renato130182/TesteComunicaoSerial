@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import model.ComposicaoCobre;
+import model.Pesagem;
 import model.Producao;
 import model.ReservaPesagem;
 
@@ -277,6 +278,7 @@ public class ProducaoDAO {
                     + "status, mac, turnomaquina, exportada, Kg_Mt, laminadora, perda) values "
                     + "(?,?,?,(select date_format(now(), \"%Y-%m-%d\")),(select date_format(now(),\"%H:%m:%s\")),"
                     + "0,?,?,?,?,'',?,?,'',?,?,'0',?,?,?,?,?,?,'0','0',?,?,?,?,?,'1',?,'0','0','0',?,?)";
+            System.out.println(sql);
             PreparedStatement st = this.conec.prepareStatement(sql);
             for (int i=1;i<=dadosQuery.size();i++){
                 st.setString(i,dadosQuery.get(i-1));
@@ -517,5 +519,36 @@ public class ProducaoDAO {
             erro.gravaErro(e);
         }
         return false;
+    }
+
+    public Pesagem buscaDadosPesagem(int pesagem) {
+        try {
+            sql = "select pes.codigo,pes.codigoembalagem, pes.codigoitem, pes.loteproduzido, "
+                    + "pes.qtosfios, pes.observacao,pes.saldoconsumo,pes.metragemoperador,"
+                    + "pes.qtosfios,it.descricao From condumigproducao.pesagem pes "
+                    + "inner join condumigproducao.item it on pes.codigoitem = it.codigo "
+                    + "where pes.codigo = ?;";
+            PreparedStatement st = this.conec.prepareStatement(sql);
+            st.setInt(1, pesagem);            
+            ResultSet res = st.executeQuery();
+            if(res.next()){
+                Pesagem pes = new Pesagem();
+                //, , , , , , , , 
+                pes.setCodEmbalagem(res.getString("codigoembalagem"));
+                pes.setCodItem(res.getString("codigoitem"));
+                pes.setCodigo(res.getString("codigo"));
+                pes.setDecItem(res.getString("descricao"));
+                pes.setLote(res.getString("loteproduzido"));
+                pes.setMetragemOperador(res.getLong("metragemoperador"));
+                pes.setObservacao(res.getString("observacao"));
+                pes.setQtosFios(res.getInt("qtosfios"));
+                pes.setSaldoConsumo(res.getLong("saldoconsumo"));                
+                return pes;
+            }            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return null;
     }
 }

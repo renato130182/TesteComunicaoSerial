@@ -636,4 +636,22 @@ public class ControllerProducao {
             erro.gravaErro(e);
         }
     }
+
+    public Pesagem BuscaDadosProducaoPesagem(int pesagem) {
+        try {
+            ConexaoDatabase db = new ConexaoDatabase();
+            if(db.isInfoDB()){
+                Connection conec = db.getConnection();                      
+                ProducaoDAO dao = new ProducaoDAO(conec);
+                Pesagem pes = dao.buscaDadosPesagem(pesagem);
+                db.desconectar();
+                return pes;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return null;    
+    
+    }
 }

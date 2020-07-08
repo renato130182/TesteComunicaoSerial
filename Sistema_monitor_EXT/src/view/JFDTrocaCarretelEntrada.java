@@ -688,7 +688,7 @@ public class JFDTrocaCarretelEntrada extends javax.swing.JDialog {
             if(prods!=null){
                 for(int i=0;i<prods.size();i++){
                     DefaultTableModel model = (DefaultTableModel)jTableEngAlternativa.getModel();
-                    model.addRow(new Object[]{prods.get(i).getCodigo(),prods.get(i).getDescricao()} );
+                    model.addRow(new Object[]{prods.get(i).item.getCodigo(),prods.get(i).item.getDescricao()} );
                 }
             }
         } catch (Exception e) {
@@ -700,7 +700,7 @@ public class JFDTrocaCarretelEntrada extends javax.swing.JDialog {
         okButton.setEnabled(false);
         if(!pesEntrada.getCodItem().equals(pesSaida.getCodItem())){
             for(int i=0;i<prods.size();i++){
-                if(prods.get(i).getCodigo().equals(pesEntrada.getCodItem())){
+                if(String.valueOf(prods.get(i).item.getCodigo()).equals(pesEntrada.getCodItem())){
                     okButton.setEnabled(true);
                     return;
                 }
