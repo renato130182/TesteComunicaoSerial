@@ -128,6 +128,29 @@ public class ControllerReservaMaquina {
         }
         return 0;
     }
+
+    public boolean AtualizaMontagemMaquina(List<ReservaMaquina> resMaq) {
+         try {
+            ConexaoDatabase db = new ConexaoDatabase();
+            if(db.isInfoDB()){
+                Connection conec = db.getConnection();                
+                conec.setAutoCommit(false);
+                ReservaMaquinaDAO dao = new ReservaMaquinaDAO(conec);               
+                for(ReservaMaquina r : resMaq){                    
+                    if(!dao.AtualizaReservaMaquina(r)) {
+                        conec.rollback();
+                        return false;
+                    }                     
+                }
+                conec.commit();
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return false;
+    }
     
     
 }

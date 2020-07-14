@@ -156,6 +156,33 @@ public class ReservaMaquinaDAO {
             e.printStackTrace();
             erro.gravaErro(e);
         }
-        return 0;    
+        return 0;
+    }
+
+    public boolean AtualizaReservaMaquina(ReservaMaquina r) {
+        try {
+            sql = "update condumigproducao.reservamaquina  set codigoitemprod = ?, "
+                    + "loteitemres = ?,qtosfios = ?, codigoembalagem = ?,codigoitemres = ?, "
+                    + "quantitemres = ?,loteproducao = ?,tipoextrusao = ? , pesagem = ? "
+                    + "where codigo = ?;";
+            PreparedStatement st = conec.prepareStatement(sql);            
+            st.setString(1,r.getCodItemProd());
+            st.setString(2,r.getLoteItemRes());
+            st.setInt(3, r.getQtosFios());
+            st.setString(4, r.getCodigoembalagem());
+            st.setString(5, r.getCodItemRes());
+            st.setDouble(6, r.getQuantItemRes());
+            st.setString(7, r.getLoteProducao());
+            st.setString(8, r.getTipoExtrusao());
+            st.setInt(9, r.getPesagem());
+            st.setLong(10, r.getCodigoReserva());
+            
+            st.executeUpdate();
+            return st.getUpdateCount()==1;       
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return false;
     }
 }

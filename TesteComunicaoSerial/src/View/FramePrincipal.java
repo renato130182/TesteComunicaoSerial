@@ -136,7 +136,7 @@ public class FramePrincipal extends javax.swing.JFrame implements ActionListener
         jButtonRele3 = new javax.swing.JButton();
         jButtonRele4 = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Teste de comunicação serial");
         setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
         setName("framePrincipal"); // NOI18N

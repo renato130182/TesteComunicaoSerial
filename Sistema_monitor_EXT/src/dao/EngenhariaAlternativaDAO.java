@@ -26,7 +26,7 @@ public class EngenhariaAlternativaDAO {
         this.conec = conec;
     }
 
-    public List<Produto> BuscaItenDescricaoEngAlternativa(String codItem, String codItemProducao) {
+    public List<Produto> BuscaListaItenDescricaoEngAlternativa(String codItem, String codItemProducao) {
         List<Produto> prods = new ArrayList<>();
         try {
             sql = "SELECT al.`al-codigo` as codItem,it.descricao FROM qlikview.cad_estrutura_alternativo al " +
@@ -50,4 +50,80 @@ public class EngenhariaAlternativaDAO {
         }
         return null;
     }          
+
+    public String BuscaItemCobrePadrao(String codItemProducao) {
+        try {
+            sql = "SELECT `es-codigo` as itemPadrao FROM qlikview.cad_estrutura"
+                    + " where`it-codigo` = ? and `es-codigo` like '40%';";
+            PreparedStatement st = conec.prepareStatement(sql);            
+            st.setString(1, codItemProducao);                
+            ResultSet res = st.executeQuery();
+            if(res.next()){
+                return res.getString("itemPadrao");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return "";
+    }
+
+    public String BuscaItemPVCExtrusadoPadrao(long codigo) {
+        try {
+            sql = "SELECT `es-codigo` as itemPadrao FROM qlikview.cad_estrutura "
+                    + "where`it-codigo` = ? and `es-codigo` like '2002%' "
+                    + "and `qtd-compon` =  (select max(`qtd-compon`) "
+                    + "FROM qlikview.cad_estrutura where`it-codigo` = ? and "
+                    + "`es-codigo` like '2002%');";
+            PreparedStatement st = conec.prepareStatement(sql);            
+            st.setLong(1, codigo);    
+            st.setLong(2, codigo);                
+            ResultSet res = st.executeQuery();
+            if(res.next()){
+                return res.getString("itemPadrao");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return "";
+    }
+
+    public String BuscaItemPVC_CoExtrusadoPadrao(long codigo) {
+        try {
+            sql = "SELECT `es-codigo` as itemPadrao FROM qlikview.cad_estrutura "
+                    + "where`it-codigo` = ? and `es-codigo` like '2002%'"
+                    + "and `qtd-compon` =  (select min(`qtd-compon`) "
+                    + "FROM qlikview.cad_estrutura where`it-codigo` = ? "
+                    + "and `es-codigo` like '2002%');";
+            PreparedStatement st = conec.prepareStatement(sql);            
+            st.setLong(1, codigo);    
+            st.setLong(2, codigo);            
+            ResultSet res = st.executeQuery();
+            if(res.next()){
+                return res.getString("itemPadrao");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return "";
+    }
+
+    public String BuscaItemPigmentoPadrao(long codigo) {
+        try {
+            sql = "SELECT `es-codigo` as itemPadrao FROM qlikview.cad_estrutura "
+                    + "where`it-codigo` = ? and `es-codigo` like '2003%';";
+            PreparedStatement st = conec.prepareStatement(sql);            
+            st.setLong(1, codigo);             
+            ResultSet res = st.executeQuery();
+            if(res.next()){
+                return res.getString("itemPadrao");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return "";
+    }
 }

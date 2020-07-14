@@ -36,5 +36,21 @@ public class ControllerEngenharia {
         }
         return null;
     }
-    
+
+    public boolean validaEngenhariaPorItem(long codItementrando, long codigoItemProducao) {
+        try {
+            ConexaoDatabase db = new ConexaoDatabase();
+            if(db.isInfoDB()){
+                Connection conec = db.getConnection();                
+                EngenhariaDAO dao  = new EngenhariaDAO(conec);
+                boolean itemEngenharia = dao.verificaItemEngenharia(codItementrando,codigoItemProducao);                               
+                db.desconectar();
+                return itemEngenharia;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return false;            
+    }
 }

@@ -39,7 +39,16 @@ public class JFDTrocaCarretelEntrada extends javax.swing.JDialog {
      */
     public static final int RET_OK = 1;
     private Pesagem pesSaida;
+    private int metragem;
+    private String codMaquina;
+    private String lote;
+    private boolean montagem=false;
 
+        
+    public void setMontagem(boolean montagem) {
+        this.montagem = montagem;
+    }
+            
     public Pesagem getPesSaida() {
         return pesSaida;
     }
@@ -60,9 +69,6 @@ public class JFDTrocaCarretelEntrada extends javax.swing.JDialog {
     public void setLote(String lote) {
         this.lote = lote;
     }
-    private int metragem;
-    private String codMaquina;
-    private String lote;
     /**
      * Creates new form JFDTrocaCarretelEntrada
      * @param parent
@@ -503,12 +509,17 @@ public class JFDTrocaCarretelEntrada extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
-        ControllerReservaMaquina ctr = new ControllerReservaMaquina();
-        if(ctr.trocaCarrtelEntrada(pesSaida, pesEntrada)){
-            doClose(RET_OK);        
+        
+        if(montagem){
+            doClose(RET_OK);
         }else{
-            JOptionPane.showMessageDialog(rootPane,"Falha ao registrar troca do carretel de entrada \n "
-                    + "Por favor tente novamente.","Troca do carretel de entrada",JOptionPane.ERROR_MESSAGE);
+            ControllerReservaMaquina ctr = new ControllerReservaMaquina();
+            if(ctr.trocaCarrtelEntrada(pesSaida, pesEntrada)){
+                doClose(RET_OK);        
+            }else{
+                JOptionPane.showMessageDialog(rootPane,"Falha ao registrar troca do carretel de entrada \n "
+                        + "Por favor tente novamente.","Troca do carretel de entrada",JOptionPane.ERROR_MESSAGE);
+            }
         }
     }//GEN-LAST:event_okButtonActionPerformed
 
@@ -684,7 +695,7 @@ public class JFDTrocaCarretelEntrada extends javax.swing.JDialog {
     public void buscaItensAlternativosMontagem(String codItemProducao){
         try {                    
             ControllerEngenhariaAlternativa eng = new ControllerEngenhariaAlternativa();
-            prods = eng.buscaListaAlternativas(this.pesSaida.getCodItem(),codItemProducao);
+            prods = eng.buscaListaAlternativas(eng.buscaItemCobrePadrao(codItemProducao),codItemProducao);
             if(prods!=null){
                 for(int i=0;i<prods.size();i++){
                     DefaultTableModel model = (DefaultTableModel)jTableEngAlternativa.getModel();

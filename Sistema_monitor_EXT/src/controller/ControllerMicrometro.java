@@ -35,10 +35,22 @@ public class ControllerMicrometro extends Micrometro{
                 System.out.println("dados inválidos");
                 return null;
             }
-            if(!info.getDesvio().trim().equals(""))this.setDesvio(Float.parseFloat(info.getDesvio()));
-            if(!info.getMaximo().trim().equals(""))this.setDiametroMaximo(Float.parseFloat(info.getMaximo()));
-            if(!info.getMedia().trim().equals(""))this.setDiametroMedio(Float.parseFloat(info.getMedia()));
-            if(!info.getMinimo().trim().equals(""))this.setDiametroMinimo(Float.parseFloat(info.getMinimo()));
+            /*
+            Alteração para corrigir o erro:
+            Stacktrace: java.lang.NumberFormatException: For input string: "X"
+            at java.base/jdk.internal.math.FloatingDecimal.readJavaFormatString(FloatingDecimal.java:2054)
+            at java.base/jdk.internal.math.FloatingDecimal.parseFloat(FloatingDecimal.java:122)
+            at java.base/java.lang.Float.parseFloat(Float.java:455)
+            at controller.ControllerMicrometro.setarDadosMicrometro(ControllerMicrometro.java:38)            
+            */
+            if(ControllerUtil.SoTemNumeros(info.getDesvio().trim()))
+                this.setDesvio(Float.parseFloat(info.getDesvio()));
+            if(ControllerUtil.SoTemNumeros(info.getMaximo().trim()))
+                this.setDiametroMaximo(Float.parseFloat(info.getMaximo()));
+            if(ControllerUtil.SoTemNumeros(info.getMedia().trim()))
+                this.setDiametroMedio(Float.parseFloat(info.getMedia()));
+            if(ControllerUtil.SoTemNumeros(info.getMinimo().trim()))
+                this.setDiametroMinimo(Float.parseFloat(info.getMinimo()));
                        
             
             return this;

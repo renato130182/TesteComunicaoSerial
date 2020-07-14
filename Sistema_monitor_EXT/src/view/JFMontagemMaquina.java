@@ -5,7 +5,9 @@
  */
 package view;
 
+import controller.ControllerEngenharia;
 import controller.ControllerEngenhariaAlternativa;
+import controller.ControllerEventosSistema;
 import controller.ControllerReservaMaquina;
 import controller.LogErro;
 import java.awt.CardLayout;
@@ -16,7 +18,9 @@ import model.ProgramacaoMaquina;
 import model.ReservaMaquina;
 import controller.ControllerItem;
 import controller.ControllerProducao;
+import dao.PesagemDAO;
 import java.awt.Color;
+import java.awt.HeadlessException;
 import javax.swing.JOptionPane;
 import model.Pesagem;
 import model.Produto;
@@ -33,7 +37,8 @@ public class JFMontagemMaquina extends javax.swing.JFrame {
     private String comando="";
     private ProgramacaoMaquina prog;
     private List<ReservaMaquina> resMaq;
-    
+    private boolean carretelTrocado=false;
+    private String pesEntrada="",pesSaida="";
     private LogErro erro = new LogErro();
 
     public void setProg(ProgramacaoMaquina prog) {
@@ -41,6 +46,7 @@ public class JFMontagemMaquina extends javax.swing.JFrame {
         jTAProdutoSaida.setText("Codigo: " + prog.getProduto().item.getCodigo() +
                 "\n " + prog.getProduto().item.getDescricao() + " \n Lote: " +
                 prog.getLoteproducao());
+        verificarEngenhariaReservaMaquina();
     }
     /**
      * Creates new form JFMontagemMaquina
@@ -61,6 +67,7 @@ public class JFMontagemMaquina extends javax.swing.JFrame {
         CardLayout card = (CardLayout) root.getLayout();
         card.show(root,"jPanel1");
         buscaReservaMaquina(codigoMaquina);
+        
     }
 
     /**
@@ -93,11 +100,27 @@ public class JFMontagemMaquina extends javax.swing.JFrame {
         jTextArea1.setRows(5);
         jScrollPane1.setViewportView(jTextArea1);
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Montagem de Máquina");
         setAlwaysOnTop(true);
-        setAutoRequestFocus(false);
-        setResizable(false);
+        setExtendedState(JFMontagemMaquina.MAXIMIZED_BOTH);
+        setType(java.awt.Window.Type.UTILITY);
+        addWindowStateListener(new java.awt.event.WindowStateListener() {
+            public void windowStateChanged(java.awt.event.WindowEvent evt) {
+                formWindowStateChanged(evt);
+            }
+        });
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+            public void windowDeactivated(java.awt.event.WindowEvent evt) {
+                formWindowDeactivated(evt);
+            }
+            public void windowIconified(java.awt.event.WindowEvent evt) {
+                formWindowIconified(evt);
+            }
+        });
         addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 formKeyPressed(evt);
@@ -225,7 +248,8 @@ public class JFMontagemMaquina extends javax.swing.JFrame {
                     if(comando.length()==10){
                         System.out.println("Materia prima: " + comando);
                         comandoTrocaMateriaPrima(comando);                
-                    }else{
+                    }
+                    else{
                         if(comando.length()>0){
                             System.out.println("Pesagem : " + comando);
                             comandoTrocaCarretelEntrada(Integer.valueOf(comando));
@@ -241,6 +265,50 @@ public class JFMontagemMaquina extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_formKeyPressed
 
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        encerrarMontagem();
+    }//GEN-LAST:event_formWindowClosing
+
+    private void formWindowIconified(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowIconified
+        encerrarMontagem();
+    }//GEN-LAST:event_formWindowIconified
+
+    private void formWindowDeactivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowDeactivated
+        //encerrarMontagem();
+    }//GEN-LAST:event_formWindowDeactivated
+
+    private void formWindowStateChanged(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowStateChanged
+        //setExtendedState(MAXIMIZED_BOTH);
+    }//GEN-LAST:event_formWindowStateChanged
+
+    private void encerrarMontagem(){
+        Object[] opcao = {"Sim","Não"};
+        try {
+            int r = JOptionPane.showOptionDialog(root,"Deseja realizar a troca do lote atual para "
+                    + prog.getLoteproducao() , "Montagem de maquina",JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,null, opcao,opcao[0]);
+            if(r == JOptionPane.YES_OPTION){
+                atualizarReservaNovoLote();
+                if(verificarEngenhariaReservaMaquina()){
+                    if(carretelTrocado){
+                        ControllerEventosSistema ctr = new ControllerEventosSistema();
+                        ctr.verificaPreApontamento("2",resMaq.get(0).getCodigoMaquina(),
+                                "Troca na Montagem",true,Integer.valueOf(pesSaida)
+                                ,Integer.valueOf(pesEntrada));
+                    }
+                    ControllerReservaMaquina ctrRes = new ControllerReservaMaquina(); 
+                    if(ctrRes.AtualizaMontagemMaquina(resMaq)){
+                       this.dispose();
+                    }
+                }
+            }else{
+                this.dispose();
+            }
+        } catch (HeadlessException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+    }
 //        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
 //        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
 //         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
@@ -387,8 +455,9 @@ public class JFMontagemMaquina extends javax.swing.JFrame {
                     jTAPvcExtrusado.setBackground(Color.yellow);
                     return;
                 }
-                if(codigoItem==itemEntrando.getCodigo() ||
-                        validaEngenharia(itemEntrando,String.valueOf(codigoItem))){
+                
+                if(validaEngenharia(itemEntrando) ||
+                        validaEngenhariaAlternativa(itemEntrando,1)){
                     if(atualizaReservaMaquina(codReservaMaquina,String.valueOf(itemEntrando.getCodigo()),novoLote)){
                         jTAPvcExtrusado.setBackground(Color.green);
                         preenchedadosExtrusoraPrincipal();
@@ -422,8 +491,14 @@ public class JFMontagemMaquina extends javax.swing.JFrame {
                     jTACoExtrusaoPigmento.setBackground(Color.yellow);
                     return;
                 }
-                if(codigoItem==itemEntrando.getCodigo() ||
-                        validaEngenharia(itemEntrando,String.valueOf(codigoItem))){
+                int tipo;
+                if("2002".equals(String.valueOf(codigoItem).substring(4))){
+                    tipo=2;
+                }else{
+                    tipo=3;
+                }
+                if(validaEngenharia(itemEntrando) ||
+                        validaEngenhariaAlternativa(itemEntrando,tipo)){
                     if(atualizaReservaMaquina(codReservaMaquina,String.valueOf(itemEntrando.getCodigo()),novoLote)){
                         jTACoExtrusaoPigmento.setBackground(Color.green);
                         preencheDadosCoExtrusora();
@@ -447,27 +522,84 @@ public class JFMontagemMaquina extends javax.swing.JFrame {
         }
     }
 
-    private void comandoTrocaCarretelEntrada(int pesgem) {
-        long codReservaMquina=0;
+    private void comandoTrocaCarretelEntrada(int pesagem) {
+        long codReservaMquina=0;                        
         for(ReservaMaquina r : resMaq){
-            if(r.getPesagem()==pesgem){
-                codReservaMquina = r.getCodigoReserva();                
+            if(r.getPesagem()==pesagem){
+                codReservaMquina = r.getCodigoReserva(); 
+                jTACarretelEntrada.setBackground(Color.red);
+                Pesagem pesMontada = new Pesagem();
+                PesagemDAO dao = new PesagemDAO();                
+                //pesEntrada = dao.buscaPesagemCodigo(jTFNumeroPesagem.getText());
+                pesMontada = dao.buscaPesagemCodigo(String.valueOf(pesagem));
+                JFDTrocaCarretelEntrada trc = new JFDTrocaCarretelEntrada(this,true);
+                trc.setMontagem(true);
+                trc.setPesSaida(pesMontada);
+                trc.setMetragem(0);
+                trc.setCodMaquina(resMaq.get(0).getCodigoMaquina());
+                trc.setLote(prog.getLoteproducao());
+                trc.buscaItensAlternativosMontagem(String.valueOf(prog.getProduto().item.getCodigo()));
+                trc.setVisible(true);
+                if(trc.getReturnStatus()==1){
+                    codReservaMquina = r.getCodigoReserva(); 
+                    r.setLoteItemRes(trc.getPesEntrada().getLote());
+                    r.setQtosFios(trc.getPesEntrada().getQtosFios());
+                    r.setCodigoembalagem(trc.getPesEntrada().getCodEmbalagem());
+                    r.setCodItemRes(trc.getPesEntrada().getCodItem());
+                    r.setQuantItemRes(trc.getPesEntrada().getSaldoConsumo());
+                    r.setPesagem(Integer.valueOf(trc.getPesEntrada().getCodigo()));
+                    preencheDadosCarretelEntrada();
+                    carretelTrocado = true;
+                    pesEntrada = pesMontada.getCodigo();
+                    pesSaida = trc.getPesEntrada().getCodigo();                    
+                    jTACarretelEntrada.setBackground(Color.green);
+                }else{
+                    jTACarretelEntrada.setBackground(Color.yellow);
+                }
                 break;
             }                    
-        }
-        if(codReservaMquina!=0){
-            jTACarretelEntrada.setBackground(Color.red);
-            
-        }else{
-            JOptionPane.showMessageDialog(root,"Numero da pesagem não encontrada na montagem da maquina."
-                    + "\nPor fvor verifique e tente novamente","Numero pesagem não encontrada",JOptionPane.ERROR_MESSAGE);
-        }
+        }        
+    if(codReservaMquina==0){                                            
+        JOptionPane.showMessageDialog(root,"Numero da pesagem não encontrada na montagem da maquina."
+                + "\nPor fvor verifique e tente novamente","Numero pesagem não encontrada",JOptionPane.ERROR_MESSAGE);
+        }       
+                
     }
 
-    private boolean validaEngenharia(Item itemEntrando,String itemSaindo) {
+    private boolean validaEngenhariaAlternativa(Item itemEntrando,int tipoItem) {
+        String itemPadrao="";
         List<Produto> prods = new ArrayList<>();
         ControllerEngenhariaAlternativa eng = new ControllerEngenhariaAlternativa();
-            prods = eng.buscaListaAlternativas(itemSaindo,String.valueOf(prog.getProduto().item.getCodigo()));
+            switch (tipoItem){
+                case 1: //Extrusora Principal
+                    itemPadrao = eng.buscaCodigoItemPVCExtrusadoPadrao
+                            (prog.getProduto().item.getCodigo());
+                    if(!itemPadrao.equals(""))prods = eng.buscaListaAlternativas(itemPadrao,
+                            String.valueOf(prog.getProduto().item.getCodigo()));
+                    break;
+                case 2: // Co-Extrusora 
+                    itemPadrao = eng.buscaCodigoItemPVC_CoExtrusadoPadrao
+                            (prog.getProduto().item.getCodigo());
+                    if(!itemPadrao.equals(""))prods = eng.buscaListaAlternativas(itemPadrao,
+                            String.valueOf(prog.getProduto().item.getCodigo()));
+                    break;
+                case 3: //Pigmento
+                    itemPadrao = eng.buscaCodigoItemPigmentoPadrao
+                            (prog.getProduto().item.getCodigo());
+                    if(!itemPadrao.equals(""))prods = eng.buscaListaAlternativas(itemPadrao,
+                            String.valueOf(prog.getProduto().item.getCodigo()));
+                    break;
+                case 4: // cobre
+                    itemPadrao = eng.buscaItemCobrePadrao(
+                            (String.valueOf(prog.getProduto().item.getCodigo())));
+                    if(!itemPadrao.equals(""))prods = eng.buscaListaAlternativas(itemPadrao,
+                            String.valueOf(prog.getProduto().item.getCodigo()));
+                    break;
+                default:
+                    System.out.println("Tipo Inválido");
+                    prods=null;
+                    break;
+            }            
             if(prods!=null){
                 for(Produto p : prods){
                     if(p.item.getCodigo()==itemEntrando.getCodigo()){
@@ -495,5 +627,59 @@ public class JFMontagemMaquina extends javax.swing.JFrame {
             erro.gravaErro(e);
         }
         return false;
+    }
+
+    private boolean validaEngenharia(Item itemEntrando) {
+        ControllerEngenharia ctr = new ControllerEngenharia();        
+        return ctr.validaEngenhariaPorItem(itemEntrando.getCodigo(),prog.getProduto().item.getCodigo());            
+    }
+
+    private boolean verificarEngenhariaReservaMaquina() {
+        boolean extrusora=false,coExtrusora=false,pigmento=false,cobre=false;
+        if(resMaq!=null){
+            try {
+                for(ReservaMaquina r : resMaq){                    
+                    if("1".equals(r.getTipoExtrusao())){
+                        extrusora=validaEngenharia(new Item(Long.valueOf(r.getCodItemRes()))) ||
+                        validaEngenhariaAlternativa(new Item(Long.valueOf(r.getCodItemRes()))
+                            ,1);                            
+                    }
+                    if("2".equals(r.getTipoExtrusao())){
+                        coExtrusora=validaEngenharia(new Item(Long.valueOf(r.getCodItemRes()))) ||
+                        validaEngenhariaAlternativa(new Item(Long.valueOf(r.getCodItemRes()))
+                            ,2);
+                    }
+                    if("2003".equals(r.getCodItemRes().substring(0,4))){
+                        pigmento =validaEngenharia(new Item(Long.valueOf(r.getCodItemRes()))) ||
+                        validaEngenhariaAlternativa(new Item(Long.valueOf(r.getCodItemRes()))
+                            ,3);
+                    }
+                    if("40".equals(r.getCodItemRes().substring(0,2))){
+                        cobre =validaEngenharia(new Item(Long.valueOf(r.getCodItemRes()))) ||
+                        validaEngenhariaAlternativa(new Item(Long.valueOf(r.getCodItemRes()))
+                            ,4);
+                    }
+                }                
+                if(!extrusora){
+                    jTAPvcExtrusado.setBackground(Color.red);
+                }
+                if(!coExtrusora || !pigmento){
+                    jTACoExtrusaoPigmento.setBackground(Color.red);
+                }
+                if(!cobre){
+                    jTACarretelEntrada.setBackground(Color.red);
+                }
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                erro.gravaErro(e);
+            }
+        }
+    return extrusora && coExtrusora && pigmento && cobre;
+    }    
+    private void atualizarReservaNovoLote() {
+        for(ReservaMaquina r : resMaq){
+            r.setCodItemProd(String.valueOf(prog.getProduto().item.getCodigo()));
+            r.setLoteProducao(prog.getLoteproducao());            
+        }
     }
 }

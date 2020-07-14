@@ -17,6 +17,7 @@ public class Produto implements InterfaceProduto {
     }
 
     public Produto() {
+        this.item = new Item();
     }
 
     public Produto(Item item, float diametroMinimo, float diametroNominal, float diametroMaximo) {

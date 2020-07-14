@@ -75,7 +75,7 @@ public class ProdutoCarretelDAO {
             st.setString(3, codEmbalagem.substring(3,7));            
             ResultSet res = st.executeQuery();
             return res.next();                                
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             erro.gravaErro(e);
         }

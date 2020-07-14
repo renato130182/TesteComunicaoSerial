@@ -15,6 +15,7 @@ import controller.ControllerMicrometro;
 import controller.ControllerParadasMaquina;
 import controller.ControllerProducao;
 import controller.ControllerProdutoMetragem;
+import controller.ControllerProgramacao;
 import controller.ControllerReservaMaquina;
 import controller.ControllerUtil;
 import controller.LogErro;
@@ -62,6 +63,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private static final String SERIAL_MICROMETRO = "micrometroserial";
     private static String identificador;
     private static String codMaquina;
+    static boolean resetarSerial=false;
     private long tempoSistema = System.currentTimeMillis(); 
     private double[] mediaVel = {0,0,0,0,0,0,0,0,0,0};  
     private boolean maqParada = false;
@@ -69,7 +71,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private boolean evtRegistrado = true;
     private boolean iniciaLeituras = true;
     private int resumoRelatorio,linhas=14;
-    private int eventosTimer,qtdEvt=5;
+    private int eventosTimer,qtdEvt=30;
     private List<String> metrosAlerta = new ArrayList<>();
     private boolean evtCarSaida,evtMetProg,evtCarEnt,evtSaldoEnt1,evtSaldoEnt2;
     private boolean evtDiaMin,evtDiaMax;
@@ -97,6 +99,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private GpioPinDigitalOutput IN2 = null;
     private GpioPinDigitalOutput IN3 = null;
     private int metProdTmp=0;
+    
     //private GpioPinDigitalOutput IN4 = null; Fora de uso
     /**
      * Creates new form JFPrincipal
@@ -133,10 +136,11 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                         }else{
                             if(ControllerUtil.bancoRespondendo()){
                                 eventosTimer++;
-                                qtdEvt = 5;
+                                qtdEvt = 30;                                
                             }else{
                                 qtdEvt = 60;
                             }
+                            if(!ConexaoDatabase.AMBPROD)qtdEvt=5;
                             System.out.println("Enventos timer" + String.valueOf(eventosTimer));
                         }
                         if(displaySingleEvtCarEntrada.getValue()!=0){
@@ -427,7 +431,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         jTextField1.setText("jTextField1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("Sistema Condumig Extrusoras 08072020");
+        setTitle("Sistema Condumig Extrusoras 14072020");
         setExtendedState(JFPrincipal.MAXIMIZED_BOTH);
         setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         setName("framePrincipal"); // NOI18N
@@ -1738,7 +1742,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private void jMenuConfigSerialRFIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuConfigSerialRFIDActionPerformed
         // TODO add your handling code here:
         try {                    
-            JFConfigSerialRFID cfg = new JFConfigSerialRFID();
+            JFConfigSerialRFID cfg = new JFConfigSerialRFID(comMicrometro);
             cfg.setConfigName(SERIAL_MICROMETRO);
             cfg.setVisible(true);
         } catch (Exception e) {
@@ -1899,6 +1903,13 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 }            
             }else{
                 JOptionPane.showMessageDialog(rootPane, "Ainda não foi detectado o retorno de produção","Maquina permanece parada",JOptionPane.ERROR_MESSAGE);
+                if(comMicrometro==null) comMicrometro = new SerialTxRx();
+                if(parametrizarSerial(SERIAL_MICROMETRO)){
+                if(comMicrometro.iniciaSerial()){
+                    System.out.println("serial Micrometro iniciada");
+                    comMicrometro.addActionListener(this);
+                }
+            }    
             }
         } catch (HeadlessException e) {
             erro.gravaErro(e);
@@ -2213,6 +2224,14 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             if(prod != null){
                 if(prod.getCarretelSaida().trim().equals("")){
                     String carretelSaida = JOptionPane.showInputDialog(rootPane,"Carretel de Saida","Por favor digite o numero do carretel de entrada",JOptionPane.QUESTION_MESSAGE);
+                    /*
+                    Adicionado para corrigir o tamanho da string do carretel de saida, que 
+                    obrigatóriamente presisa de 7 caracteres
+                    */
+                    while(carretelSaida.length()<7){
+                        carretelSaida = "0" + carretelSaida;
+                    }
+                    //-Fim da alteração
                     System.out.println(carretelSaida);
                     if(carretelSaida!=null){
                         if(!carretelSaida.trim().equals("")){
@@ -2352,7 +2371,10 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 buscarParadasProcessoProducao();
                 ajustarMostradorVelocidade();
                 ajustarMostradoresMetragem();
-                configurarMostradoresDiametro();          
+                configurarMostradoresDiametro();  
+                ControllerProgramacao prog = new ControllerProgramacao();
+                prog.setarMontagemLoteProducao(prod.getLoteProducao(),
+                        prod.getItemProducao());
                 CardLayout card = (CardLayout) jpRoot.getLayout();
                 card.show(jpRoot,"jpProducao");
                 if(timerVelocimetro==null) {
@@ -2377,7 +2399,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             login.setNivel("");
             login.setSenha("");
             login.setCode("");
-            if(ConexaoDatabase.AMBPROD) limparTelaLogin(); //apenas para teste, passar para true em producao
+            //if(ConexaoDatabase.AMBPROD) limparTelaLogin(); //apenas para teste, passar para true em producao
+            limparTelaLogin();
             bloquearMenu();            
             //if(parametrizarSerial(SERIAL_RFID)){
            //    if(comRFID.iniciaSerial()){
@@ -2476,8 +2499,12 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {            
         try {                    
+            if(resetarSerial){
+                resetarSerial=false;
+                throw new RuntimeException("Forçar para serial");                
+            }
             if(e.getActionCommand().trim().equals("")) return;
-            System.out.println("dados recebidos: " + e.getActionCommand());
+            System.out.println("dados recebidos: " + e.getActionCommand());            
             if(e.getActionCommand().substring(0,3).equalsIgnoreCase("TAG")){
                 tagEvent(e.getActionCommand());
             }else{
@@ -2501,7 +2528,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 }
                 dadosSerialMicrometro(e.getActionCommand());
             }
-        } catch (HeadlessException ex) {            
+        } catch (HeadlessException ex) {   
+            ex.printStackTrace();
             erro.gravaErro(ex);
         }
     }

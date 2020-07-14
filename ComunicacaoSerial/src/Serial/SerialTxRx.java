@@ -44,6 +44,7 @@ public class SerialTxRx implements SerialPortEventListener{
     private String serialPortName = "";
     private String[] portas;
     private String[] tipoPortas;
+    LogErro erro = new LogErro();
     
     private List<ActionListener> listeners = new ArrayList<ActionListener>(0);
     
@@ -104,12 +105,13 @@ public class SerialTxRx implements SerialPortEventListener{
                 
                 serialPort.close(); 
                 serialPort.removeEventListener();
-                
+                return true;
             //}
-            return true;
         } catch (Exception e) {
-            return false;
-        }        
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }   
+        return false;
     }
     
     @Override

@@ -6,6 +6,7 @@
 package dao;
 
 import controller.LogErro;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -22,7 +23,15 @@ import model.Item;
 public class ProgramacaoMaquinaDAO {
     private String sql;
     LogErro erro = new LogErro();
+    private final Connection conection;
     
+    public ProgramacaoMaquinaDAO() {
+        conection=null;
+    }
+    
+    public ProgramacaoMaquinaDAO(Connection conec) {
+        this.conection = conec;
+    }
     public List<ProgramacaoMaquina> buscaProgramacaoMaquina(String codMaquina){
         List<ProgramacaoMaquina> lista = new ArrayList<>();
         ConexaoDatabase db = new ConexaoDatabase();
@@ -103,5 +112,21 @@ public class ProgramacaoMaquinaDAO {
         }
         db.desconectar();
         return null;
+    }
+
+    public boolean setarMontagemLoteProducao(String lote, String item) {
+        try {
+            sql = "update condumigproducao.programacaomaquina set montada = 1 "
+                    + " where loteproducao = ? and codigoitem = ?;";
+            PreparedStatement st = conection.prepareStatement(sql);            
+            st.setString(1,lote);
+            st.setString(2,item);
+            st.executeUpdate();
+            return st.getUpdateCount()==1;  
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return false;
     }
 }
