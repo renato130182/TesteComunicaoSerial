@@ -2399,8 +2399,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             login.setNivel("");
             login.setSenha("");
             login.setCode("");
-            //if(ConexaoDatabase.AMBPROD) limparTelaLogin(); //apenas para teste, passar para true em producao
-            limparTelaLogin();
+            if(ConexaoDatabase.AMBPROD) limparTelaLogin(); //apenas para teste, passar para true em producao
             bloquearMenu();            
             //if(parametrizarSerial(SERIAL_RFID)){
            //    if(comRFID.iniciaSerial()){
@@ -2743,12 +2742,6 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             double metMaxima =  prodCar.getMetragemMaxima();
             double metProduzida =  prod.getMetragemProduzida();               
             double metTotalProduzida = Double.valueOf(jLabelProducaoMetTotalProd.getText());
-//            
-//            validação para solução do erro:
-//            Stacktrace: java.lang.NullPointerException
-//            at view.JFPrincipal.atualizarMostradoresMetragem(JFPrincipal.java:2732)
-            if(metProduzida==0 || metMaxima==0 || metProduzida==0 || metTotalProduzida==0) return;
-//            Fim da validação
             metTotalProduzida += metProduzida;         
             double metTotalProgramada = Double.valueOf(jLabelProducaoMetTotalProg.getText());
             if(metProgramada>metMaxima){

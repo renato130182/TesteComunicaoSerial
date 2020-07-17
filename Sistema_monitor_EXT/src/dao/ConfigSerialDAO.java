@@ -51,7 +51,7 @@ public class ConfigSerialDAO {
         return cfg;
     }
     
-    public boolean AtualizarConfigSerial(ConfigSerialPort cfg){
+    public boolean atualizarConfigSerial(ConfigSerialPort cfg){
         sql = "update bd_sistema_monitor.tb_config_serial  set timeout=?, "
                 + "databits=?, stopbits=?, parity=?, flowcontrol=?, serialportname=?, "
                 + "datarate=? where configname = ? and serial_maquina_monitor = ?;";

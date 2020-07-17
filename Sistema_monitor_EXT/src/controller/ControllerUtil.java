@@ -34,6 +34,8 @@ public final class ControllerUtil {
     public static final boolean SoTemNumeros(String texto) { 
         try {                    
             if(texto.length()==0)return false;
+            texto = texto.replace(".","");
+            texto = texto.replace(",","");
             for (int i = 0; i < texto.length(); i++) { 
                 if (!Character.isDigit(texto.charAt(i))) { 
                     return false; 

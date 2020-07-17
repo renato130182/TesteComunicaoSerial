@@ -6,6 +6,7 @@
 package view;
 
 import Serial.SerialTxRx;
+import comunicacaoserial.ComunicacaoSerial;
 import controller.LogErro;
 import dao.ConfigSerialDAO;
 import java.awt.HeadlessException;
@@ -27,10 +28,11 @@ public class JFConfigSerialRFID extends javax.swing.JFrame {
     
     /**
      * Creates new form JFConfigSerialRFID
+     * @param con
      */
     public JFConfigSerialRFID(SerialTxRx con) {
         initComponents();
-        this.con = con;
+        this.con = (con!=null) ? con : new ComunicacaoSerial();
         CarregaPortasDisponiveis();        
     }
     
@@ -39,18 +41,19 @@ public class JFConfigSerialRFID extends javax.swing.JFrame {
             cmbPorta.removeAllItems();
 
             String portas[] = serialPorts.BuscarPortas();       
-            for(int i=0;i<portas.length;i++){           
-                if(portas[i]!=null){
-                    cmbPorta.addItem(portas[i]);
+            for (String porta : portas) {
+                if (porta != null) {
+                    cmbPorta.addItem(porta);
                 }
             }
            if(cmbPorta.getItemCount()>0){
                jButtonSalvar.setEnabled(true);
             }else{
               jButtonSalvar.setEnabled(false);
-           }
-           serialPorts.close();
+           }           
+           //serialPorts.close();
         } catch (Exception e) {
+            e.printStackTrace();
             erro.gravaErro(e);
         }
     }
@@ -250,7 +253,7 @@ public class JFConfigSerialRFID extends javax.swing.JFrame {
             if(nova){
                 regs = dao.adicionarNovaConfigSerial(conn);
             }else{
-                regs = dao.AtualizarConfigSerial(conn);     
+                regs = dao.atualizarConfigSerial(conn);     
             }
             if(regs){
                 JOptionPane.showMessageDialog(rootPane,"Configuração atualizada com sucesso!","Configuração atualizada",JOptionPane.INFORMATION_MESSAGE);

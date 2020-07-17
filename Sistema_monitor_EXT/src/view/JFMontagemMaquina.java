@@ -8,22 +8,22 @@ package view;
 import controller.ControllerEngenharia;
 import controller.ControllerEngenhariaAlternativa;
 import controller.ControllerEventosSistema;
-import controller.ControllerReservaMaquina;
-import controller.LogErro;
-import java.awt.CardLayout;
-import java.util.ArrayList;
-import java.util.List;
-import model.Item;
-import model.ProgramacaoMaquina;
-import model.ReservaMaquina;
 import controller.ControllerItem;
 import controller.ControllerProducao;
+import controller.ControllerReservaMaquina;
+import controller.LogErro;
 import dao.PesagemDAO;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.HeadlessException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JOptionPane;
+import model.Item;
 import model.Pesagem;
 import model.Produto;
+import model.ProgramacaoMaquina;
+import model.ReservaMaquina;
 
 /**
  *
