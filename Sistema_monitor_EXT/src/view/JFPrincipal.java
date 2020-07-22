@@ -61,6 +61,7 @@ import model.Usuario;
 public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     //private static final String SERIAL_RFID = "rfidserial";
     private static final String SERIAL_MICROMETRO = "micrometroserial";
+    private static final String SERIAL_METRADOR = "metradorserial";
     private static String identificador;
     private static String codMaquina;
     static boolean resetarSerial=false;
@@ -83,12 +84,11 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private ProdutoCarretel prodCar = new ProdutoCarretel();
     private Producao prod = new Producao();
     private List<Pesagem> listaPesagens = new ArrayList<>();
-    private SerialTxRx comRFID ;
+    private SerialTxRx comMetrador ;
     private SerialTxRx comMicrometro;
     private Micrometro leituraAtual = new Micrometro();
     private boolean falhaRegistro=false;
     private int metTemporaria;
-    //private Micrometro leituraAnterior = new Micrometro();
     private double metragemAnterior;
     private List<Micrometro> relatorio = new ArrayList<>();
     private int metrosRelatorio=0;  
@@ -1905,11 +1905,17 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 JOptionPane.showMessageDialog(rootPane, "Ainda não foi detectado o retorno de produção","Maquina permanece parada",JOptionPane.ERROR_MESSAGE);
                 if(comMicrometro==null) comMicrometro = new SerialTxRx();
                 if(parametrizarSerial(SERIAL_MICROMETRO)){
-                if(comMicrometro.iniciaSerial()){
-                    System.out.println("serial Micrometro iniciada");
-                    comMicrometro.addActionListener(this);
+                    if(comMicrometro.iniciaSerial()){
+                        System.out.println("serial Micrometro iniciada");
+                        comMicrometro.addActionListener(this);
+                    }
+                }   
+                if(parametrizarSerial(SERIAL_METRADOR)){
+                    if(comMetrador.iniciaSerial()){
+                        System.out.println("serial Metrador iniciada");
+                        comMetrador.addActionListener(this);
+                    }
                 }
-            }    
             }
         } catch (HeadlessException e) {
             erro.gravaErro(e);
@@ -2367,6 +2373,12 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                     comMicrometro.addActionListener(this);
                 }
             }
+            if(parametrizarSerial(SERIAL_METRADOR)){
+                if(comMetrador.iniciaSerial()){
+                    System.out.println("serial Metrador iniciada");
+                    comMetrador.addActionListener(this);
+                }
+            }
             if(buscarInformaçoesProducao()){
                 buscarParadasProcessoProducao();
                 ajustarMostradorVelocidade();
@@ -2393,20 +2405,14 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
 
     private void abrirTelaLogin() {
         try {                                      
-            if(comRFID==null) comRFID = new SerialTxRx();
+            if(comMetrador==null) comMetrador = new SerialTxRx();
             login.setUsuario("");
             login.setNome("");
             login.setNivel("");
             login.setSenha("");
             login.setCode("");
             if(ConexaoDatabase.AMBPROD) limparTelaLogin(); //apenas para teste, passar para true em producao
-            bloquearMenu();            
-            //if(parametrizarSerial(SERIAL_RFID)){
-           //    if(comRFID.iniciaSerial()){
-           //         System.out.println("serial RFID iniciada");
-            //        comRFID.addActionListener(this);
-           //    }            
-            //}            
+            bloquearMenu();                      
             CardLayout card = (CardLayout) jpRoot.getLayout();
             card.show(jpRoot,"jpLogin");
             jPasswordFieldCartao.requestFocus();
@@ -2417,18 +2423,18 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private boolean parametrizarSerial(String configName ){
         try {                    
             ControllerConfigSerialPort cfg = new ControllerConfigSerialPort();
-            /*if(configName.equals(SERIAL_RFID)){
-                if(comRFID!=null){               
-                   comRFID = cfg.configurarPortaSerial(configName,identificador);
-                   if(comRFID!=null){                   
-                       System.out.println("Serial comfigurada com sucesso!! " + comRFID.getSerialPortName());
+            if(configName.equals(SERIAL_METRADOR)){
+                if(comMetrador!=null){               
+                   comMetrador = cfg.configurarPortaSerial(configName,identificador);
+                   if(comMetrador!=null){                   
+                       System.out.println("Serial comfigurada com sucesso!! " + comMetrador.getSerialPortName());
                        return true;
                    }else{                   
                        System.out.println("Falha ao configurar porta serial");
                        return false;
                    }                    
                }
-            }*/
+            }
             if(configName.equals(SERIAL_MICROMETRO)){
                 if(comMicrometro!=null){               
                    comMicrometro = cfg.configurarPortaSerial(configName,identificador);
@@ -2503,28 +2509,11 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 throw new RuntimeException("Forçar para serial");                
             }
             if(e.getActionCommand().trim().equals("")) return;
-            System.out.println("dados recebidos: " + e.getActionCommand());            
-            if(e.getActionCommand().substring(0,3).equalsIgnoreCase("TAG")){
-                tagEvent(e.getActionCommand());
+            System.out.println("dados recebidos: " + e.getActionCommand());              
+            dadosSerialMicrometro(e.getActionCommand());
+            if(e.getActionCommand().contains("Pulsos")){
+                
             }else{
-                if(e.getActionCommand().equals("**********  Troca de bobina  - Novo relatorio  **********")){
-                    try {
-                        metragemAnterior=0;
-                        metTemporaria=0;
-                        leituraAtual.setMetragem(0);
-                        if(maqParada){
-                            ControllerEventosSistema ctrEvt = new ControllerEventosSistema();
-                            if(ctrEvt.verificaPreApontamentoRealizado("1" ,maquina.getCodigo(),false,0)){
-                                apontamentoProducao();
-                            }
-                        }
-                    } catch (HeadlessException ex) {
-                        ex.printStackTrace();
-                        erro.gravaErro(ex);
-                    }
-                    System.out.println("saida das opcao de apontamento");
-                    return;
-                }
                 dadosSerialMicrometro(e.getActionCommand());
             }
         } catch (HeadlessException ex) {   
@@ -2664,26 +2653,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         }
         return media;
     }
-    private void tagEvent(String tag){    
-        try {                    
-            String code=tag.substring(3,tag.length());
-            if(!login.getCode().equals(code)){            
-                if(!login.getCode().trim().equals("")){
-                    code = login.getCode();
-                }
-                login.setCode(code);              
-                if(login.logarCode(login)){
-                    usuariologado();            
-                }else{
-                    login.setCode(code);
-                    JOptionPane.showMessageDialog(null, "Codigo de Identificação não vinculado","Codigo invalido",JOptionPane.ERROR_MESSAGE);
-                }        
-            }
-        } catch (HeadlessException e) {
-            erro.gravaErro(e);
-        }
-    }
-    
+      
     private void usuariologado() {
         try {                    
             if(!login.getNome().trim().equals("")) bloquearMenu();

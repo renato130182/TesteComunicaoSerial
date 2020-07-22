@@ -22,7 +22,7 @@ import model.DadosConexao;
  */
 public class ConexaoDatabase extends DadosConexao{
     
-    public static final boolean AMBPROD = true ;
+    public static final boolean AMBPROD = false ;
     private Connection conexao = null;
     private boolean infoDB=false;
     LogErro erro = new LogErro();
