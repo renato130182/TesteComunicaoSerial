@@ -29,7 +29,8 @@ public class ControllerConfigSerialPort {
                 conn.setPARITY(cfg.getParity());
                 conn.setSTOP_BITS(cfg.getStopBits());
                 conn.setSerialPortName(cfg.getSerialPortName());
-                conn.setTIME_OUT(cfg.getTimeOut());            
+                conn.setTIME_OUT(cfg.getTimeOut()); 
+                conn.setAppName(configName);
                 return conn;
             }
         } catch (Exception e) {

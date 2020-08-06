@@ -41,7 +41,11 @@ public class ProdutoCarretelDAO {
                 prodCar.setMetragemMaxima(res.getInt("maxima"));
                 prodCar.setMetragemPadrao(res.getInt("padrao"));
                 car.setCodigo(carretel);
-                car.setDescricao(res.getString("DescEmb"));
+                if(res.getString("DescEmb")==null){
+                    car.setDescricao("Sem descrição");
+                }else{
+                    car.setDescricao(res.getString("DescEmb"));
+                }
                 car.setFlange(res.getString("flange"));
                 prodCar.setCarretel(car);                
             }else{

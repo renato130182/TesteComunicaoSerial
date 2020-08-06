@@ -31,7 +31,11 @@ public class ManipuladorArquivo {
     }
 
     public void setDados(String dados) {
-        this.dados = dados;
+        if(dados==null){
+            this.dados = "";
+        }else{
+            this.dados = dados;
+        }
     }
     
     public String getArquivo() {

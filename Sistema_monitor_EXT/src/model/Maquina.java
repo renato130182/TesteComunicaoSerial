@@ -9,12 +9,22 @@ public class Maquina implements InterfaceMaquina {
     private float alertaPercentualVelocidade;
     private int alertaMetrosParaArrebentamento;
     private int metrosAmostraDiametro;
+    private double pulsosPorMetro;
     public Maquina() {
         codigo="";
         descricao="";
         alertaPercentualVelocidade=0.f;
         alertaMetrosParaArrebentamento=0;
         metrosAmostraDiametro=0;
+        pulsosPorMetro=0;
+    }
+
+    public double getPulsosPorMetro() {
+        return pulsosPorMetro;
+    }
+
+    public void setPulsosPorMetro(double pulsosPorMetro) {
+        this.pulsosPorMetro = pulsosPorMetro;
     }
 
     public int getMetrosAmostraDiametro() {

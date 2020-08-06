@@ -22,6 +22,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.TooManyListenersException;
 
+
 /**
  *
  * @author renato.soares
@@ -29,25 +30,32 @@ import java.util.TooManyListenersException;
 public class SerialTxRx implements SerialPortEventListener{
 
     SerialPort serialPort = null;
-    
     private String appName;
-    private BufferedReader input;
+    
     private OutputStream output;
     private String dadosSerial;
     private int TIME_OUT=1000;
-    private int DATA_RATE=9600;
-    private int DATA_BITS=8;
-    private int STOP_BITS=1;
-    private int PARITY=0;
-    private int FLOW_CONTROL=0;
+    private int DATA_RATE;
+    private int DATA_BITS;
+    private int STOP_BITS;
+    private int PARITY;
+    private int FLOW_CONTROL;
 
     private String serialPortName = "";
     private String[] portas;
     private String[] tipoPortas;
     LogErro erro = new LogErro();
     
-    private List<ActionListener> listeners = new ArrayList<ActionListener>(0);
-    
+    private List<ActionListener> listeners = new ArrayList<>(0);
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
+    }
+            
     public void addActionListener(ActionListener listener) {
 		this.listeners.add(listener);
 	}
@@ -64,7 +72,7 @@ public class SerialTxRx implements SerialPortEventListener{
             Enumeration portEnum = CommPortIdentifier.getPortIdentifiers();
             
             while(portId == null && portEnum.hasMoreElements()){
-                CommPortIdentifier currPortId = (CommPortIdentifier) portEnum.nextElement();                
+                CommPortIdentifier currPortId = (CommPortIdentifier) portEnum.nextElement();                   
                 if(currPortId.getName().equals(serialPortName)){
                     serialPort = (SerialPort) currPortId.open(appName,TIME_OUT);
                     portId = currPortId;
@@ -78,35 +86,35 @@ public class SerialTxRx implements SerialPortEventListener{
             serialPort.setSerialPortParams(DATA_RATE,DATA_BITS, STOP_BITS,PARITY);
             serialPort.setFlowControlMode(FLOW_CONTROL);
             serialPort.addEventListener(this);
-            serialPort.notifyOnDataAvailable(true);
-            
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-            }
-            
+            serialPort.notifyOnDataAvailable(true);          
             return true;
-        } catch (PortInUseException | UnsupportedCommOperationException | TooManyListenersException e) {
-            System.out.println(e.getMessage());
-            return false;
+        } catch (PortInUseException | UnsupportedCommOperationException | TooManyListenersException  e) {
+            return false;        
         }
     }
     
     public void SendData(String data){
         try {
-            output = serialPort.getOutputStream();
-            output.write(data.getBytes());            
-        } catch (IOException e) {
+            output = serialPort.getOutputStream();                        
+            output.write(data.getBytes());
+            output.flush();
+            output.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
         }        
     }
     public synchronized boolean close(){
         try {            
-            //if(serialPort != null){
-                
-                serialPort.close(); 
-                serialPort.removeEventListener();
+            if(serialPort != null){    
+                serialPort.removeEventListener();     
+                System.err.println("Evento removido");             
+                Thread.sleep(500);            
+                serialPort.close();
+                System.err.println("Serial Fechada"); 
+                Thread.sleep(500);            
                 return true;
-            //}
+            }
         } catch (Exception e) {
             e.printStackTrace();
             erro.gravaErro(e);
@@ -117,17 +125,19 @@ public class SerialTxRx implements SerialPortEventListener{
     @Override
     public void serialEvent(SerialPortEvent spe) {
         //metodo que recebe os dados da serial
+        BufferedReader input=null;
+        dadosSerial="";
         try {
-            switch(spe.getEventType()){
+            switch(spe.getEventType()){                
                 case SerialPortEvent.DATA_AVAILABLE:
                     if(input == null){
                         input = new BufferedReader(new InputStreamReader(serialPort.getInputStream()));
-                    }                    
-                    dadosSerial = input.readLine();
+                    }
+                    dadosSerial = input.readLine(); 
                     //System.out.println(dadosSerial); 
                     //Sinalizar evento na porta serial
                     if(!dadosSerial.isEmpty())dadosRecebidos();
-                    input=null;
+                    //input=null;
                     break;
                 default:
                     break;

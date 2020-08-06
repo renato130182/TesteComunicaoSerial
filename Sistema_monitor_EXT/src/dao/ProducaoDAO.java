@@ -44,7 +44,7 @@ public class ProducaoDAO {
                 prod.setItemProducao(res.getString("codigoitemprod"));
                 prod.setLoteProducao(res.getString("loteproducao"));
                 prod.setCarretelSaida(res.getString("carretel_saida"));
-                prod.setMetragemProduzida(res.getLong("met_produzida"));
+                prod.setMetragemProduzida(res.getDouble("met_produzida"));
 
                 return prod;                    
             }else{
@@ -463,7 +463,7 @@ public class ProducaoDAO {
             sql = "update bd_sistema_monitor.tb_maquina_producao_tmp  set met_prod = "
                     + "met_prod + ? where codigo_maquina = ?;";
             PreparedStatement st = this.conec.prepareStatement(sql);
-            st.setInt(1,(int)metragemProd);
+            st.setDouble(1,metragemProd);
             st.setString(2, cod_maquina);            
             st.executeUpdate();
             return st.getUpdateCount()!=0;
@@ -479,7 +479,7 @@ public class ProducaoDAO {
             sql = "insert into bd_sistema_monitor.tb_maquina_producao_tmp (codigo_maquina, met_prod) values (?,?);";
             PreparedStatement st = this.conec.prepareStatement(sql);
             st.setString(1, cod_maquina);            
-            st.setInt(2,(int)metragemProd);            
+            st.setDouble(2,metragemProd);            
             st.executeUpdate();
             return st.getUpdateCount()!=0;
         } catch (SQLException ex) {
@@ -550,5 +550,20 @@ public class ProducaoDAO {
             erro.gravaErro(e);
         }
         return null;
+    }
+
+    public boolean verificarDadosMicrometroRegistrados(String codigo) {
+        try {
+            sql = "SELECT * FROM bd_sistema_monitor.tb_maquina_dados_micrometro "
+                    + "where cod_maquina = ? and isnull(codigo_pesagem);";
+            PreparedStatement st = this.conec.prepareStatement(sql);
+            st.setString(1, codigo);            
+            ResultSet res = st.executeQuery();
+            return res.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return false;
     }
 }

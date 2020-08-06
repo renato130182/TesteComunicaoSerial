@@ -88,7 +88,7 @@ public class JFDadosConexao extends javax.swing.JFrame {
         jButtonTestarBASETESTE = new javax.swing.JButton();
         jButtonTestarProducao = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jpConfigDefault.setBackground(new java.awt.Color(204, 255, 255));
         jpConfigDefault.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N

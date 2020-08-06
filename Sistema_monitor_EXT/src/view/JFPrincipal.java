@@ -42,7 +42,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
-import model.DadosConexao;
+import model.ContadorMetros;
 import model.Maquina;
 import model.Micrometro;
 import model.Paradas;
@@ -52,7 +52,9 @@ import model.Producao;
 import model.ProdutoCarretel;
 import model.ProdutoMaquina;
 import model.ProgramacaoMaquina;
-import model.Usuario;
+import connectiondatabase.ConnectionDatabase;
+import controller.ControllerContadorMetros;
+import model.Metrador;
 
 /**
  *
@@ -60,8 +62,8 @@ import model.Usuario;
  */
 public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     //private static final String SERIAL_RFID = "rfidserial";
-    private static final String SERIAL_MICROMETRO = "micrometroserial";
-    private static final String SERIAL_METRADOR = "metradorserial";
+    public static final String SERIAL_MICROMETRO = "micrometroserial";
+    public static final String SERIAL_METRADOR = "metradorserial";
     private static String identificador;
     private static String codMaquina;
     static boolean resetarSerial=false;
@@ -70,9 +72,9 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private boolean maqParada = false;
     private boolean maqPronta = true;
     private boolean evtRegistrado = true;
-    private boolean iniciaLeituras = true;
-    private int resumoRelatorio,linhas=14;
+    private static boolean iniciaLeituras = true;
     private int eventosTimer,qtdEvt=30;
+    public static boolean serialMetrador,serialMicrometro;
     private List<String> metrosAlerta = new ArrayList<>();
     private boolean evtCarSaida,evtMetProg,evtCarEnt,evtSaldoEnt1,evtSaldoEnt2;
     private boolean evtDiaMin,evtDiaMax;
@@ -87,19 +89,20 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private SerialTxRx comMetrador ;
     private SerialTxRx comMicrometro;
     private Micrometro leituraAtual = new Micrometro();
+    private ContadorMetros contaMetros = new ContadorMetros();
     private boolean falhaRegistro=false;
-    private int metTemporaria;
+    private double metTemporaria;
     private double metragemAnterior;
     private List<Micrometro> relatorio = new ArrayList<>();
-    private int metrosRelatorio=0;  
+    private double metrosRelatorio=0;  
     private ControllerParadasMaquina paradas;
     private LogErro erro = new LogErro();
     private Timer timerVelocimetro;
     private GpioPinDigitalOutput IN1 = null;
     private GpioPinDigitalOutput IN2 = null;
     private GpioPinDigitalOutput IN3 = null;
-    private int metProdTmp=0;
     
+
     //private GpioPinDigitalOutput IN4 = null; Fora de uso
     /**
      * Creates new form JFPrincipal
@@ -124,6 +127,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                         if(eventosTimer >= qtdEvt){
                             radialLcdVelocidade.setValueAnimated(mediaVelocidade(0));
                             System.out.println("Parada pelo Timer!!!!");
+                            comMetrador.close();
+                            serialMetrador=false;                            
                             if(!maqParada){                                
                                 abrirTelaParadas();                                   
                             }
@@ -138,7 +143,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                                 eventosTimer++;
                                 qtdEvt = 30;                                
                             }else{
-                                qtdEvt = 60;
+                                qtdEvt = 30;
                             }
                             if(!ConexaoDatabase.AMBPROD)qtdEvt=5;
                             System.out.println("Enventos timer" + String.valueOf(eventosTimer));
@@ -267,13 +272,13 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 codMaquina = dados.buscaCodigoMaquina(identificador);
                 if(codMaquina!=null){                
                     maquina = maqDao.buscarDadosMaquina(codMaquina);
+                    contaMetros  = new ContadorMetros();
                 }                
                 abrirTelaLogin();                
                 ControllerEventosSistema ctr = new ControllerEventosSistema();
                 ctr.registraEventos(1,"",0,0,codMaquina,"");
-                ControllerProducao prd = new ControllerProducao();
-                metProdTmp=prd.buscaMetProdTemp(maquina);                
-
+//                ControllerProducao prd = new ControllerProducao();
+//                metProdTmp=prd.buscaMetProdTemp(maquina);                                
             } catch (PlatformAlreadyAssignedException  e) {
                 e.printStackTrace();
                 erro.gravaErro(e);
@@ -310,43 +315,6 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         jButtonIncluirMotivoParada = new javax.swing.JButton();
         jButtonRemoverMotivoParada = new javax.swing.JButton();
         jButtonRegistrarParada = new javax.swing.JButton();
-        jpConfigDefault = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
-        jSeparator1 = new javax.swing.JSeparator();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jtfUserDafaut = new javax.swing.JTextField();
-        jpfSenhaDefault = new javax.swing.JPasswordField();
-        jSeparator3 = new javax.swing.JSeparator();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
-        jLabel11 = new javax.swing.JLabel();
-        jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
-        jSeparator2 = new javax.swing.JSeparator();
-        jLabel14 = new javax.swing.JLabel();
-        jLabel15 = new javax.swing.JLabel();
-        jLabel16 = new javax.swing.JLabel();
-        jLabel17 = new javax.swing.JLabel();
-        jLabel18 = new javax.swing.JLabel();
-        jLabel19 = new javax.swing.JLabel();
-        jLabel20 = new javax.swing.JLabel();
-        jtfDriverProducao = new javax.swing.JTextField();
-        jtfServidorProducao = new javax.swing.JTextField();
-        jtfUrlProducao = new javax.swing.JTextField();
-        jtfBDProducao = new javax.swing.JTextField();
-        jtfUsuarioProducao = new javax.swing.JTextField();
-        jtfDriverTeste = new javax.swing.JTextField();
-        jtfServidorTeste = new javax.swing.JTextField();
-        jtfUrlTeste = new javax.swing.JTextField();
-        jtfBDTeste = new javax.swing.JTextField();
-        jtfUsuarioTeste = new javax.swing.JTextField();
-        jbCriarArquivosDefault = new javax.swing.JButton();
-        jpfSenhaProducao = new javax.swing.JPasswordField();
-        jpfSenhaTeste = new javax.swing.JPasswordField();
         jpProducao = new javax.swing.JPanel();
         jLabel23 = new javax.swing.JLabel();
         jSeparator5 = new javax.swing.JSeparator();
@@ -426,7 +394,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         menuConfiguracoes = new javax.swing.JMenu();
         jMenuConfigDefault = new javax.swing.JMenuItem();
         jMenuTrocarMaquina = new javax.swing.JMenuItem();
-        jMenuConfigSerialRFID = new javax.swing.JMenuItem();
+        jMenuConfigSerialMicrometro = new javax.swing.JMenuItem();
+        jMenuSerialMetrador = new javax.swing.JMenuItem();
 
         jTextField1.setText("jTextField1");
 
@@ -628,230 +597,6 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         );
 
         jpRoot.add(jpParadas, "jpParadas");
-
-        jpConfigDefault.setBackground(new java.awt.Color(204, 255, 255));
-        jpConfigDefault.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
-
-        jLabel3.setFont(new java.awt.Font("Verdana", 1, 14)); // NOI18N
-        jLabel3.setText("Configurações Default");
-
-        jLabel4.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
-        jLabel4.setText("Configurações usuário default");
-
-        jLabel5.setText("Usuário:");
-
-        jLabel6.setText("Senha:");
-
-        jtfUserDafaut.setText("jtfUserDafaut");
-
-        jpfSenhaDefault.setText("jPasswordField1");
-
-        jLabel7.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
-        jLabel7.setText("Configurações de Banco de dados base produção:");
-
-        jLabel8.setText("Nome do driver:");
-
-        jLabel9.setText("Servidor:");
-
-        jLabel10.setText("Url:");
-
-        jLabel11.setText("Banco de dados:");
-
-        jLabel12.setText("Usuario:");
-
-        jLabel13.setText("Senha:");
-
-        jLabel14.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
-        jLabel14.setText("Configurações de Banco de dados base teste:");
-
-        jLabel15.setText("Nome do driver:");
-
-        jLabel16.setText("Servidor:");
-
-        jLabel17.setText("Url:");
-
-        jLabel18.setText("Banco de dados:");
-
-        jLabel19.setText("Usuário:");
-
-        jLabel20.setText("Senha:");
-
-        jtfDriverProducao.setText("jtfDriverProducao");
-
-        jtfServidorProducao.setText("jtfServidorProducao");
-
-        jtfUrlProducao.setText("jtfUrlProducao");
-
-        jtfBDProducao.setText("jtfBDProducao");
-
-        jtfUsuarioProducao.setText("jtfUsuarioProducao");
-
-        jtfDriverTeste.setText("jtfDriverTeste");
-
-        jtfServidorTeste.setText("jtfServidorTeste");
-
-        jtfUrlTeste.setText("jtfUrlTeste");
-
-        jtfBDTeste.setText("jtfBDTeste");
-
-        jtfUsuarioTeste.setText("jtfUsuarioTeste");
-
-        jbCriarArquivosDefault.setText("Guardar");
-        jbCriarArquivosDefault.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jbCriarArquivosDefaultActionPerformed(evt);
-            }
-        });
-
-        jpfSenhaProducao.setText("000000000000");
-
-        jpfSenhaTeste.setText("jPasswordField1");
-
-        javax.swing.GroupLayout jpConfigDefaultLayout = new javax.swing.GroupLayout(jpConfigDefault);
-        jpConfigDefault.setLayout(jpConfigDefaultLayout);
-        jpConfigDefaultLayout.setHorizontalGroup(
-            jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jpConfigDefaultLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jpConfigDefaultLayout.createSequentialGroup()
-                        .addGroup(jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jSeparator1)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(jpConfigDefaultLayout.createSequentialGroup()
-                                .addGroup(jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
-                                    .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jpfSenhaDefault)
-                                    .addComponent(jtfUserDafaut)))
-                            .addGroup(jpConfigDefaultLayout.createSequentialGroup()
-                                .addGroup(jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(jLabel19, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel18, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
-                                    .addComponent(jLabel17, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel16, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel15, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jtfServidorTeste)
-                                    .addComponent(jtfUrlTeste)
-                                    .addComponent(jtfBDTeste)
-                                    .addComponent(jtfUsuarioTeste)
-                                    .addComponent(jtfDriverTeste)))
-                            .addGroup(jpConfigDefaultLayout.createSequentialGroup()
-                                .addComponent(jLabel14)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(jpConfigDefaultLayout.createSequentialGroup()
-                                .addGroup(jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel10, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel12, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel13, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel11, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jpConfigDefaultLayout.createSequentialGroup()
-                                        .addComponent(jtfDriverProducao, javax.swing.GroupLayout.PREFERRED_SIZE, 705, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(0, 180, Short.MAX_VALUE))
-                                    .addComponent(jtfServidorProducao)
-                                    .addComponent(jtfUrlProducao)
-                                    .addComponent(jtfBDProducao)
-                                    .addComponent(jtfUsuarioProducao)
-                                    .addComponent(jpfSenhaProducao))))
-                        .addContainerGap())
-                    .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jSeparator3)
-                    .addComponent(jSeparator2)
-                    .addGroup(jpConfigDefaultLayout.createSequentialGroup()
-                        .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jpfSenhaTeste)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jbCriarArquivosDefault, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))))
-        );
-        jpConfigDefaultLayout.setVerticalGroup(
-            jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jpConfigDefaultLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(1, 1, 1)
-                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(jtfUserDafaut, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(6, 6, 6)
-                .addGroup(jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel6)
-                    .addComponent(jpfSenhaDefault, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(14, 14, 14)
-                .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel7)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jtfDriverProducao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel8))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel9)
-                    .addComponent(jtfServidorProducao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel10)
-                    .addComponent(jtfUrlProducao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel11)
-                    .addComponent(jtfBDProducao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel12)
-                    .addComponent(jtfUsuarioProducao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel13)
-                    .addComponent(jpfSenhaProducao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel14)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel15)
-                    .addComponent(jtfDriverTeste, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel16)
-                    .addComponent(jtfServidorTeste, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel17)
-                    .addComponent(jtfUrlTeste, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel18)
-                    .addComponent(jtfBDTeste, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel19)
-                    .addComponent(jtfUsuarioTeste, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jpConfigDefaultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel20)
-                    .addComponent(jpfSenhaTeste, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jbCriarArquivosDefault))
-                .addGap(197, 197, 197))
-        );
-
-        jpRoot.add(jpConfigDefault, "jpConfigDefault");
-        jpConfigDefault.getAccessibleContext().setAccessibleName("");
 
         jpProducao.setBackground(new java.awt.Color(204, 255, 255));
         jpProducao.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -1556,13 +1301,21 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         });
         menuConfiguracoes.add(jMenuTrocarMaquina);
 
-        jMenuConfigSerialRFID.setText("Serial Micrometro");
-        jMenuConfigSerialRFID.addActionListener(new java.awt.event.ActionListener() {
+        jMenuConfigSerialMicrometro.setText("Serial Micrometro");
+        jMenuConfigSerialMicrometro.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuConfigSerialRFIDActionPerformed(evt);
+                jMenuConfigSerialMicrometroActionPerformed(evt);
             }
         });
-        menuConfiguracoes.add(jMenuConfigSerialRFID);
+        menuConfiguracoes.add(jMenuConfigSerialMicrometro);
+
+        jMenuSerialMetrador.setText("Serial Metrador");
+        jMenuSerialMetrador.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuSerialMetradorActionPerformed(evt);
+            }
+        });
+        menuConfiguracoes.add(jMenuSerialMetrador);
 
         menuPrincipal.add(menuConfiguracoes);
 
@@ -1632,71 +1385,19 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     }//GEN-LAST:event_jbLoginActionPerformed
 
     private void jMenuConfigDefaultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuConfigDefaultActionPerformed
-        // TODO add your handling code here:
-        try {                    
-            limparCamposConfigDefault();
-            DadosConexao dp =  new DadosConexao();
-            DadosDefaultDAO dao = new DadosDefaultDAO();
-            dp = dao.buscaDadosConexaoDefault(true);
-            if(dp!=null){
-                jtfBDProducao.setText(dp.getMyDatabase());
-                jtfDriverProducao.setText(dp.getDriverName());
-                jtfServidorProducao.setText(dp.getServerName());
-                jtfUrlProducao.setText(dp.getUrl());
+        if(System.getProperty("os.name").equals("Linux")){
+            try {
+                Runtime.getRuntime().exec("sudo nice -n -19 java -jar /home/pipc/NetBeansProjects/ConnectionDatabase/dist/ConnectionDatabase.jar");
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                erro.gravaErro(ex);
             }
-            DadosConexao dt =  new DadosConexao();
-            dt = dao.buscaDadosConexaoDefault(false);
-            if(dt!=null){
-                jtfBDTeste.setText(dt.getMyDatabase());
-                jtfDriverTeste.setText(dt.getDriverName());
-                jtfServidorTeste.setText(dt.getServerName());
-                jtfUrlTeste.setText(dt.getUrl());
-            }
-            CardLayout card = (CardLayout) jpRoot.getLayout();
-            card.show(jpRoot,"jpConfigDefault");
-        } catch (Exception e) {
-            erro.gravaErro(e);
+        }else{
+            String args[] = null;
+            ConnectionDatabase.main(args);
         }
-    }//GEN-LAST:event_jMenuConfigDefaultActionPerformed
 
-    private void jbCriarArquivosDefaultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbCriarArquivosDefaultActionPerformed
-        // TODO add your handling code here:
-        try {                    
-            boolean add = true;
-            Usuario us = new Usuario();
-            us.setUsuario(jtfUserDafaut.getText());
-            us.setSenha(jpfSenhaDefault.getText());
-            DadosDefaultDAO dao = new DadosDefaultDAO();
-            if (!dao.ArmazenarUserDefault(us)) {
-                JOptionPane.showMessageDialog(null, "Falha ao registrar dados usuario default","Usuário Default",JOptionPane.ERROR_MESSAGE);
-                add = false;
-            }
-            DadosConexao d = new DadosConexao();
-            d.setDriverName(jtfDriverProducao.getText());
-            d.setMyDatabase(jtfBDProducao.getText());
-            d.setPassword(jpfSenhaProducao.getText());
-            d.setServerName(jtfServidorProducao.getText());
-            d.setUrl(jtfUrlProducao.getText());
-            d.setUserName(jtfUsuarioProducao.getText());
-            if(!dao.armazenaDadosConexao(d,true)) {
-                JOptionPane.showMessageDialog(null, "Falha ao registrar dados de conexão","Banco de dados Produção",JOptionPane.ERROR_MESSAGE);
-                add = false;
-            }
-            d.setDriverName(jtfDriverTeste.getText());
-            d.setMyDatabase(jtfBDTeste.getText());
-            d.setPassword(jpfSenhaTeste.getText());
-            d.setServerName(jtfServidorTeste.getText());
-            d.setUrl(jtfUrlTeste.getText());
-            d.setUserName(jtfUsuarioTeste.getText());
-            if(!dao.armazenaDadosConexao(d,false)) {
-                JOptionPane.showMessageDialog(null, "Falha ao registrar dados de conexão","Banco de dados Teste",JOptionPane.ERROR_MESSAGE);
-                add = false;
-            }
-            if(add) JOptionPane.showMessageDialog(null,"Dados Registrados com sucesso");
-        } catch (HeadlessException e) {
-            erro.gravaErro(e);
-        }
-    }//GEN-LAST:event_jbCriarArquivosDefaultActionPerformed
+    }//GEN-LAST:event_jMenuConfigDefaultActionPerformed
 
     private void jMenuItemSairActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSairActionPerformed
         // TODO add your handling code here:   
@@ -1739,16 +1440,17 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         }
     }//GEN-LAST:event_jMenuTrocarMaquinaActionPerformed
 
-    private void jMenuConfigSerialRFIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuConfigSerialRFIDActionPerformed
+    private void jMenuConfigSerialMicrometroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuConfigSerialMicrometroActionPerformed
         // TODO add your handling code here:
         try {                    
-            JFConfigSerialRFID cfg = new JFConfigSerialRFID(comMicrometro);
+            JFConfigSerialCon cfg = new JFConfigSerialCon(comMicrometro);
             cfg.setConfigName(SERIAL_MICROMETRO);
             cfg.setVisible(true);
         } catch (Exception e) {
+            e.printStackTrace();
             erro.gravaErro(e);
         }
-    }//GEN-LAST:event_jMenuConfigSerialRFIDActionPerformed
+    }//GEN-LAST:event_jMenuConfigSerialMicrometroActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
@@ -1889,8 +1591,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         // TODO add your handling code here:        
         try {                
             if(!verificaMontagemMaquina())return;
-             if(!maqParada){ //retornar apos testes
-            //if(maqParada){ //remover ampos testes
+             if(!maqParada){
                 if(jTableMotivosParada.getRowCount()>0){
                     registrarMotivoParadas();                    
                     habilitarMenu();
@@ -1903,21 +1604,29 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 }            
             }else{
                 JOptionPane.showMessageDialog(rootPane, "Ainda não foi detectado o retorno de produção","Maquina permanece parada",JOptionPane.ERROR_MESSAGE);
-                if(comMicrometro==null) comMicrometro = new SerialTxRx();
-                if(parametrizarSerial(SERIAL_MICROMETRO)){
-                    if(comMicrometro.iniciaSerial()){
-                        System.out.println("serial Micrometro iniciada");
-                        comMicrometro.addActionListener(this);
+                if(serialMicrometro==false) {
+                    comMicrometro = new SerialTxRx();                
+                    if(parametrizarSerial(SERIAL_MICROMETRO)){
+                        if(comMicrometro.iniciaSerial()){
+                            System.out.println("serial Micrometro iniciada");
+                            comMicrometro.addActionListener(this);
+                            serialMicrometro = true;
+                        }
                     }
-                }   
-                if(parametrizarSerial(SERIAL_METRADOR)){
-                    if(comMetrador.iniciaSerial()){
-                        System.out.println("serial Metrador iniciada");
-                        comMetrador.addActionListener(this);
+                }
+                if(serialMetrador==false) {
+                    comMetrador = new SerialTxRx();                
+                    if(parametrizarSerial(SERIAL_METRADOR)){
+                        if(comMetrador.iniciaSerial()){
+                            System.out.println("serial Metrador iniciada");
+                            comMetrador.addActionListener(this);
+                            serialMetrador=true;
+                        }
                     }
                 }
             }
         } catch (HeadlessException e) {
+            e.printStackTrace();
             erro.gravaErro(e);
         }
     }//GEN-LAST:event_jButtonRegistrarParadaActionPerformed
@@ -1967,6 +1676,17 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         }
     }//GEN-LAST:event_jTableProgramacaoMouseClicked
 
+    private void jMenuSerialMetradorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuSerialMetradorActionPerformed
+        try {                    
+            JFConfigSerialCon cfg = new JFConfigSerialCon(comMetrador);
+            cfg.setConfigName(SERIAL_METRADOR);
+            cfg.setVisible(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+    }//GEN-LAST:event_jMenuSerialMetradorActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -2008,7 +1728,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     }
     
     public static void ZerarMetragemCarretelSaida(){
-        displaySingleMetragemCarretel.setValue(0);
+        displaySingleMetragemCarretel.setValue(0);     
     }
 
     public static String getIdentificador() {
@@ -2051,18 +1771,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JButton jButtonRemoverMotivoParada;
     private javax.swing.JComboBox<String> jComboBoxParadasMaquina;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
-    private javax.swing.JLabel jLabel15;
-    private javax.swing.JLabel jLabel16;
-    private javax.swing.JLabel jLabel17;
-    private javax.swing.JLabel jLabel18;
-    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
@@ -2072,7 +1781,6 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel28;
     private javax.swing.JLabel jLabel29;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel30;
     private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel32;
@@ -2083,12 +1791,6 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JLabel jLabel37;
     private javax.swing.JLabel jLabel38;
     private javax.swing.JLabel jLabel39;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JLabel jLabelAlerta;
     private javax.swing.JLabel jLabelCarretel1;
     private javax.swing.JLabel jLabelCarretel2;
@@ -2107,7 +1809,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JLabel jLabelProducaoVelIdeal;
     private javax.swing.JMenuItem jMenuAjusteMetragem;
     private javax.swing.JMenuItem jMenuConfigDefault;
-    private javax.swing.JMenuItem jMenuConfigSerialRFID;
+    private javax.swing.JMenuItem jMenuConfigSerialMicrometro;
     private javax.swing.JMenuItem jMenuItemDesligar;
     private javax.swing.JMenuItem jMenuItemLogin;
     private javax.swing.JMenuItem jMenuItemParadas;
@@ -2115,6 +1817,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JMenuItem jMenuItemProgramacao;
     private javax.swing.JMenuItem jMenuItemReiniciar;
     private javax.swing.JMenuItem jMenuItemSair;
+    private javax.swing.JMenuItem jMenuSerialMetrador;
     private javax.swing.JMenuItem jMenuTrocarMaquina;
     private javax.swing.JPanel jPLogo;
     private javax.swing.JPanel jPanelEventoEntrada;
@@ -2126,9 +1829,6 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSeparator jSeparator5;
     private javax.swing.JSeparator jSeparator6;
@@ -2140,30 +1840,14 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JTable jTableProgramacao;
     private javax.swing.JTextArea jTextAreaObsParada;
     private javax.swing.JTextField jTextField1;
-    private javax.swing.JButton jbCriarArquivosDefault;
     private javax.swing.JButton jbLogin;
-    private javax.swing.JPanel jpConfigDefault;
     private javax.swing.JPanel jpLogin;
     private javax.swing.JPanel jpParadas;
     private javax.swing.JPanel jpProducao;
     private javax.swing.JPanel jpProgramacao;
     private javax.swing.JPanel jpRoot;
     private javax.swing.JPasswordField jpfPassword;
-    private javax.swing.JPasswordField jpfSenhaDefault;
-    private javax.swing.JPasswordField jpfSenhaProducao;
-    private javax.swing.JPasswordField jpfSenhaTeste;
-    private javax.swing.JTextField jtfBDProducao;
-    private javax.swing.JTextField jtfBDTeste;
-    private javax.swing.JTextField jtfDriverProducao;
-    private javax.swing.JTextField jtfDriverTeste;
-    private javax.swing.JTextField jtfServidorProducao;
-    private javax.swing.JTextField jtfServidorTeste;
-    private javax.swing.JTextField jtfUrlProducao;
-    private javax.swing.JTextField jtfUrlTeste;
     private javax.swing.JTextField jtfUser;
-    private javax.swing.JTextField jtfUserDafaut;
-    private javax.swing.JTextField jtfUsuarioProducao;
-    private javax.swing.JTextField jtfUsuarioTeste;
     private eu.hansolo.lightbulb.LightBulb lightBulbAlertaEvento;
     private eu.hansolo.lightbulb.LightBulb lightBulbAlertaSaldoEntrada1;
     private eu.hansolo.lightbulb.LightBulb lightBulbAlertaSaldoEntrada2;
@@ -2180,15 +1864,6 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private eu.hansolo.steelseries.gauges.Radial4Lcd radialLcdDiametro;
     private eu.hansolo.steelseries.gauges.Radial4Lcd radialLcdVelocidade;
     // End of variables declaration//GEN-END:variables
-
-    private void limparCamposConfigDefault() {
-        jtfUserDafaut.setText("");
-        jpfSenhaDefault.setText("");
-        jtfUsuarioProducao.setText("");
-        jpfSenhaProducao.setText("");
-        jtfUsuarioTeste.setText("");
-        jpfSenhaTeste.setText("");
-    }
     
     private void limparTelaLogin(){
         jtfUser.setText("");
@@ -2272,7 +1947,9 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                         abrirTelaProgramacao();
                         return false;
                     }
-                }                  
+                }           
+                
+                
                 ProgramacaoMaquinaDAO daoProg = new ProgramacaoMaquinaDAO();
                 ProdutoCarretelDAO daoProdCar =  new ProdutoCarretelDAO();
                 prog = daoProg.buscaProgramacaoLoteItem(prod.getLoteProducao(),Long.valueOf(prod.getItemProducao()));
@@ -2366,17 +2043,24 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             limparJTable(jTableProducaoArrebentamentos);
             limparJTable(jTableProducaoParadas);
             jLabelAlerta.setVisible(false);
-            if(comMicrometro==null) comMicrometro = new SerialTxRx();
-            if(parametrizarSerial(SERIAL_MICROMETRO)){
-                if(comMicrometro.iniciaSerial()){
-                    System.out.println("serial Micrometro iniciada");
-                    comMicrometro.addActionListener(this);
+            if(serialMicrometro==false){
+                comMicrometro = new SerialTxRx();           
+                if(parametrizarSerial(SERIAL_MICROMETRO)){
+                    if(comMicrometro.iniciaSerial()){
+                        System.out.println("serial Micrometro iniciada");
+                        comMicrometro.addActionListener(this);
+                        serialMicrometro=true;
+                    }
                 }
             }
-            if(parametrizarSerial(SERIAL_METRADOR)){
-                if(comMetrador.iniciaSerial()){
-                    System.out.println("serial Metrador iniciada");
-                    comMetrador.addActionListener(this);
+            if(serialMetrador==false) {
+                comMetrador = new SerialTxRx();            
+                if(parametrizarSerial(SERIAL_METRADOR)){                
+                    if(comMetrador.iniciaSerial()){
+                        System.out.println("serial Metrador iniciada");
+                        comMetrador.addActionListener(this);
+                        serialMetrador=true;
+                    }
                 }
             }
             if(buscarInformaçoesProducao()){
@@ -2405,7 +2089,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
 
     private void abrirTelaLogin() {
         try {                                      
-            if(comMetrador==null) comMetrador = new SerialTxRx();
+            //if(comMetrador==null) comMetrador = new SerialTxRx();
             login.setUsuario("");
             login.setNome("");
             login.setNivel("");
@@ -2510,126 +2194,127 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             }
             if(e.getActionCommand().trim().equals("")) return;
             System.out.println("dados recebidos: " + e.getActionCommand());              
-            dadosSerialMicrometro(e.getActionCommand());
-            if(e.getActionCommand().contains("Pulsos")){
-                
+            if(e.getActionCommand().substring(6).contains("Pulsos")){
+                dadosMetrador(e.getActionCommand());
+                serialMetrador=true;
             }else{
                 dadosSerialMicrometro(e.getActionCommand());
+                serialMicrometro=true;
             }
         } catch (HeadlessException ex) {   
             ex.printStackTrace();
             erro.gravaErro(ex);
         }
     }
-    
-    private void dadosSerialMicrometro(String dados){
-        double tempoCalculadoSistema;
+    private void dadosMetrador(String dados){
         double metrosProduzidos;
-        long metrosAguardando=0;
+        double metrosAguardando=0;
         double velocidade;
-        try { 
-            System.out.println("inicio dados Micrometro!! Metragem anterior; " + metragemAnterior);
+        try {
             if(!iniciaLeituras){                
-                //double metAnterior = (double) leituraAnterior.getMetragem();
-                ControllerMicrometro mic = new ControllerMicrometro();
-                leituraAtual = mic.setarDadosMicrometro(dados);   
-                if(leituraAtual==null)return;
-                tempoCalculadoSistema = (System.currentTimeMillis() - tempoSistema);                
-                double metAtual =  leituraAtual.getMetragem();                                
-                //if(metAnterior < metAtual) {                    
-                if(metragemAnterior<metAtual){
-                    //metrosProduzidos = metAtual - metAnterior;
-                                                            
+                ControllerContadorMetros ctrMts = new ControllerContadorMetros(maquina.getPulsosPorMetro());
+                contaMetros = ctrMts.setarDadosLeitura(dados,contaMetros,maquina.getCodigo());
+                if(contaMetros.getMetrador()==null)return;            
+                double metAtual = contaMetros.getMetragemAtual();                  
+                if(contaMetros.getMetragemProduzida()>0){
+                    System.out.println("Metragem: " + metAtual);
+                    metrosProduzidos = contaMetros.getMetragemProduzida();
+                    System.out.println("Produzido: " + metrosProduzidos);                                        
                     ControllerProducao prd = new ControllerProducao();
-                    if(prd.atualizaMetragemProduzida(listaPesagens, (metAtual - metragemAnterior), codMaquina,maqPronta,"+")){
+                    if(prd.atualizaMetragemProduzida(listaPesagens, metrosProduzidos, codMaquina,maqPronta,"+")){
                     System.out.println("Registrada metragem produzida, metragem anterior alterdada: " + (metAtual - metragemAnterior));                        
-                        //leituraAnterior = mic.setarDadosMicrometro(dados); 
-                        if(falhaRegistro){     
-                            metrosAguardando = (long)(metAtual-metragemAnterior);
-                            falhaRegistro=false;
-                            metragemAnterior=metTemporaria;                                                   
-                            if(metProdTmp!=0){
-                                if(prd.atualizaMetragemProduzida(listaPesagens, (metProdTmp - (metAtual - metragemAnterior)), codMaquina,maqPronta,"+")){                                    
-                                    metProdTmp=0;
-                                }else{
-                                    JOptionPane.showMessageDialog(rootPane,"Falha ao limpar registros de produção de metragem temporaria \n"
-                                            + "Por favor informe ao setor de informática","Falha grave",JOptionPane.ERROR_MESSAGE);
-                                }                               
+                        if(falhaRegistro){                                                                                                                        
+                            metrosAguardando= prd.buscaMetProdTemp(maquina)-metrosProduzidos;    
+                            if(metrosAguardando<0){
+                                metrosAguardando = prd.buscaMetragemArquivoTemporario();
                             }
-                            prd.limparRegistroProducaoTemporaria(codMaquina);
-                        }
-                        metrosProduzidos = metAtual - metragemAnterior;
-                        metragemAnterior =leituraAtual.getMetragem(); 
-                        
-                    }else{
+                            if(!prd.atualizaMetragemProduzida(listaPesagens, (metrosAguardando), codMaquina,maqPronta,"+")){                                                                                    
+                                JOptionPane.showMessageDialog(rootPane,"Falha ao limpar registros de produção de metragem temporaria \n"
+                                        + "Por favor informe ao setor de informática","Falha grave",JOptionPane.ERROR_MESSAGE);                                
+                            }else{                                                           
+                                prd.limparRegistroProducaoTemporaria(codMaquina);
+                                falhaRegistro=false;     
+                            }
+                        }                                                                       
+                        metragemAnterior = contaMetros.getMetragemAtual();                                                                         
+                    }else{ 
                         if(!falhaRegistro){
                             System.out.println("falha nos registros");
                             //metrosProduzidos = metAtual - metragemAnterior;
                             falhaRegistro=true;
-                            metTemporaria = (int) metragemAnterior;                                                        
+                            metTemporaria =  metragemAnterior;                                                        
                         }                        
-                        metrosProduzidos = metAtual - metTemporaria;
-                        if(!maqPronta)prd.registraMetragemProducaoTemporaria(metrosProduzidos, codMaquina);
-                        metTemporaria=(int)metAtual;
+                        metrosProduzidos = contaMetros.getMetragemProduzida();
+                        prd.registraMetragemProducaoTemporaria(metrosProduzidos, codMaquina);
+                        metTemporaria=metTemporaria+metrosProduzidos;
                         System.out.println("Met. Anterior: " + metragemAnterior);
-                        System.out.println("Met. Atual: " + leituraAtual.getMetragem());
-                        System.err.println("Met. Produzidos; " + metrosProduzidos);
-                        System.out.println("Tempo Calculado: " + tempoCalculadoSistema);                                                                
+                        System.out.println("Met. Atual: " + contaMetros.getMetragemAtual());
+                        System.err.println("Met. Produzidos; " + metrosProduzidos); 
                     }
-                    tempoSistema = System.currentTimeMillis();  
-                    atualizarMostradoresMetragem(metrosProduzidos,metrosAguardando);                    
-                    velocidade = (metrosProduzidos/(tempoCalculadoSistema/1000.0));
-                    double velMediana = mediaVelocidade(velocidade*60);                    
-                    resumoRelatorio = 0;
-                    if(velMediana>radialLcdVelocidade.getMaxValue()){
-                        radialLcdVelocidade.setValue(radialLcdVelocidade.getMaxValue());
-                    }else{
-                        radialLcdVelocidade.setValue(velMediana);                             
-                    }                    
-                    if(maqParada)if(velMediana>=(radialLcdVelocidade.getTrackStart() + 5))registrarRetornoEvento();
-                    eventosTimer = 0;
-                    if(velMediana < radialLcdVelocidade.getTrackStart() - 5){
-                        System.out.println("Parada por velocidade abaixo da minima");
-                        if(!maqParada){
-                            abrirTelaParadas();
-                        }
-                    }                 
-                    atualizarMostradoresDiametro();
-                    gerenciarColetorAmostraDiametro(metrosProduzidos, (int)velMediana);                    
+                    
+                }
+                Metrador met = new Metrador();
+                met = contaMetros.getMetrador();
+                tempoSistema = contaMetros.getTime();
+                velocidade = (contaMetros.getMetragemProduzida()/(tempoSistema/1000.0));
+                atualizarMostradoresMetragem(contaMetros.getMetragemProduzida(),metrosAguardando);                                  
+                double velMediana = mediaVelocidade(velocidade*60);                    
+                if(velMediana>radialLcdVelocidade.getMaxValue()){
+                    radialLcdVelocidade.setValue(radialLcdVelocidade.getMaxValue());
                 }else{
-                    if(resumoRelatorio >= linhas){
-                        if(radialLcdVelocidade.getValue()>0)radialLcdVelocidade.setValueAnimated(mediaVelocidade(0));
-                        if (radialLcdVelocidade.getValue()==0){
-                            System.out.println("Parada!!!");
-                            if(!maqParada)abrirTelaParadas();
-                        } 
-                    }else{
-                        resumoRelatorio ++;
-                        System.out.println("Resumo relatoio: " + resumoRelatorio);
+                    radialLcdVelocidade.setValue(velMediana);                             
+                }           
+                System.out.println("Mediana " + velMediana);
+                if(maqParada && velMediana>=(radialLcdVelocidade.getTrackStart() + 5))registrarRetornoEvento();
+                eventosTimer = 0;
+                if(velMediana < radialLcdVelocidade.getTrackStart() - 5){
+                    System.out.println("Parada por velocidade abaixo da minima");
+                    if(!maqParada){
+                        abrirTelaParadas();
                     }
+                }
+                if(velMediana==0 && met.getPulsos1()>0){
+                    System.out.println(comMetrador);
+                    comMetrador.SendData("1");
+                    contaMetros.setLastPuls(0);
                 }                
             }else{            
                 iniciarLeiturasSerial(dados);
             }
-            
+        } catch (HeadlessException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+    }
+    private void dadosSerialMicrometro(String dados){
+        
+        try { 
+            //System.out.println("Dados Midrometro..");                       
+                //double metAnterior = (double) leituraAnterior.getMetragem();
+                ControllerMicrometro mic = new ControllerMicrometro();
+                leituraAtual = mic.setarDadosMicrometro(dados);   
+                if(leituraAtual==null)return;                                                               
+                atualizarMostradoresDiametro();
+                gerenciarColetorAmostraDiametro();                                                                    
         } catch (HeadlessException e) {
             erro.gravaErro(e);
         }
     }
     private void iniciarLeiturasSerial(String dados){
         try {
-            ControllerMicrometro mic = new ControllerMicrometro();
+            //ControllerMicrometro mic = new ControllerMicrometro();            
             System.out.println("Iniciou leituras");
             //leituraAnterior = mic.setarDadosMicrometro(dados);
-            leituraAtual = mic.setarDadosMicrometro(dados);
-            if(leituraAtual!=null){
-            metragemAnterior = leituraAtual.getMetragem();
-                System.out.println("metragem inicial: " + metragemAnterior);
-                metTemporaria=(int)metragemAnterior;
-                tempoSistema = System.currentTimeMillis();
+            ControllerContadorMetros ctrMts = new ControllerContadorMetros(maquina.getPulsosPorMetro());
+            contaMetros = ctrMts.setarDadosLeitura(dados,contaMetros,maquina.getCodigo());
+            //leituraAtual = mic.setarDadosMicrometro(dados);
+            if(contaMetros.getMetrador()!=null){
+                metragemAnterior = contaMetros.getMetragemAtual();
+                metTemporaria = contaMetros.getMetragemProduzida();
                 iniciaLeituras = false;
             }
         } catch (Exception e) {
+            e.printStackTrace();
             erro.gravaErro(e);
         }
     }
@@ -2662,7 +2347,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                     + " e nivel de permissão: " + login.getNivel());             
                 jMenuItemSair.setEnabled(true);
                 jMenuItemLogin.setEnabled(false);
-                if(!maqPronta){
+                if(!maqPronta || maqParada){
                     abrirTelaParadas();
                 }else{
                     abrirTelaProducao();           
@@ -2710,7 +2395,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             double metAlvo=0;
             double metProgramada =  prog.getMetragemProgramada();
             double metMaxima =  prodCar.getMetragemMaxima();
-            double metProduzida =  prod.getMetragemProduzida();               
+            double metProduzida =  prod.getMetragemProduzida();   
+            //contaMetros.setMetragemAtual(contaMetros.getMetragemAtual()+metProduzida);
             double metTotalProduzida = Double.valueOf(jLabelProducaoMetTotalProd.getText());
             metTotalProduzida += metProduzida;         
             double metTotalProgramada = Double.valueOf(jLabelProducaoMetTotalProg.getText());
@@ -2739,20 +2425,23 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         }
     }
     
-    private void atualizarMostradoresMetragem( double metrosProduzidos, long metrosAguardando){
-        try {       
+    private void atualizarMostradoresMetragem( double metrosProduzidos, double metrosAguardando){
+        double metCarSaida;
+        double metTotalProduzida;
+        try {   
+            if(!maqPronta) return;
             if(metrosProduzidos>0){
-                ControllerProducao ctr = new ControllerProducao();
-                Producao prd = new Producao();
-                prd = ctr.buscaDadosMaquinaProducao(codMaquina);
-                double prodPerc;      
-                if(!maqPronta){
-                    displaySingleMetragemCarretel.setValue(displaySingleMetragemCarretel.getValue() + metrosProduzidos);
-                }else{
-                    displaySingleMetragemCarretel.setValue(prd.getMetragemProduzida());
-                    displaySingleMetragemProgramado.setValue(displaySingleMetragemProgramado.getValue() + (metrosProduzidos + metrosAguardando));
-                }    
-                //displaySingleMetragemProgramado.setValue(displaySingleMetragemProgramado.getValue() + metrosProduzidos);
+
+                metCarSaida = contaMetros.getMetragemAtual();
+                metTotalProduzida =contaMetros.getMetragemAtual()+Double.valueOf(jLabelProducaoMetTotalProd.getText());
+//                metCarSaida = displaySingleMetragemCarretel.getValue()+contaMetros.getMetragemProduzida();
+//                metTotalProduzida =displaySingleMetragemProgramado.getValue()+
+//                        Double.valueOf(jLabelProducaoMetTotalProd.getText())+
+//                        contaMetros.getMetragemProduzida();
+
+                double prodPerc;                                         
+                displaySingleMetragemCarretel.setValue(metCarSaida);
+                displaySingleMetragemProgramado.setValue(metTotalProduzida);
                 prodPerc = (displaySingleMetragemProgramado.getValue() / prog.getMetragemTotalProgramada()) * 100;
                 if(prodPerc>100){
                     linearProgramacao.setValue(100);            
@@ -2773,7 +2462,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                             displaySingleSaldoCarretelEntrada2.getValue() - (metrosProduzidos + metrosAguardando));
                 atualiMostradorParadaEntrada();                
             }
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             e.printStackTrace();
             erro.gravaErro(e);
         }
@@ -3059,13 +2748,15 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         return true;
     }
     */
-    private void gerenciarColetorAmostraDiametro(double metrosProduzidos,int velocidade) {
+    private void gerenciarColetorAmostraDiametro() {
         try {
             if(metrosRelatorio<=maquina.getMetrosAmostraDiametro()){
-                metrosRelatorio += (int)metrosProduzidos;
-                relatorio.add(leituraAtual);
+                if(contaMetros.getMetragemProduzida()>0){
+                    metrosRelatorio += contaMetros.getMetragemProduzida();
+                    relatorio.add(leituraAtual);
+                }
             }else{
-                //System.out.println("hora de Agir..");
+                if(relatorio.isEmpty())return;
                 double diaMinAmostra=0.0;
                 double diaMaxAmostra=0.0;
                 double diaMedAmostra=0.0;
@@ -3081,20 +2772,22 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 dados.setDiametroMedio((float)(diaMedAmostra / relatorio.size()));
                 dados.setDiametroMaximo((float)(diaMaxAmostra / relatorio.size()));
                 dados.setDesvio((float)(desvioMedio / relatorio.size()));
-                ControllerMicrometro ctr = new ControllerMicrometro();
-                String lote="0";
-                if(maqPronta){
-                    lote = prog.getLoteproducao();
-                }
-                if(ctr.registraRelatorioMicrometro(dados, codMaquina, lote,
-                        (int) displaySingleMetragemCarretel.getValue(),velocidade)){
-                    relatorio.clear();
-                    metrosRelatorio=0;
-                }            
+            ControllerMicrometro ctr = new ControllerMicrometro();
+            String lote="0";
+            if(maqPronta){
+                lote = prog.getLoteproducao();
             }
+                if(ctr.registraRelatorioMicrometro(dados, codMaquina, lote,
+                        (int) displaySingleMetragemCarretel.getValue(),(int)radialLcdVelocidade.getValue())){
+                relatorio.clear();
+                metrosRelatorio=0;
+                }                           
+            }            
         } catch (Exception e) {
             e.printStackTrace();
             erro.gravaErro(e);
+            relatorio.clear();
+            metrosRelatorio=0;
         }
     }
 
@@ -3108,7 +2801,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             System.out.println("Apontar pesagem e trocar carretel de saida");
             ControllerProducao ctrProd = new ControllerProducao();
             this.prod = ctrProd.buscaDadosMaquinaProducao(codMaquina);
-            JFApontamentoProducao apt = new JFApontamentoProducao(maquina,login,prodmaq,prodCar,prod,prog,jTableMotivosParada);
+            JFApontamentoProducao apt = new JFApontamentoProducao(maquina,login,prodmaq,prodCar,prod,prog,jTableMotivosParada,contaMetros);
             apt.setExtendedState(JFrame.MAXIMIZED_BOTH);
             apt.setVisible(true);
         }else{

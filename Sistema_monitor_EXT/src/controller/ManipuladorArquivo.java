@@ -7,6 +7,7 @@ package controller;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -32,7 +33,11 @@ public class ManipuladorArquivo {
     }
 
     public void setDados(String dados) {
-        this.dados = dados;
+        if(dados==null){
+            this.dados = "";
+        }else{
+            this.dados = dados;
+        }
     }
     
     public String getArquivo() {
@@ -44,21 +49,25 @@ public class ManipuladorArquivo {
     }
             
         
-    public void BuscarArquivo(){           
-        try (BufferedReader buffer = new BufferedReader(new FileReader(this.arquivo))) {
-            this.setDados(buffer.readLine());                        
-        } catch (FileNotFoundException ex) {
-            erro.gravaErro(ex);
+    public void BuscarArquivo(){
+        File f = new File(this.arquivo);
+        try {
+            FileReader fr = new FileReader(f);
+            BufferedReader br = new BufferedReader(fr);
+            this.setDados(br.readLine());  
+            
         } catch (IOException ex) {
+            ex.printStackTrace();
             erro.gravaErro(ex);
         }
     }
     
     public void escreverArquivo (){
      
-        try {                            
+        try {                   
             BufferedWriter buffWrite = new BufferedWriter(new FileWriter(this.arquivo));
             buffWrite.append(this.dados);
+             buffWrite.close();
         } catch (FileNotFoundException e) {
             erro.gravaErro(e);
         } catch (IOException ex) {

@@ -5,21 +5,23 @@
  */
 package comunicacaoserial;
 
-import Serial.*;
+import view.SerialComunication;
+
 
 /**
  *
  * @author renato.soares
  */
-public class ComunicacaoSerial extends Serial.SerialTxRx{
+public class ComunicacaoSerial extends Serial.SerialTxRx  {
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        Serial.SerialTxRx comunicacao = new SerialTxRx();
-        comunicacao.iniciaSerial();       
+        SerialComunication jf = new SerialComunication();
+        jf.setVisible(true);
+
     }
-    
+
 }

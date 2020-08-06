@@ -34,10 +34,11 @@ public class MaquinaDAO {
             
             try {
                 sql = "select maq.codigo, maq.descricao, al.metros_arrebentamento, "
-                        + "al.percentual_velocidade_parada,al.metros_amostra_diametro from "
+                        + "al.percentual_velocidade_parada,al.metros_amostra_diametro, "
+                        + "al.pulso_por_metro from "
                         + "condumigproducao.maquina maq left join "
-                        + "bd_sistema_monitor.tb_maquina_alerta al "
-                        + "on al.codigo_maquina_alerta = maq.codigo "
+                        + "bd_sistema_monitor.tb_maquina_parametros al "
+                        + "on al.codigo_maquina_parametros = maq.codigo "
                         + "where maq.codigo = ?;";
                 Connection conec = db.getConnection();
                 PreparedStatement st = conec.prepareStatement(sql);
@@ -49,6 +50,7 @@ public class MaquinaDAO {
                     maq.setAlertaMetrosParaArrebentamento(res.getInt("metros_arrebentamento"));
                     maq.setAlertaPercentualVelocidade(res.getFloat("percentual_velocidade_parada"));
                     maq.setMetrosAmostraDiametro(res.getInt("metros_amostra_diametro"));
+                    maq.setPulsosPorMetro(res.getDouble("pulso_por_metro"));
                     db.desconectar();
                     return maq;
                 }else{
@@ -57,6 +59,7 @@ public class MaquinaDAO {
                 }
             } catch (SQLException ex) {
                 erro.gravaErro(ex);
+                ex.printStackTrace();
             }
         }
         db.desconectar();

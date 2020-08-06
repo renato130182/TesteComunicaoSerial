@@ -18,6 +18,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import model.ComposicaoCobre;
+import model.ContadorMetros;
 import model.Engenharia;
 import model.Maquina;
 import model.Paradas;
@@ -46,7 +47,8 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
     private List<ComposicaoCobre> compCobre = new ArrayList<>();
     private List<ReservaPesagem> reservaPesagem = new ArrayList<>();
     private int perdaEstimada=0;
-    private JTable preParadasApontadas;
+    private final JTable preParadasApontadas;
+    private ContadorMetros contaMetros;
     /**
      * Creates new form JFApontamentoProducao
      * @param maquina
@@ -55,9 +57,11 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
      * @param prodCar
      * @param prod
      * @param prog
+     * @param preParadas
+     * @param contaMetros
      */
     public JFApontamentoProducao(Maquina maquina, Login login,ProdutoMaquina prodmaq,
-            ProdutoCarretel prodCar,Producao prod,ProgramacaoMaquina prog, JTable preParadas) {
+            ProdutoCarretel prodCar,Producao prod,ProgramacaoMaquina prog, JTable preParadas,ContadorMetros contaMetros) {
         initComponents();
         this.login = login;
         this.maquina = maquina;
@@ -65,6 +69,7 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
         this.prod = prod;
         this.prog = prog;
         this.preParadasApontadas=preParadas;
+        this.contaMetros = contaMetros;
         setarDadosProducao(); 
         buscarParadasProcessoProducao();
         buscaDadosConsumoMp();
@@ -521,6 +526,7 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
             }else{
                 verificarMotivosPreApontados();
             }        
+            
             FecharJanelaApontamento(true);            
         }else{
             JOptionPane.showMessageDialog(rootPane,"Falha ao realizar o registro de apontamento de produção \n "
@@ -588,7 +594,7 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
             jLabelCodItem.setText(String.valueOf(this.prog.getProduto().item.getCodigo()));
             jLabelDescricao.setText(this.prog.getProduto().item.getDescricao());
             jLabelLote.setText(this.prog.getLoteproducao());
-            jLabelMetragem.setText(String.valueOf(this.prod.getMetragemProduzida()));
+            jLabelMetragem.setText(String.valueOf((int)this.prod.getMetragemProduzida()));
             jLabelCodEmb.setText(prodCar.getCarretel().getCodigo());
             jLabelDescEmbalagem.setText(prodCar.getCarretel().getDescricao());                        
         } catch (Exception e) {
@@ -641,7 +647,7 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
             List<Engenharia> engenharia=null;
             ControllerEngenharia ctr = new ControllerEngenharia();
             engenharia=ctr.buscaListaEngenhariaEmProducao(String.valueOf(this.prog.getProduto().item.getCodigo()), 
-                    this.maquina.getCodigo(),this.prod.getMetragemProduzida());
+                    this.maquina.getCodigo(),(long)this.prod.getMetragemProduzida());
             
             for (int i=0;i<engenharia.size();i++){                                                              
                 ReservaPesagem res = new ReservaPesagem();
@@ -651,7 +657,7 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
                 res.setLoteReserva(engenharia.get(i).getLote());
                 res.setItemDescricao(engenharia.get(i).getDescricao());
                 res.setQtosfios(0);
-                res.setCodigoEmbalagem("");
+                res.setCodigoEmbalagem("");            
                 res.setQuantidade(engenharia.get(i).getQuantidade()*prod.getMetragemProduzida());
                 res.setCodigoEmbalagelTroca("");
                 res.setLoteReservaTroca("");
@@ -736,7 +742,7 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
 
     private void FecharJanelaApontamento(boolean b) {
         if(b){            
-            JFPrincipal.ZerarMetragemCarretelSaida();            
+            JFPrincipal.ZerarMetragemCarretelSaida();                 
         }
         dispose();
     }
