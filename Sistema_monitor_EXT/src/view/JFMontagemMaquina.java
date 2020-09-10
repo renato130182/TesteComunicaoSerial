@@ -39,7 +39,7 @@ public class JFMontagemMaquina extends javax.swing.JFrame {
     private List<ReservaMaquina> resMaq;
     private boolean carretelTrocado=false;
     private String pesEntrada="",pesSaida="";
-    private LogErro erro = new LogErro();
+    private final LogErro erro = new LogErro();
 
     public void setProg(ProgramacaoMaquina prog) {
         this.prog = prog;
@@ -105,17 +105,9 @@ public class JFMontagemMaquina extends javax.swing.JFrame {
         setAlwaysOnTop(true);
         setExtendedState(JFMontagemMaquina.MAXIMIZED_BOTH);
         setType(java.awt.Window.Type.UTILITY);
-        addWindowStateListener(new java.awt.event.WindowStateListener() {
-            public void windowStateChanged(java.awt.event.WindowEvent evt) {
-                formWindowStateChanged(evt);
-            }
-        });
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
-            }
-            public void windowDeactivated(java.awt.event.WindowEvent evt) {
-                formWindowDeactivated(evt);
             }
             public void windowIconified(java.awt.event.WindowEvent evt) {
                 formWindowIconified(evt);
@@ -250,9 +242,13 @@ public class JFMontagemMaquina extends javax.swing.JFrame {
                         comandoTrocaMateriaPrima(comando);                
                     }
                     else{
-                        if(comando.length()>0){
+                        if(comando.length()>0 && comando.length()<10){
                             System.out.println("Pesagem : " + comando);
-                            comandoTrocaCarretelEntrada(Integer.valueOf(comando));
+                            //comandoTrocaCarretelEntrada(Integer.valueOf(comando));
+                            comandoTrocaCarretelMontagem(Integer.valueOf(comando));  
+                        }else{
+                            JOptionPane.showMessageDialog(root,"Lote "+comando+" inválido para a montagem \n" +
+                                    "Pro favor verifique e tente novamente","Lote não encontrado",JOptionPane.ERROR_MESSAGE);
                         }
                     }
                     comando="";
@@ -273,14 +269,6 @@ public class JFMontagemMaquina extends javax.swing.JFrame {
         encerrarMontagem();
     }//GEN-LAST:event_formWindowIconified
 
-    private void formWindowDeactivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowDeactivated
-        //encerrarMontagem();
-    }//GEN-LAST:event_formWindowDeactivated
-
-    private void formWindowStateChanged(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowStateChanged
-        //setExtendedState(MAXIMIZED_BOTH);
-    }//GEN-LAST:event_formWindowStateChanged
-
     private void encerrarMontagem(){
         Object[] opcao = {"Sim","Não"};
         try {
@@ -297,6 +285,8 @@ public class JFMontagemMaquina extends javax.swing.JFrame {
                                 ,Integer.valueOf(pesEntrada));
                     }
                     ControllerReservaMaquina ctrRes = new ControllerReservaMaquina(); 
+                    ControllerEventosSistema ctrEvt = new ControllerEventosSistema();
+                    ctrEvt.atualizaLoteUltimoEventoLogin(prog.getLoteproducao());
                     if(ctrRes.AtualizaMontagemMaquina(resMaq)){
                        this.dispose();
                     }
@@ -424,7 +414,54 @@ public class JFMontagemMaquina extends javax.swing.JFrame {
             }
         }
     }
-
+    private void comandoTrocaCarretelMontagem(int pesagem){
+        long codReservaMaquina = 0;
+        String codItem="";
+        for(ReservaMaquina r : resMaq){
+            if(r.getPesagem()==pesagem){
+                codReservaMaquina=r.getcodigoReserva();
+                codItem=r.getCodItemRes();
+                break;
+            }
+        }
+        if(codReservaMaquina!=0){
+            jTACarretelEntrada.setBackground(Color.red);
+            PesagemDAO dao = new PesagemDAO();                  
+            String novaPesagem = JOptionPane.showInputDialog(root,"Informe o numero da nova pesagem!");
+            if(novaPesagem==null || novaPesagem.isEmpty()){    
+                jTACarretelEntrada.setBackground(Color.WHITE);
+                return;
+            }
+            Pesagem pesEntrando = new Pesagem();
+            pesEntrando = dao.buscaPesagemCodigo(novaPesagem);
+            if(pesEntrando!=null){
+                if(validaEngenharia(new Item(Long.valueOf(pesEntrando.getCodItem()))) ||
+                        validaEngenhariaAlternativa(new Item(Long.valueOf(pesEntrando.getCodItem())),4)){
+                    if(atualizaReservaMaquinaPesagem(codReservaMaquina,pesEntrando)){
+                        jTACarretelEntrada.setBackground(Color.green);
+                        preencheDadosCarretelEntrada();
+                    }else{
+                        JOptionPane.showMessageDialog(root,"Falha ao registrar item para atualização da montagem da maquina"
+                            + "\nPor favor tente novamente."
+                            + "\nSe o problema persistir procure o setor de informatica.","Falha ao atualizar lista de montagem da maquina",
+                            JOptionPane.ERROR_MESSAGE);
+                    jTACarretelEntrada.setBackground(Color.yellow);
+                    }
+                }else{
+                    JOptionPane.showMessageDialog(root,"O item escolhido não corresponde a engenharia de produto"
+                            + "\nPor favor informe ao setor de engenharia de produção"
+                            + "\nSe o problema persistir procure o setor de informatica.","Enenharia de Produção incorreta",JOptionPane.ERROR_MESSAGE);
+                    jTACarretelEntrada.setBackground(Color.yellow);
+                }
+            }else{
+                JOptionPane.showMessageDialog(root,"Numero da pesagem não encontrada nos registros de produção. "
+                    + "\nPor favor verifique e tente novamente","Numero da Pesagem não encontrada",JOptionPane.ERROR_MESSAGE);
+            }
+        }else{
+            JOptionPane.showMessageDialog(root,"Numero da pesagem não encontrada na montagem da maquina. "
+                    + "\nPor favor verifique e tente novamente","Numero da Pesagem não encontrada",JOptionPane.ERROR_MESSAGE);
+        }
+    }
     private void comandoTrocaMateriaPrima(String lote) {
         long codReservaMaquina=0;
         String tipoExtrusao="";
@@ -518,11 +555,11 @@ public class JFMontagemMaquina extends javax.swing.JFrame {
             }
         }else{
             JOptionPane.showMessageDialog(root,"Lote interno não encontrado na montagem da maquina. "
-                    + "\nPor fvor verifique e tente novamente","Lote Interno não encontrado",JOptionPane.ERROR_MESSAGE);
+                    + "\nPor favor verifique e tente novamente","Lote Interno não encontrado",JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void comandoTrocaCarretelEntrada(int pesagem) {
+    private void comandoTrocaCarretelEntrada(long pesagem) {
         long codReservaMquina=0;                        
         for(ReservaMaquina r : resMaq){
             if(r.getPesagem()==pesagem){
@@ -681,5 +718,25 @@ public class JFMontagemMaquina extends javax.swing.JFrame {
             r.setCodItemProd(String.valueOf(prog.getProduto().item.getCodigo()));
             r.setLoteProducao(prog.getLoteproducao());            
         }
+    }
+
+    private boolean atualizaReservaMaquinaPesagem(long codReservaMaquina, Pesagem pesEntrando) {
+        try {
+            for(ReservaMaquina r : resMaq){
+                if(codReservaMaquina==r.getCodigoReserva()){
+                    r.setLoteItemRes(pesEntrando.getLote());
+                    r.setQtosFios(pesEntrando.getQtosFios());
+                    r.setCodigoembalagem(pesEntrando.getCodEmbalagem());
+                    r.setCodItemRes(pesEntrando.getCodItem());
+                    r.setQuantItemRes(pesEntrando.getSaldoConsumo());
+                    r.setPesagem(Integer.valueOf(pesEntrando.getCodigo()));
+                    return true;
+                }
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return false;
     }
 }

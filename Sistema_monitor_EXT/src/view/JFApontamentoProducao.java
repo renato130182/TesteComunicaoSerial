@@ -519,8 +519,8 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
         if(ctr.registrarApontamentoPesagem(prod, perdaEstimada, usr, maquina, prog, jTextPane1.getText(),
                 reservaPesagem,paradasProcesso,compCobre,login)){
             JOptionPane.showMessageDialog(rootPane,"Registro de apontamento realizado com sucesso!","Registro de produção",JOptionPane.INFORMATION_MESSAGE);
-            
-            ControllerEventosSistema ctrEvt = new ControllerEventosSistema();
+            ControllerEventosSistema ctrEvt = new ControllerEventosSistema();          
+            ctrEvt.registraEventos(11,login.getCodigoOperador(),0,0,maquina.getCodigo(),prog.getLoteproducao());            
             if(!ctrEvt.verificaPreApontamento("1" ,maquina.getCodigo(),"",true,0,0)){
                 JOptionPane.showMessageDialog(rootPane,"Falha ao registrar motivo da parada, por favor indique manualmentente","Registro de motivo de parada",JOptionPane.ERROR_MESSAGE);
             }else{

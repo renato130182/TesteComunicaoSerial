@@ -342,4 +342,20 @@ public class EventosSistemaDAO {
         }
         return true;
     }
+
+    public void atualizaUltimoEventoLoginLote(String lote) {
+        try {
+            sql = "update bd_sistema_monitor.tb_eventos_sistema_lote lote set "
+                    + "lote = ? where lote.id_evento_sistema_log = "
+                    + "(select id from bd_sistema_monitor.tb_eventos_sistema_log log "
+                    + "where log.cod_evento = 11 order by id desc limit 1);";
+            PreparedStatement st = conec.prepareStatement(sql);
+            st.setString(1, lote);                        
+            st.executeUpdate();    
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+   
+    }
 }

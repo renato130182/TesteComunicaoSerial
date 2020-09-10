@@ -13,7 +13,6 @@ import java.awt.HeadlessException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.concurrent.Executors;
 import javax.swing.JOptionPane;
 import model.DadosConexao;
 

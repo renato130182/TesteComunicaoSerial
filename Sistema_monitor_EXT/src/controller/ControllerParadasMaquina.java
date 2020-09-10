@@ -101,6 +101,7 @@ public class ControllerParadasMaquina {
     
     public boolean registraRetornoParadamaquina(long metragem, String cod_maquina){
         try {
+            System.out.println("Registra retorno parada maquina");
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
                 Connection conec = db.getConnection();   
@@ -110,7 +111,19 @@ public class ControllerParadasMaquina {
                 evt.setMetragemEvento(metragem);            
                 evt.setIdEvento(daoPar.buscarIDEventoAberto(cod_maquina));
                 this.ultimoEvento = evt.getIdEvento();
-                return  daoPar.RegistrarRetornoEventoMaquina(evt);
+                if(this.ultimoEvento!=0){
+                    boolean reg = daoPar.RegistrarRetornoEventoMaquina(evt);
+                    if(reg){
+                        System.out.println("Retorno registrado");
+                    }else{
+                        System.out.println("Falha no registro do retorno");
+                    }
+                    db.desconectar();
+                    return reg;
+                }else{
+                    db.desconectar();
+                    return true;
+                }                                
             }
         } catch (Exception e) {
             erro.gravaErro(e);

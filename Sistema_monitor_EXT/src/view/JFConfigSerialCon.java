@@ -6,7 +6,6 @@
 package view;
 
 import Serial.SerialTxRx;
-import comunicacaoserial.ComunicacaoSerial;
 import controller.LogErro;
 import dao.ConfigSerialDAO;
 import java.awt.HeadlessException;

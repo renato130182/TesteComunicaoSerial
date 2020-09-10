@@ -21,9 +21,9 @@ public class SerialComunication extends javax.swing.JFrame implements ActionList
      */
     public SerialComunication() {
         initComponents();
-        com.setSerialPortName("COM10");
+        com.setSerialPortName("COM8");
         com.setDATA_BITS(8);
-        com.setDATA_RATE(19200);
+        com.setDATA_RATE(9600);
         com.setFLOW_CONTROL(0);
         com.setPARITY(0);
         com.setSTOP_BITS(1);

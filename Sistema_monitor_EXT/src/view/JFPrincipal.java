@@ -68,10 +68,10 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private static String codMaquina;
     static boolean resetarSerial=false;
     private long tempoSistema = System.currentTimeMillis(); 
-    private double[] mediaVel = {0,0,0,0,0,0,0,0,0,0};  
-    private boolean maqParada = false;
-    private boolean maqPronta = true;
-    private boolean evtRegistrado = true;
+    private double[] mediaVel = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};  
+    private boolean maqParada = true;
+    private boolean maqPronta = false;
+    private boolean evtRegistrado = false;
     private static boolean iniciaLeituras = true;
     private int eventosTimer,qtdEvt=30;
     public static boolean serialMetrador,serialMicrometro;
@@ -84,7 +84,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private ProdutoMaquina prodmaq = new ProdutoMaquina();
     private ProgramacaoMaquina prog = new ProgramacaoMaquina();
     private ProdutoCarretel prodCar = new ProdutoCarretel();
-    private Producao prod = new Producao();
+    private static Producao prod = new Producao();
     private List<Pesagem> listaPesagens = new ArrayList<>();
     private SerialTxRx comMetrador ;
     private SerialTxRx comMicrometro;
@@ -129,22 +129,25 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                             System.out.println("Parada pelo Timer!!!!");
                             comMetrador.close();
                             serialMetrador=false;                            
-                            if(!maqParada){                                
+                            if(!maqParada){
+                                maqParada=true;
                                 abrirTelaParadas();                                   
                             }
-                            if(!evtRegistrado)evtRegistrado=paradas.registraInicioParadamaquina((long) 
-                                displaySingleMetragemCarretel.getValue() , codMaquina);
+                            if(buscarInformaçoesProducao()){
+                                if(!evtRegistrado)evtRegistrado=paradas.registraInicioParadamaquina((long)prod.getMetragemProduzida()
+                                        , codMaquina);
+                            }
                             if(evtRegistrado){
                                 timerVelocimetro=null;
                                 throw new RuntimeException("Forcada");
                             }
                         }else{
-                            if(ControllerUtil.bancoRespondendo()){
+//                            if(ControllerUtil.bancoRespondendo()){
                                 eventosTimer++;
                                 qtdEvt = 30;                                
-                            }else{
-                                qtdEvt = 30;
-                            }
+//                            }else{
+//                                qtdEvt = 30;
+//                            }
                             if(!ConexaoDatabase.AMBPROD)qtdEvt=5;
                             System.out.println("Enventos timer" + String.valueOf(eventosTimer));
                         }
@@ -400,7 +403,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         jTextField1.setText("jTextField1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("Sistema Condumig Extrusoras 14072020");
+        setTitle("Sistema Condumig Extrusoras 21082020");
         setExtendedState(JFPrincipal.MAXIMIZED_BOTH);
         setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         setName("framePrincipal"); // NOI18N
@@ -1590,8 +1593,12 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     private void jButtonRegistrarParadaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRegistrarParadaActionPerformed
         // TODO add your handling code here:        
         try {                
+            System.out.println("Verifica Montagem maquina");
             if(!verificaMontagemMaquina())return;
+            System.out.println("Montagem verificada");
+            System.out.println("Verifica flag maquina parada");
              if(!maqParada){
+                 System.out.println("Flag maquina rodando");
                 if(jTableMotivosParada.getRowCount()>0){
                     registrarMotivoParadas();                    
                     habilitarMenu();
@@ -1604,26 +1611,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 }            
             }else{
                 JOptionPane.showMessageDialog(rootPane, "Ainda não foi detectado o retorno de produção","Maquina permanece parada",JOptionPane.ERROR_MESSAGE);
-                if(serialMicrometro==false) {
-                    comMicrometro = new SerialTxRx();                
-                    if(parametrizarSerial(SERIAL_MICROMETRO)){
-                        if(comMicrometro.iniciaSerial()){
-                            System.out.println("serial Micrometro iniciada");
-                            comMicrometro.addActionListener(this);
-                            serialMicrometro = true;
-                        }
-                    }
-                }
-                if(serialMetrador==false) {
-                    comMetrador = new SerialTxRx();                
-                    if(parametrizarSerial(SERIAL_METRADOR)){
-                        if(comMetrador.iniciaSerial()){
-                            System.out.println("serial Metrador iniciada");
-                            comMetrador.addActionListener(this);
-                            serialMetrador=true;
-                        }
-                    }
-                }
+                conectarPerifericos();
             }
         } catch (HeadlessException e) {
             e.printStackTrace();
@@ -1728,7 +1716,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     }
     
     public static void ZerarMetragemCarretelSaida(){
-        displaySingleMetragemCarretel.setValue(0);     
+        displaySingleMetragemCarretel.setValue(0);  
+        prod.setMetragemProduzida(0);
     }
 
     public static String getIdentificador() {
@@ -1996,22 +1985,20 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     
     private void abrirTelaParadas() {
         try {
+            if(!buscarInformaçoesProducao()){
+                System.out.println("Falha ao buscar informações da produção");
+            }
             if(System.getProperty("os.name").equals("Linux")){
                 this.IN1.setState(PinState.LOW);
             }
             if(paradas==null) paradas = new ControllerParadasMaquina(codMaquina);
-            long metragem = (long) displaySingleMetragemCarretel.getValue();
-            if(maqPronta){
-                evtRegistrado=paradas.registraInicioParadamaquina(metragem, codMaquina);
-                maqParada = true;
-            }
             List<String> listaParadas = new ArrayList<>();
             listaParadas = paradas.buscaListaParadasDescricao();
             jComboBoxParadasMaquina.removeAllItems();
             for(int i=0;i<listaParadas.size();i++){
                 jComboBoxParadasMaquina.addItem(listaParadas.get(i));
             }             
-            maqPronta = false;
+            maqPronta = false;            
             limparJTable(jTableMotivosParada);
             bloquearMenu();
             desbloquearMenuLigaDesliga();                        
@@ -2043,26 +2030,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             limparJTable(jTableProducaoArrebentamentos);
             limparJTable(jTableProducaoParadas);
             jLabelAlerta.setVisible(false);
-            if(serialMicrometro==false){
-                comMicrometro = new SerialTxRx();           
-                if(parametrizarSerial(SERIAL_MICROMETRO)){
-                    if(comMicrometro.iniciaSerial()){
-                        System.out.println("serial Micrometro iniciada");
-                        comMicrometro.addActionListener(this);
-                        serialMicrometro=true;
-                    }
-                }
-            }
-            if(serialMetrador==false) {
-                comMetrador = new SerialTxRx();            
-                if(parametrizarSerial(SERIAL_METRADOR)){                
-                    if(comMetrador.iniciaSerial()){
-                        System.out.println("serial Metrador iniciada");
-                        comMetrador.addActionListener(this);
-                        serialMetrador=true;
-                    }
-                }
-            }
+            conectarPerifericos();
             if(buscarInformaçoesProducao()){
                 buscarParadasProcessoProducao();
                 ajustarMostradorVelocidade();
@@ -2070,7 +2038,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 configurarMostradoresDiametro();  
                 ControllerProgramacao prog = new ControllerProgramacao();
                 prog.setarMontagemLoteProducao(prod.getLoteProducao(),
-                        prod.getItemProducao());
+                prod.getItemProducao());
                 CardLayout card = (CardLayout) jpRoot.getLayout();
                 card.show(jpRoot,"jpProducao");
                 if(timerVelocimetro==null) {
@@ -2079,7 +2047,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 }
                 if(System.getProperty("os.name").equals("Linux")){
                     this.IN1.setState(PinState.HIGH);
-                }    
+                }
+                
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -2100,6 +2069,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
             CardLayout card = (CardLayout) jpRoot.getLayout();
             card.show(jpRoot,"jpLogin");
             jPasswordFieldCartao.requestFocus();
+            conectarPerifericos();
         } catch (Exception e) {
             erro.gravaErro(e);
         }
@@ -2250,8 +2220,8 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                         System.out.println("Met. Anterior: " + metragemAnterior);
                         System.out.println("Met. Atual: " + contaMetros.getMetragemAtual());
                         System.err.println("Met. Produzidos; " + metrosProduzidos); 
-                    }
-                    
+                    }                 
+                gerenciarColetorAmostraDiametro(contaMetros.getMetragemProduzida(),false);    
                 }
                 Metrador met = new Metrador();
                 met = contaMetros.getMetrador();
@@ -2265,12 +2235,27 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                     radialLcdVelocidade.setValue(velMediana);                             
                 }           
                 System.out.println("Mediana " + velMediana);
-                if(maqParada && velMediana>=(radialLcdVelocidade.getTrackStart() + 5))registrarRetornoEvento();
+                double alvoVel =  prodmaq.getVelocidade();
+                double startTrack =  (alvoVel * maquina.getAlertaPercentualVelocidade());
+                if(!login.getNome().isEmpty()){
+                    System.out.println("Usuario logado");
+                    if(maqParada && velMediana>=(startTrack + 15))registrarRetornoEvento();
+                }else{
+                    System.out.println("Não validou usuario para registrar retorno de produção");
+                }
                 eventosTimer = 0;
-                if(velMediana < radialLcdVelocidade.getTrackStart() - 5){
+                if(startTrack<=20)startTrack=25;
+                if(velMediana <= (startTrack-20)){
                     System.out.println("Parada por velocidade abaixo da minima");
+                    if(!evtRegistrado){
+                        if(buscarInformaçoesProducao()){
+                            if(!evtRegistrado)evtRegistrado=paradas.registraInicioParadamaquina((long)prod.getMetragemProduzida()
+                                    , codMaquina);
+                        }
+                    }
                     if(!maqParada){
                         abrirTelaParadas();
+                        maqParada=true;
                     }
                 }
                 if(velMediana==0 && met.getPulsos1()>0){
@@ -2295,7 +2280,7 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 leituraAtual = mic.setarDadosMicrometro(dados);   
                 if(leituraAtual==null)return;                                                               
                 atualizarMostradoresDiametro();
-                gerenciarColetorAmostraDiametro();                                                                    
+                gerenciarColetorAmostraDiametro(0,true);                                                                    
         } catch (HeadlessException e) {
             erro.gravaErro(e);
         }
@@ -2322,17 +2307,17 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         double media=0;
         int interacaoes=0;
         try {                    
-            for (int i=8;i>=0;i--){
+            for (int i=28;i>=0;i--){
                 mediaVel[i+1]=mediaVel[i];    
             } 
             mediaVel[0]=ultimaVel;
-            for (int i=0;i<=9;i++){
+            for (int i=0;i<=29;i++){
                 media += mediaVel[i];
                 interacaoes += 1;
 
             }
-            media /= interacaoes;       
-            System.out.println("velMedia: " + String.valueOf(media));
+            media /= interacaoes;
+            System.out.println("Ultima Vel.: " + String.valueOf(ultimaVel));            
         } catch (Exception e) {
             erro.gravaErro(e);
         }
@@ -2341,7 +2326,6 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
       
     private void usuariologado() {
         try {                    
-            if(!login.getNome().trim().equals("")) bloquearMenu();
                 habilitarMenu();
                 System.out.println("Logado com " + login.getNome()
                     + " e nivel de permissão: " + login.getNivel());             
@@ -2538,12 +2522,17 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
     }
 
     private void registrarRetornoEvento() {
-        try {                    
-            if(paradas.registraRetornoParadamaquina((long) displaySingleMetragemCarretel.getValue(), codMaquina)){
-                maqParada = false;
+        System.out.println("Registra retorno do evento");
+        try {             
+            ControllerProducao prd = new ControllerProducao();                                                                                                                                  
+            double metrosRet= prd.buscaMetProdTemp(maquina) + prod.getMetragemProduzida();   
+            if(paradas.registraRetornoParadamaquina((long) metrosRet, codMaquina)){                
                 eventosTimer = 0;            
-                bloquearMenuligaDesliga();                       
-            }
+                bloquearMenuligaDesliga();    
+                evtRegistrado=false;
+                System.out.println("Flag MaqParada setda FALSE");
+                maqParada = false;
+            }                        
         } catch (Exception e) {
             erro.gravaErro(e);
         }
@@ -2748,12 +2737,12 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         return true;
     }
     */
-    private void gerenciarColetorAmostraDiametro() {
+    private void gerenciarColetorAmostraDiametro(double metProduzida,boolean mic) {
         try {
             if(metrosRelatorio<=maquina.getMetrosAmostraDiametro()){
                 if(contaMetros.getMetragemProduzida()>0){
-                    metrosRelatorio += contaMetros.getMetragemProduzida();
-                    relatorio.add(leituraAtual);
+                    metrosRelatorio += metProduzida;
+                    if(mic)relatorio.add(leituraAtual);
                 }
             }else{
                 if(relatorio.isEmpty())return;
@@ -2772,13 +2761,17 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
                 dados.setDiametroMedio((float)(diaMedAmostra / relatorio.size()));
                 dados.setDiametroMaximo((float)(diaMaxAmostra / relatorio.size()));
                 dados.setDesvio((float)(desvioMedio / relatorio.size()));
-            ControllerMicrometro ctr = new ControllerMicrometro();
-            String lote="0";
-            if(maqPronta){
-                lote = prog.getLoteproducao();
-            }
+                ControllerMicrometro ctr = new ControllerMicrometro();
+                String lote="0";
+                if(maqPronta){
+                    lote = prog.getLoteproducao();
+                }
+                ControllerProducao prod = new ControllerProducao();
+                Producao prd = new Producao();
+                prd = prod.buscaDadosMaquinaProducao(codMaquina);
+                double met = prod.buscaMetProdTemp(maquina) + prd.getMetragemProduzida();
                 if(ctr.registraRelatorioMicrometro(dados, codMaquina, lote,
-                        (int) displaySingleMetragemCarretel.getValue(),(int)radialLcdVelocidade.getValue())){
+                        (int) met,(int)radialLcdVelocidade.getValue())){
                 relatorio.clear();
                 metrosRelatorio=0;
                 }                           
@@ -2859,4 +2852,32 @@ public class JFPrincipal extends javax.swing.JFrame implements ActionListener {
         listaPesagens = daoPes.buscapesagensMontagem(codMaquina);
         return true;
     }
+    private void conectarPerifericos(){
+        try {
+            if(serialMicrometro==false) {
+                comMicrometro = new SerialTxRx();                
+                if(parametrizarSerial(SERIAL_MICROMETRO)){
+                    if(comMicrometro.iniciaSerial()){
+                        System.out.println("serial Micrometro iniciada");
+                        comMicrometro.addActionListener(this);
+                        serialMicrometro = true;
+                    }
+                }
+            }
+            if(serialMetrador==false) {
+                comMetrador = new SerialTxRx();                
+                if(parametrizarSerial(SERIAL_METRADOR)){
+                    if(comMetrador.iniciaSerial()){
+                        System.out.println("serial Metrador iniciada");
+                        comMetrador.addActionListener(this);
+                        serialMetrador=true;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+    }
+    
 }
