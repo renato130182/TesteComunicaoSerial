@@ -18,6 +18,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import model.ComposicaoCobre;
+import model.ContadorMetros;
 import model.Engenharia;
 import model.Maquina;
 import model.Paradas;
@@ -46,7 +47,8 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
     private List<ComposicaoCobre> compCobre = new ArrayList<>();
     private List<ReservaPesagem> reservaPesagem = new ArrayList<>();
     private int perdaEstimada=0;
-    private JTable preParadasApontadas;
+    private final JTable preParadasApontadas;
+    private ContadorMetros contaMetros;
     /**
      * Creates new form JFApontamentoProducao
      * @param maquina
@@ -55,9 +57,11 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
      * @param prodCar
      * @param prod
      * @param prog
+     * @param preParadas
+     * @param contaMetros
      */
     public JFApontamentoProducao(Maquina maquina, Login login,ProdutoMaquina prodmaq,
-            ProdutoCarretel prodCar,Producao prod,ProgramacaoMaquina prog, JTable preParadas) {
+            ProdutoCarretel prodCar,Producao prod,ProgramacaoMaquina prog, JTable preParadas,ContadorMetros contaMetros) {
         initComponents();
         this.login = login;
         this.maquina = maquina;
@@ -65,6 +69,7 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
         this.prod = prod;
         this.prog = prog;
         this.preParadasApontadas=preParadas;
+        this.contaMetros = contaMetros;
         setarDadosProducao(); 
         buscarParadasProcessoProducao();
         buscaDadosConsumoMp();
@@ -97,6 +102,7 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
         jLabelLote = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabelMetragem = new javax.swing.JLabel();
+        jTBSomarPuxador = new javax.swing.JToggleButton();
         jPanelCarretelSaida = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
         jLabelCodEmb = new javax.swing.JLabel();
@@ -120,6 +126,11 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Conferência de Produção");
         setSize(new java.awt.Dimension(1000, 850));
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         jScrollPane1.setPreferredSize(new java.awt.Dimension(902, 800));
         jScrollPane1.setRequestFocusEnabled(false);
@@ -183,6 +194,9 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
         jLabelMetragem.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabelMetragem.setText("jLabelMetragem");
 
+        jTBSomarPuxador.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jTBSomarPuxador.setText("Somar Puxador na metragem");
+
         javax.swing.GroupLayout jPanelItemProduzidoLayout = new javax.swing.GroupLayout(jPanelItemProduzido);
         jPanelItemProduzido.setLayout(jPanelItemProduzidoLayout);
         jPanelItemProduzidoLayout.setHorizontalGroup(
@@ -198,7 +212,7 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
                         .addComponent(jLabel6)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabelMetragem)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanelItemProduzidoLayout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -206,7 +220,10 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabelDescricao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addComponent(jLabelDescricao, javax.swing.GroupLayout.DEFAULT_SIZE, 386, Short.MAX_VALUE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jTBSomarPuxador, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         jPanelItemProduzidoLayout.setVerticalGroup(
             jPanelItemProduzidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -221,7 +238,9 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
                     .addComponent(jLabel4)
                     .addComponent(jLabelLote)
                     .addComponent(jLabel6)
-                    .addComponent(jLabelMetragem)))
+                    .addComponent(jLabelMetragem))
+                .addGap(0, 9, Short.MAX_VALUE))
+            .addComponent(jTBSomarPuxador, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         jPanelCarretelSaida.setBorder(javax.swing.BorderFactory.createTitledBorder("Carretel de saida:"));
@@ -472,7 +491,7 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanelAcoes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(153, Short.MAX_VALUE))
+                .addContainerGap(144, Short.MAX_VALUE))
         );
 
         jScrollPane1.setViewportView(jPanelRoot);
@@ -494,25 +513,37 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
     private void jButtonApontarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonApontarActionPerformed
         // TODO add your handling code here:
         ControllerProducao ctr = new ControllerProducao();
+        if(jTBSomarPuxador.isSelected()){
+            prod.setMetragemProduzida(prod.getMetragemProduzida()+50);
+        }
         if(ctr.registrarApontamentoPesagem(prod, perdaEstimada, usr, maquina, prog, jTextPane1.getText(),
                 reservaPesagem,paradasProcesso,compCobre,login)){
             JOptionPane.showMessageDialog(rootPane,"Registro de apontamento realizado com sucesso!","Registro de produção",JOptionPane.INFORMATION_MESSAGE);
-            ControllerEventosSistema ctrEvt = new ControllerEventosSistema();
+            ControllerEventosSistema ctrEvt = new ControllerEventosSistema();          
+            ctrEvt.registraEventos(11,login.getCodigoOperador(),0,0,maquina.getCodigo(),prog.getLoteproducao());            
             if(!ctrEvt.verificaPreApontamento("1" ,maquina.getCodigo(),"",true,0,0)){
                 JOptionPane.showMessageDialog(rootPane,"Falha ao registrar motivo da parada, por favor indique manualmentente","Registro de motivo de parada",JOptionPane.ERROR_MESSAGE);
             }else{
                 verificarMotivosPreApontados();
-            }
-            dispose();
+            }        
+            
+            FecharJanelaApontamento(true);            
         }else{
             JOptionPane.showMessageDialog(rootPane,"Falha ao realizar o registro de apontamento de produção \n "
                     + "por favor tente novamente!","Registro de produção",JOptionPane.ERROR_MESSAGE);
+            
         }
     }//GEN-LAST:event_jButtonApontarActionPerformed
 
     private void jButtonCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCancelarActionPerformed
         // TODO add your handling code here:
+        FecharJanelaApontamento(false);
     }//GEN-LAST:event_jButtonCancelarActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // TODO add your handling code here:
+        FecharJanelaApontamento(false);
+    }//GEN-LAST:event_formWindowClosing
         
     /**
      * @param args the command line arguments
@@ -549,6 +580,7 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JToggleButton jTBSomarPuxador;
     private javax.swing.JTable jTableConsumoMP;
     private javax.swing.JTable jTableHistoricoOperador;
     private javax.swing.JTable jTableParadas;
@@ -559,10 +591,10 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
         try {
             jLabelCodMaquina.setText(this.maquina.getCodigo());
             jLabelMaquina.setText(this.maquina.getDescricao());
-            jLabelCodItem.setText(this.prog.getProduto().getCodigo());
-            jLabelDescricao.setText(this.prog.getProduto().getDescricao());
+            jLabelCodItem.setText(String.valueOf(this.prog.getProduto().item.getCodigo()));
+            jLabelDescricao.setText(this.prog.getProduto().item.getDescricao());
             jLabelLote.setText(this.prog.getLoteproducao());
-            jLabelMetragem.setText(String.valueOf(this.prod.getMetragemProduzida()));
+            jLabelMetragem.setText(String.valueOf((int)this.prod.getMetragemProduzida()));
             jLabelCodEmb.setText(prodCar.getCarretel().getCodigo());
             jLabelDescEmbalagem.setText(prodCar.getCarretel().getDescricao());                        
         } catch (Exception e) {
@@ -614,8 +646,8 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
         try {
             List<Engenharia> engenharia=null;
             ControllerEngenharia ctr = new ControllerEngenharia();
-            engenharia=ctr.buscaListaEngenhariaEmProducao(this.prog.getProduto().getCodigo(), 
-                    this.maquina.getCodigo(),this.prod.getMetragemProduzida());
+            engenharia=ctr.buscaListaEngenhariaEmProducao(String.valueOf(this.prog.getProduto().item.getCodigo()), 
+                    this.maquina.getCodigo(),(long)this.prod.getMetragemProduzida());
             
             for (int i=0;i<engenharia.size();i++){                                                              
                 ReservaPesagem res = new ReservaPesagem();
@@ -625,7 +657,7 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
                 res.setLoteReserva(engenharia.get(i).getLote());
                 res.setItemDescricao(engenharia.get(i).getDescricao());
                 res.setQtosfios(0);
-                res.setCodigoEmbalagem("");
+                res.setCodigoEmbalagem("");            
                 res.setQuantidade(engenharia.get(i).getQuantidade()*prod.getMetragemProduzida());
                 res.setCodigoEmbalagelTroca("");
                 res.setLoteReservaTroca("");
@@ -706,5 +738,12 @@ public class JFApontamentoProducao extends javax.swing.JFrame {
         } catch (NumberFormatException e) {
             erro.gravaErro(e);
         }
+    }
+
+    private void FecharJanelaApontamento(boolean b) {
+        if(b){            
+            JFPrincipal.ZerarMetragemCarretelSaida();                 
+        }
+        dispose();
     }
 }

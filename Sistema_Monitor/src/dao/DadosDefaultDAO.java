@@ -14,7 +14,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 import model.DadosConexao;
-import model.Usuario;
 
 /**
  *
@@ -35,49 +34,11 @@ public class DadosDefaultDAO {
     private final static String USERDEFAULT = System.getProperty ("user.home") + System.getProperty ("file.separator") +  "UserDefault.cnf";
     private final static String ARQDBPROD =  System.getProperty ("user.home") + System.getProperty ("file.separator") + "DataBase.cnf";
     private final static String ARQDBTESTE =  System.getProperty ("user.home") + System.getProperty ("file.separator") + "DataBaseTeste.cnf";
-
+    
     public static String getUSERDEFAULT() {
         return USERDEFAULT;
     }
-    
-    public boolean ArmazenarUserDefault(Usuario us){
-        ManipuladorArquivo man = new ManipuladorArquivo();
-        try {                  
-            String msg =
-            us.getUsuario()+ ";"+ us.getSenha();                                         
-            preparaDados(msg);
-            man.setArquivo(USERDEFAULT);
-            man.setDados(dados);
-            man.escreverArquivo();
-            return true;
-        } catch (Exception e) {            
-            erro.gravaErro(e);
-            return false;
-        }
-    }
-    
-    public boolean armazenaDadosConexao(DadosConexao d, boolean amb){
-        ManipuladorArquivo man = new ManipuladorArquivo();
-        try {
-            String msg
-            = d.getDriverName()+";"+d.getMyDatabase()+";"+d.getPassword()+";"
-                    +d.getServerName()+";"+d.getUrl()+";"+d.getUserName();
-            preparaDados(msg);
-            if(amb){
-                
-                man.setArquivo(ARQDBPROD);
-            }else{
-                man.setArquivo(ARQDBTESTE);
-            }           
-            man.setDados(dados);
-            man.escreverArquivo();
-            return true;
-        } catch (Exception e) {
-            erro.gravaErro(e);
-            return false;
-        }        
-    }
-    
+   
     public DadosConexao buscaDadosConexaoDefault (boolean amb){
         ManipuladorArquivo man = new ManipuladorArquivo();
         DadosConexao d = new DadosConexao();
@@ -107,18 +68,7 @@ public class DadosDefaultDAO {
             return null;
         }
     }
-    private void preparaDados(String msg){
-        try {                    
-            dados = "";
-            msgCrito = CriptoCode.encrypt(msg);
-            for ( int i=0; i<msgCrito.length;i++){
-                //System.out.print(new Integer(msgCrito[i])+" ");                    
-                dados = dados + Byte.toString(msgCrito[i])+" ";
-            }
-        } catch (Exception e) {
-            erro.gravaErro(e);
-        }
-    }
+
     public String buscaCodigoMaquina(String serial){
         String codMaquina=null;
         ConexaoDatabase db = new ConexaoDatabase();

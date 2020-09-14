@@ -21,7 +21,7 @@ import model.Usuario;
 public class ControllerEventosSistema {
     LogErro erro =  new LogErro();
     
-    public boolean registraEventos(Integer cod_Evento, String usuario,double diametro,
+    public boolean registraEventos(Integer cod_Evento, String user,double diametro,
             Integer metragem,String codMaquina,String lote ){
         boolean registrado = false;
         try {                    
@@ -34,14 +34,16 @@ public class ControllerEventosSistema {
                 if(dao.registraEventoSistema(cod_Evento,codMaquina)){
                     registrado = true;
                     if(dao.buscaIdEventoSistema()){
-                        if(!usuario.trim().equals("")){
-                            if(dao.registraUsuarioEventoSistema(usuario)){
-                                registrado = true;
-                            }else{
-                                conec.rollback();
-                                db.desconectar();
-                                return false;
-                            }                                
+                        if(user!=null){
+                            if(!user.trim().equals("")){
+                                if(dao.registraUsuarioEventoSistema(user)){
+                                    registrado = true;
+                                }else{
+                                    conec.rollback();
+                                    db.desconectar();
+                                    return false;
+                                }                                
+                            }
                         }
                         if(diametro > 0){
                             if(dao.registraDiametroEventoSistema(diametro)){
@@ -265,4 +267,30 @@ public class ControllerEventosSistema {
         }
         return null;
     }
+
+    public boolean verificaPreApontamentoRealizado(String codParada, String codMaquina, boolean msg, int codPesagemSaida) {
+    ConexaoDatabase db = new ConexaoDatabase();
+        if(db.isInfoDB()){
+            Connection conec = db.getConnection();   
+            if(conec==null)return false;
+            EventosSistemaDAO dao = new EventosSistemaDAO(conec);
+            boolean ap = dao.ValidaPreApontamentoEventoSistema(codParada, codMaquina,msg,codPesagemSaida);
+            db.desconectar();
+            return ap;
+        }
+        return false;
+    }
+
+    public void atualizaLoteUltimoEventoLogin(String lote) {
+        ConexaoDatabase db = new ConexaoDatabase();
+        if(db.isInfoDB()){
+            Connection conec = db.getConnection();   
+            if(conec==null)return;
+            EventosSistemaDAO dao = new EventosSistemaDAO(conec);
+            dao.atualizaUltimoEventoLoginLote(lote);
+            db.desconectar();
+        }
+    }
+       
+    
 }

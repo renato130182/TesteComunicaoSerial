@@ -15,6 +15,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.sql.Connection;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
@@ -33,6 +34,8 @@ public final class ControllerUtil {
     public static final boolean SoTemNumeros(String texto) { 
         try {                    
             if(texto.length()==0)return false;
+            texto = texto.replace(".","");
+            texto = texto.replace(",","");
             for (int i = 0; i < texto.length(); i++) { 
                 if (!Character.isDigit(texto.charAt(i))) { 
                     return false; 
@@ -71,7 +74,7 @@ public final class ControllerUtil {
             Date dataHoraFinal = sdf.parse(dataFim);
             long tempo = dataHoraFinal.getTime()-dataHoraInicial.getTime();
             return (int) (tempo/1000);            
-        } catch (Exception e) {
+        } catch (ParseException e) {
             LogErro erro = new LogErro();
             erro.gravaErro(e);
             return 0;
@@ -122,8 +125,10 @@ public final class ControllerUtil {
         try {
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
-                Connection conec = db.getConnection();   
-                return conec != null;                
+                Connection conec = db.getConnection();
+                boolean tmp = conec!=null;
+                db.desconectar();
+                return tmp;                
             }
         }catch(Exception e){
             e.printStackTrace();

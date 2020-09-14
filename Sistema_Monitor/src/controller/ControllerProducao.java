@@ -30,9 +30,12 @@ import model.Usuario;
  * @author renato.soares
  */
 public class ControllerProducao {
+    
+    private final static String ARQMETRADOR =  System.getProperty ("user.home") + System.getProperty ("file.separator") + "metrador.cnf";
     private List<String> listaMetragemObservacao = new ArrayList<>();
     LogErro erro = new LogErro();
     private int codPesagem=0;
+    
     public List<String> getListaMetragemObservacao() {
         return listaMetragemObservacao;
     }
@@ -63,16 +66,19 @@ public class ControllerProducao {
     }
     
     
-    public boolean atualizaMetragemProduzida(List<Pesagem> lista, double metragemProd, String cod_maquina){
-        try {                   
+    public boolean atualizaMetragemProduzida(List<Pesagem> lista, double metragemProd, String cod_maquina,boolean pronta, String sinal){
+        try {
+            if(!pronta || metragemProd<0){
+                return false;
+            }
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
                 Connection conec = db.getConnection();
                 if(conec!=null){    
                     ProducaoDAO daoProd = new ProducaoDAO(conec);
-                    if(daoProd.atualizaMetragemProduzida(cod_maquina, String.valueOf(metragemProd))){
+                    if(daoProd.atualizaMetragemProduzida(cod_maquina, String.valueOf(metragemProd),sinal)){
                         for (int i=0;i<lista.size();i++){
-                            if(!daoProd.atualizaSaldoConsumoEntrada(lista.get(i).getCodigo(),String.valueOf(metragemProd))) {
+                            if(!daoProd.atualizaSaldoConsumoEntrada(lista.get(i).getCodigo(),String.valueOf(metragemProd),sinal)) {
                                 db.desconectar();
                                 return false;
                             }
@@ -158,11 +164,13 @@ public class ControllerProducao {
         try {
             ConexaoDatabase db = new ConexaoDatabase();
             if(db.isInfoDB()){
-                Connection conec = db.getConnection();                      
-                ProducaoDAO dao = new ProducaoDAO(conec);
-                Producao prod = dao.buscaItemProducao(codMaquina);
-                db.desconectar();
-                return prod;
+                Connection conec = db.getConnection();   
+                if(conec!=null){
+                    ProducaoDAO dao = new ProducaoDAO(conec);
+                    Producao prod = dao.buscaItemProducao(codMaquina);
+                    db.desconectar();
+                    return prod;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -297,7 +305,18 @@ public class ControllerProducao {
                 Connection conec = db.getConnection();                   
                 conec.setAutoCommit(false);
                 ProducaoDAO dao = new ProducaoDAO(conec);
+                ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO(conec); 
                 List<String> dadosQuery = new ArrayList<>();
+                EventoMaquina evt = new EventoMaquina();
+                evt.setCod_maquina(maquina.getCodigo());
+                evt = daoPar.buscadadosUltimoEventoMaquina(maquina.getCodigo());
+                if(evt.getDataHoraFinal()==null || evt.getDataHoraFinal().isEmpty()){
+                    if(!daoPar.registraDataHoraRetornoEvento(evt.getIdEvento())){
+                        conec.rollback();
+                        db.desconectar();
+                        return false;
+                    }
+                }
                 dadosQuery = montarDadosQueryPesagem(prod, perdaEstimada, usr, maquina, prog, obsPesagem, dao);
                 if(dadosQuery!=null){
                     if(dadosQuery.size()==25){
@@ -308,25 +327,27 @@ public class ControllerProducao {
                                     if(resgistrarParadasPesagem(paradas,prod,dao,conec)){
                                         if(registrarComposicaoCobrePesagem(compCobre,dao)){
                                             if(verificarDadosInspecaoAmostra(login,prod,conec)){
-                                                if(dao.registrarApontamentoLogSistemaMonitor(maquina.getCodigo(),this.codPesagem)){
-                                                    ParadasMaquinaDAO daoPar = new ParadasMaquinaDAO(conec); 
-                                                    EventoMaquina evt = new EventoMaquina();
-                                                    evt.setCod_maquina(maquina.getCodigo());
-                                                    evt.setMetragemEvento(prod.getMetragemProduzida()); 
-                                                    evt.setIdEvento(daoPar.buscarIDEventoAberto(maquina.getCodigo()));
+                                                if(dao.registrarApontamentoLogSistemaMonitor(maquina.getCodigo(),this.codPesagem)){                                                                                                                                                            
+                                                    //evt.setMetragemEvento((long)prod.getMetragemProduzida()); 
+                                                    //busca dados do ultimo evento para a maquina                                                    
+                                                    //evt.setIdEvento(daoPar.buscarIDEventoAberto(maquina.getCodigo()));  //
                                                     //ControllerParadasMaquina ctrParadas = new ControllerParadasMaquina(maquina.getCodigo());
-                                                    if(daoPar.RegistrarRetornoEventoMaquina(evt)){
+                                                    if(daoPar.AtualizaMetragemRetornoEventoMaquina(evt,(long)prod.getMetragemProduzida())){
                                                     //if(ctrParadas.registraRetornoParadamaquina(prod.getMetragemProduzida(),maquina.getCodigo())){
-                                                        if(dao.registrarApontamentosMaquinaEvento(this.codPesagem,maquina.getCodigo())){
-                                                            evt.setMetragemEvento(0);
-                                                            if(daoPar.incluirInicioEventoMaquina(evt)){
-                                                                if(dao.registraCodPesagemRelatorioMicromero(this.codPesagem,maquina.getCodigo(),prod.getLoteProducao())){
-                                                                    if(dao.limparTabelaMaquinaProducao(maquina.getCodigo())){
-                                                                        System.out.println("Finalmente apontada"); 
-                                                                        conec.commit();
+                                                        if(dao.registrarApontamentosMaquinaEvento(this.codPesagem,maquina.getCodigo())){                                                           
+                                                            if(daoPar.incluirEventoMaquinaInicioProducao(evt)){                                                                
+                                                                if(dao.verificarDadosMicrometroRegistrados(maquina.getCodigo())){
+                                                                    if(!dao.registraCodPesagemRelatorioMicromero(this.codPesagem,maquina.getCodigo(),prod.getLoteProducao())){
+                                                                        conec.rollback();
                                                                         db.desconectar();
-                                                                        return true;                                                                       
+                                                                        return false;
                                                                     }
+                                                                }
+                                                                if(dao.limparTabelaMaquinaProducao(maquina.getCodigo())){
+                                                                    System.out.println("Finalmente apontada");                                                                     
+                                                                    conec.commit();
+                                                                    db.desconectar();
+                                                                    return true;                                                                       
                                                                 }
                                                             }
                                                         }
@@ -416,8 +437,7 @@ public class ControllerProducao {
                             String tmpInicio = evt.get(i).getDataHoraFinal();
                             String tmpFinal = evt.get(i+1).getDataHoraInicio();
                             tempoProd+=ControllerUtil.calculaTempoPercorridoSegundos(tmpInicio, tmpFinal);
-                        }
-                        
+                        }                        
                         return String.valueOf(tempoProd/60);
                     }   
                 }
@@ -451,8 +471,11 @@ public class ControllerProducao {
                             }
                             tempoProd+= ControllerUtil.calculaTempoPercorridoSegundos(tmpInicio, tmpFinal);
                         }
-                        
-                        return String.valueOf(tempoProd/60);
+                                    long temp = tempoProd/60;
+                        if(temp>9999){
+                            temp=9999;
+                        }
+                        return String.valueOf(temp);
                     }   
                 }
             }            
@@ -494,6 +517,9 @@ public class ControllerProducao {
                         tempoParada= Integer.valueOf(dados.get(2));
                         qtdEvento=Integer.valueOf(dados.get(3));
                         tempoMotivo = (tempoParada/qtdEvento)/60;
+                        if(tempoMotivo>9999){
+                            tempoMotivo=9999;
+                        }
                         if(tempoMotivo==0) tempoMotivo=1;        
                         idEvento=paradas.getListaParadas().get(i).getIdRegistro();
                     }
@@ -566,6 +592,130 @@ public class ControllerProducao {
             System.out.println("Falha ao buscar tipo de inspeção");
             return false;            
         }
+    }        
+
+    public void registraMetragemProducaoTemporaria(double metragemProd, String cod_maquina) {
+        try {
+            ConexaoDatabase db = new ConexaoDatabase();
+            if(db.isInfoDB()){
+                Connection conec = db.getConnection();
+                if(conec!=null){
+                    ProducaoDAO daoProd = new ProducaoDAO(conec);
+                    if(daoProd.existeCadastroProducaoTmp(cod_maquina)){
+                        daoProd.atualizaMetProducaoTemp(metragemProd,cod_maquina);
+                    }else{
+                        daoProd.criarProducaoTemp(metragemProd,cod_maquina);
+                    }
+                    db.desconectar();
+                }else{
+                    registrarMetragemArquivoTemporario(metragemProd);                    
+                }
+            }    
+        } catch (Exception e) {
+            
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
     }
-        
+
+    public int buscaMetProdTemp(Maquina maquina) {
+        try {
+            ConexaoDatabase db = new ConexaoDatabase();
+            if(db.isInfoDB()){
+                Connection conec = db.getConnection();
+                if(conec!=null){
+                    ProducaoDAO daoProd = new ProducaoDAO(conec);
+                    int met = daoProd.buscaMetProducaoTemporaria(maquina.getCodigo());
+                    db.desconectar();
+                    return met;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return 0;
+    }        
+    
+    public void limparRegistroProducaoTemporaria(String codMaquina){
+        try {
+            limparMetragemArquivoTemporario();
+            ConexaoDatabase db = new ConexaoDatabase();
+            if(db.isInfoDB()){
+                Connection conec = db.getConnection();
+                if(conec!=null){
+                    ProducaoDAO daoProd = new ProducaoDAO(conec);
+                    daoProd.limparRegistrosMetragemTemporaria(codMaquina);
+                    db.desconectar();               
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+    }
+
+    public Pesagem BuscaDadosProducaoPesagem(int pesagem) {
+        try {
+            ConexaoDatabase db = new ConexaoDatabase();
+            if(db.isInfoDB()){
+                Connection conec = db.getConnection();                      
+                ProducaoDAO dao = new ProducaoDAO(conec);
+                Pesagem pes = dao.buscaDadosPesagem(pesagem);
+                db.desconectar();
+                return pes;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return null;    
+    
+    }
+    private void limparMetragemArquivoTemporario() {        
+        try {
+            ManipuladorArquivo man = new ManipuladorArquivo();
+            man.setArquivo(ARQMETRADOR);        
+            man.setDados(String.valueOf(0));
+            man.escreverArquivo();
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+    }
+    private void registrarMetragemArquivoTemporario(double metragemProd) {
+        double metragem=0;
+        try {
+            ManipuladorArquivo man = new ManipuladorArquivo();
+            man.setArquivo(ARQMETRADOR);
+            man.BuscarArquivo();
+            String metTmp = man.getDados();
+            if(!metTmp.isEmpty()){
+                metragem = Double.valueOf(metTmp)+metragemProd;
+            }else{
+                metragem = metragemProd;
+            }
+            man.setDados(String.valueOf(metragem));
+            man.escreverArquivo();
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+    }
+    public double buscaMetragemArquivoTemporario() {     
+        try {
+            ManipuladorArquivo man = new ManipuladorArquivo();
+            man.setArquivo(ARQMETRADOR);
+            man.BuscarArquivo();
+            String metTmp = man.getDados();
+            if(!metTmp.isEmpty()){
+                return Double.valueOf(metTmp);
+            }
+
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return 0;
+    }
 }

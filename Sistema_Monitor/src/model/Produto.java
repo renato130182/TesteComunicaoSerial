@@ -3,13 +3,11 @@ package model;
 import controller.InterfaceProduto;
 
 public class Produto implements InterfaceProduto {
-
-    private String codigo;
-    private String descricao;
+    
     private float diametroMaximo;
     private float diametroMinimo;
     private float diametroNominal;
-    
+    public  Item item;
     public float getDiametroNominal() {
         return diametroNominal;
     }
@@ -19,37 +17,20 @@ public class Produto implements InterfaceProduto {
     }
 
     public Produto() {
+        this.item = new Item();
     }
 
-    public Produto(String codigo, String descricao, float diametroMinimo, float diametroNominal, float diametroMaximo) {
-        this.codigo = codigo;
-        this.descricao = descricao;
+    public Produto(Item item, float diametroMinimo, float diametroNominal, float diametroMaximo) {
+        this.item = item;
         this.diametroMaximo = diametroMaximo;
         this.diametroMinimo = diametroMinimo;
         this.diametroNominal = diametroNominal;
     }
 
-    public Produto(String codigo, String descricao) {
-        this.codigo = codigo;
-        this.descricao = descricao;
+    public Produto(Item item) {
+        this.item = item;
     }
     
-    public String getCodigo() {
-        return codigo;
-    }
-
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
-    }
-
-    public String getDescricao() {
-        return descricao;
-    }
-
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
-
     public float getDiametroMaximo() {
         return diametroMaximo;
     }

@@ -40,15 +40,6 @@ public class ControllerReservaPesagem {
                        resCobre.get(i).setCodigoPesagem(codigoPesagem);
                        res.add(resCobre.get(i));
                     }
-                    /*
-                    for(int i=0;i<resCobre.size();i++){
-                        resCobre.get(i).setCodigoPesagem(codigoPesagem);
-                        tmp=(int) resCobre.get(i).getQuantidade();
-                        resCobre.get(i).setQuantidade(resCobre.get(i).getQuantidade()-metros);
-                        metros=tmp;
-                        res.add(resCobre.get(i));
-                    } 
-                */
                 }
                 db.desconectar();
                 return res;

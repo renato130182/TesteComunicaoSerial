@@ -22,7 +22,7 @@ import model.DadosConexao;
  */
 public class ConexaoDatabase extends DadosConexao{
     
-    private static final boolean AMBPROD = true;
+    public static final boolean AMBPROD = false ;
     private Connection conexao = null;
     private boolean infoDB=false;
     LogErro erro = new LogErro();
@@ -52,8 +52,9 @@ public class ConexaoDatabase extends DadosConexao{
             }
             //System.out.println("Arquivo: " + man.getArquivo());
             man.BuscarArquivo();
-            String arqCripto = man.getDados().trim();        
-            String[] dadosConexao = CriptoCode.decrypt(CriptoCode.converterStringByte(arqCripto, " ")).split(";");
+            String arqCripto = man.getDados().trim();     
+            String tmp = CriptoCode.decrypt(CriptoCode.converterStringByte(arqCripto, " "));
+            String[] dadosConexao = tmp.split(";");
             //System.out.println("Dados da conexao: " + dadosConexao[3]);
             if(dadosConexao.length==6){
                 this.driverName=dadosConexao[0];
@@ -76,9 +77,12 @@ public class ConexaoDatabase extends DadosConexao{
      public java.sql.Connection getConnection() {                    
          try {
             if(ControllerUtil.testaConexao(serverName)){
+
                 Class.forName(driverName);
-                conexao = DriverManager.getConnection(url + serverName + "/" + myDatabase ,userName,password);                
+                
+                conexao = DriverManager.getConnection(url + serverName + "/" + myDatabase ,userName,password);
                 //testando a conexão
+                
                 if(conexao != null){
                     System.out.println("Conexão realizada com banco de dados: " + this.serverName );
                 }else{
@@ -91,7 +95,8 @@ public class ConexaoDatabase extends DadosConexao{
                 return null;
             }
         } catch (SQLException | ClassNotFoundException e){                           
-                System.out.println("Falha ao conctar com banco de dados");            
+             e.printStackTrace();
+             erro.gravaErro(e);
             //erro.gravaErro(e);
             return null;
         }

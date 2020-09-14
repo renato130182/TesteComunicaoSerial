@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import model.ComposicaoCobre;
+import model.Pesagem;
 import model.Producao;
 import model.ReservaPesagem;
 
@@ -43,7 +44,7 @@ public class ProducaoDAO {
                 prod.setItemProducao(res.getString("codigoitemprod"));
                 prod.setLoteProducao(res.getString("loteproducao"));
                 prod.setCarretelSaida(res.getString("carretel_saida"));
-                prod.setMetragemProduzida(res.getLong("met_produzida"));
+                prod.setMetragemProduzida(res.getDouble("met_produzida"));
 
                 return prod;                    
             }else{
@@ -74,11 +75,11 @@ public class ProducaoDAO {
         return null;
     }
     
-    public boolean atualizaMetragemProduzida (String maquina, String metragem){
+    public boolean atualizaMetragemProduzida (String maquina, String metragem, String sinal){
         
         try {
             sql = "update bd_sistema_monitor.tb_maquina_producao set met_produzida "
-                + "= met_produzida + ? where cod_maq = ?;";                
+                + "= met_produzida "+sinal+" ? where cod_maq = ?;";                
             PreparedStatement st = this.conec.prepareStatement(sql);
             st.setString(1, metragem);
             st.setString(2, maquina);
@@ -91,9 +92,14 @@ public class ProducaoDAO {
         return false;
     }
     
-    public boolean atualizaSaldoConsumoEntrada (String cod_Pesagem, String metragem){        
+    public boolean atualizaSaldoConsumoEntrada (String cod_Pesagem, String metragem, String sinal){        
         try {
-            sql = "update condumigproducao.pesagem set saldoconsumo = (saldoconsumo - ?) where codigo = ?";                
+            if(sinal.equals("+")){
+                sinal = "-";
+            }else{
+                sinal = "+";
+            }                
+            sql = "update condumigproducao.pesagem set saldoconsumo = (saldoconsumo "+sinal+" ?) where codigo = ?";                
             PreparedStatement st = this.conec.prepareStatement(sql);
             st.setString(1, metragem);
             st.setString(2, cod_Pesagem);
@@ -227,8 +233,11 @@ public class ProducaoDAO {
     public String[] buscaDataHoraFimProducao(String codMaquina) {
         try {
             sql = "SELECT data_hora_inicio as dataFimProducao FROM bd_sistema_monitor.tb_maquina_evento "
-                    + "where id not in (select id from bd_sistema_monitor.tb_maquina_evento_apontamento) "
-                    + "and cod_maquina = ? order by id desc limit 1;";
+                    + "evt where evt.id not in (SELECT id_maquina_evento "
+                    + "FROM bd_sistema_monitor.tb_maquina_evento_parada par "
+                    + "where par.id in(SELECT id_maquina_evento_parada FROM "
+                    + "bd_sistema_monitor.tb_maquina_evento_apontamento)) and "
+                    + "evt.cod_maquina = ? order by evt.id desc limit 1;";
             PreparedStatement st = this.conec.prepareStatement(sql);
             st.setString(1, codMaquina);            
             ResultSet res = st.executeQuery();
@@ -269,6 +278,7 @@ public class ProducaoDAO {
                     + "status, mac, turnomaquina, exportada, Kg_Mt, laminadora, perda) values "
                     + "(?,?,?,(select date_format(now(), \"%Y-%m-%d\")),(select date_format(now(),\"%H:%m:%s\")),"
                     + "0,?,?,?,?,'',?,?,'',?,?,'0',?,?,?,?,?,?,'0','0',?,?,?,?,?,'1',?,'0','0','0',?,?)";
+            System.out.println(sql);
             PreparedStatement st = this.conec.prepareStatement(sql);
             for (int i=1;i<=dadosQuery.size();i++){
                 st.setString(i,dadosQuery.get(i-1));
@@ -431,5 +441,129 @@ public class ProducaoDAO {
         }
         return false;
         
+    }
+
+    public boolean existeCadastroProducaoTmp(String cod_maquina) {
+        try {
+            sql = "SELECT * FROM bd_sistema_monitor.tb_maquina_producao_tmp where codigo_maquina = ?;";
+             PreparedStatement st = this.conec.prepareStatement(sql);
+             st.setString(1, cod_maquina);
+             ResultSet res = st.executeQuery();
+            return res.next();                            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return false;
+    }
+
+    public boolean atualizaMetProducaoTemp(double metragemProd, String cod_maquina) {
+        
+        try {
+            sql = "update bd_sistema_monitor.tb_maquina_producao_tmp  set met_prod = "
+                    + "met_prod + ? where codigo_maquina = ?;";
+            PreparedStatement st = this.conec.prepareStatement(sql);
+            st.setDouble(1,metragemProd);
+            st.setString(2, cod_maquina);            
+            st.executeUpdate();
+            return st.getUpdateCount()!=0;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            erro.gravaErro(ex);
+        }
+        return false;
+    }
+
+    public boolean criarProducaoTemp(double metragemProd, String cod_maquina) {
+        try {
+            sql = "insert into bd_sistema_monitor.tb_maquina_producao_tmp (codigo_maquina, met_prod) values (?,?);";
+            PreparedStatement st = this.conec.prepareStatement(sql);
+            st.setString(1, cod_maquina);            
+            st.setDouble(2,metragemProd);            
+            st.executeUpdate();
+            return st.getUpdateCount()!=0;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            erro.gravaErro(ex);
+        }
+        return false;
+    }
+
+    public int buscaMetProducaoTemporaria(String cod_maquina) {
+        try {
+            sql = "SELECT * FROM bd_sistema_monitor.tb_maquina_producao_tmp where codigo_maquina = ?;";
+            PreparedStatement st = this.conec.prepareStatement(sql);
+            st.setString(1, cod_maquina);
+            ResultSet res = st.executeQuery();
+            if(res.next()){
+                int met=0;
+                met = res.getInt("met_prod");                
+                return met;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return 0;
+    }
+    
+    public boolean limparRegistrosMetragemTemporaria(String cod_maquina){
+        try {
+            sql = "delete from bd_sistema_monitor.tb_maquina_producao_tmp where codigo_maquina = ?;";
+            PreparedStatement st = this.conec.prepareStatement(sql);
+            st.setString(1, cod_maquina);            
+            st.executeUpdate();
+            return st.getUpdateCount()!=0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return false;
+    }
+
+    public Pesagem buscaDadosPesagem(int pesagem) {
+        try {
+            sql = "select pes.codigo,pes.codigoembalagem, pes.codigoitem, pes.loteproduzido, "
+                    + "pes.qtosfios, pes.observacao,pes.saldoconsumo,pes.metragemoperador,"
+                    + "pes.qtosfios,it.descricao From condumigproducao.pesagem pes "
+                    + "inner join condumigproducao.item it on pes.codigoitem = it.codigo "
+                    + "where pes.codigo = ?;";
+            PreparedStatement st = this.conec.prepareStatement(sql);
+            st.setInt(1, pesagem);            
+            ResultSet res = st.executeQuery();
+            if(res.next()){
+                Pesagem pes = new Pesagem();
+                //, , , , , , , , 
+                pes.setCodEmbalagem(res.getString("codigoembalagem"));
+                pes.setCodItem(res.getString("codigoitem"));
+                pes.setCodigo(res.getString("codigo"));
+                pes.setDecItem(res.getString("descricao"));
+                pes.setLote(res.getString("loteproduzido"));
+                pes.setMetragemOperador(res.getLong("metragemoperador"));
+                pes.setObservacao(res.getString("observacao"));
+                pes.setQtosFios(res.getInt("qtosfios"));
+                pes.setSaldoConsumo(res.getLong("saldoconsumo"));                
+                return pes;
+            }            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return null;
+    }
+
+    public boolean verificarDadosMicrometroRegistrados(String codigo) {
+        try {
+            sql = "SELECT * FROM bd_sistema_monitor.tb_maquina_dados_micrometro "
+                    + "where cod_maquina = ? and isnull(codigo_pesagem);";
+            PreparedStatement st = this.conec.prepareStatement(sql);
+            st.setString(1, codigo);            
+            ResultSet res = st.executeQuery();
+            return res.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return false;
     }
 }

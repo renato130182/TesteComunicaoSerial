@@ -14,13 +14,16 @@ public class EventoMaquina {
     private long metragemEvento;
     private long idEvento;
     private String dataHoraInicio;
-    private String dataHoraFinal;
+    private String dataHoraFinal;   
     private long metragemRetorno;
     
     public EventoMaquina() {
         this.cod_maquina = "";
         this.metragemEvento = 0;
+        this.metragemRetorno = 0;
         this.idEvento = 0;
+        this.dataHoraFinal="";
+        this.dataHoraInicio="";
     }
 
     public String getDataHoraInicio() {

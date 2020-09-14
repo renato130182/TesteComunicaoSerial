@@ -104,6 +104,7 @@ public class ParadasMaquinaDAO {
     }
     
     public boolean incluirMotivoEventoMaquina(long cod_parada, long id_Evento){
+        if(id_Evento==0)return true;
         sql = "insert into bd_sistema_monitor.tb_maquina_evento_parada "
                 + "(id_maquina_evento, cod_parada_maquina) values (?,?)";
         try {
@@ -205,20 +206,44 @@ public class ParadasMaquinaDAO {
     public List<EventoMaquina> buscaTempoMetragemEventosApontamento(String codMaquina){
         try {
             List<EventoMaquina> evt = new ArrayList<>();
-             sql = "SELECT * FROM bd_sistema_monitor.tb_maquina_evento where id not in "
-                     + "(select id from bd_sistema_monitor.tb_maquina_evento_apontamento) and cod_maquina = ?;";
-                PreparedStatement st = conec.prepareStatement(sql);
-                st.setString(1, codMaquina);
-                ResultSet res = st.executeQuery();
-                while(res.next()){
-                    EventoMaquina tmp =  new EventoMaquina();
-                    tmp.setDataHoraInicio(res.getString("data_hora_inicio"));
-                    tmp.setMetragemEvento(res.getLong("metragem_evento"));
-                    tmp.setDataHoraFinal(res.getString("data_hora_final"));
-                    tmp.setMetragemRetorno(res.getLong("metragem_retorno"));
-                    evt.add(tmp);
-                }
-                return evt;
+            sql = "SELECT * FROM bd_sistema_monitor.tb_maquina_evento where id in (" +
+                "SELECT id_maquina_evento FROM bd_sistema_monitor.tb_maquina_evento_parada where id not in (" +
+                "select id_maquina_evento_parada from bd_sistema_monitor.tb_maquina_evento_apontamento)) and cod_maquina = ?;";
+            PreparedStatement st = conec.prepareStatement(sql);
+            st.setString(1, codMaquina);
+            ResultSet res = st.executeQuery();
+            while(res.next()){
+                EventoMaquina tmp =  new EventoMaquina();
+                tmp.setDataHoraInicio(res.getString("data_hora_inicio"));
+                tmp.setMetragemEvento(res.getLong("metragem_evento"));
+                tmp.setDataHoraFinal(res.getString("data_hora_final"));
+                tmp.setMetragemRetorno(res.getLong("metragem_retorno"));
+                evt.add(tmp);
+            }
+            evt.add(buscadadosUltimoEventoMaquina(codMaquina));
+            return evt;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return null;
+    }
+    public EventoMaquina buscadadosUltimoEventoMaquina(String codMaquina) {
+        try {
+            sql = "SELECT * FROM bd_sistema_monitor.tb_maquina_evento where cod_maquina = ? order by id desc limit 1";
+            PreparedStatement st = conec.prepareStatement(sql);
+            st.setString(1, codMaquina);
+            ResultSet res = st.executeQuery();
+            if(res.next()){
+                EventoMaquina tmp =  new EventoMaquina();
+                tmp.setCod_maquina(codMaquina);
+                tmp.setIdEvento(res.getLong("id"));
+                tmp.setDataHoraInicio(res.getString("data_hora_inicio"));
+                tmp.setMetragemEvento(res.getLong("metragem_evento"));
+                tmp.setDataHoraFinal(res.getString("data_hora_final"));
+                tmp.setMetragemRetorno(res.getLong("metragem_retorno"));
+                return tmp;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             erro.gravaErro(e);
@@ -251,5 +276,62 @@ public class ParadasMaquinaDAO {
             erro.gravaErro(e);
         }
         return null;
-    }    
+    }       
+
+    public boolean AtualizaMetragemRetornoEventoMaquina(EventoMaquina evt, long metragem) {
+        try {
+            sql = "update bd_sistema_monitor.tb_maquina_evento set metragem_retorno = ? where id = ?;";
+            PreparedStatement st = conec.prepareStatement(sql);                
+            st.setLong(1,metragem);
+            st.setLong(2,evt.getIdEvento());           
+            st.executeUpdate();            
+            return st.getUpdateCount()==1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return false;
+    }
+
+    public boolean registraDataHoraRetornoEvento(long id) {
+         try {
+            sql = "update bd_sistema_monitor.tb_maquina_evento  set data_hora_final = CURRENT_TIMESTAMP where id = ?;";
+            PreparedStatement st = conec.prepareStatement(sql);       
+            st.setLong(1, id);
+            st.executeUpdate();            
+            return st.getUpdateCount()==1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return false;
+    }
+
+    public boolean incluirEventoMaquinaInicioProducao(EventoMaquina evt) {
+        try {
+            if(evt.getDataHoraFinal()==null || evt.getDataHoraFinal().isEmpty()){
+                sql = "Insert into bd_sistema_monitor.tb_maquina_evento (cod_maquina,data_hora_inicio,metragem_evento) "
+                    + "values (?,CURRENT_TIMESTAMP,?);";   
+                PreparedStatement st = conec.prepareStatement(sql);
+                st.setString(1,evt.getCod_maquina());
+                st.setLong(2,0);
+                st.executeUpdate();
+                return st.getUpdateCount()==1;   
+            }else{           
+                sql = "Insert into bd_sistema_monitor.tb_maquina_evento (cod_maquina,data_hora_inicio,metragem_evento,"
+                    + "data_hora_final, metragem_retorno) values (?,?,?,CURRENT_TIMESTAMP,?);";  
+                PreparedStatement st = conec.prepareStatement(sql);
+                st.setString(1,evt.getCod_maquina());
+                st.setString(2,evt.getDataHoraFinal());
+                st.setLong(3,0);
+                st.setLong(4,(evt.getMetragemRetorno()-evt.getMetragemEvento()));
+                st.executeUpdate();
+                return st.getUpdateCount()==1;   
+            }                                                             
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            erro.gravaErro(ex);
+        }            
+        return false;    
+    }
 }

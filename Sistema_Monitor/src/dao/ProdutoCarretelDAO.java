@@ -36,17 +36,28 @@ public class ProdutoCarretelDAO {
             st.setString(3, maquina);
             st.setString(4, carretel);
             ResultSet res = st.executeQuery();
-            if(res.next()){
-                Carretel car = new Carretel();
+            Carretel car = new Carretel();
+            if(res.next()){                
                 prodCar.setMetragemMaxima(res.getInt("maxima"));
                 prodCar.setMetragemPadrao(res.getInt("padrao"));
                 car.setCodigo(carretel);
-                car.setDescricao(res.getString("DescEmb"));
+                if(res.getString("DescEmb")==null){
+                    car.setDescricao("Sem descrição");
+                }else{
+                    car.setDescricao(res.getString("DescEmb"));
+                }
                 car.setFlange(res.getString("flange"));
-                prodCar.setCarretel(car);
-                db.desconectar();
-                return prodCar;
+                prodCar.setCarretel(car);                
+            }else{
+                prodCar.setMetragemMaxima(22000);
+                prodCar.setMetragemPadrao(20000);
+                car.setCodigo(carretel);
+                car.setDescricao("Sem descrição");
+                car.setFlange("Sem Flange");
+                prodCar.setCarretel(car);                                
             }
+            db.desconectar();
+            return prodCar;
         } catch (SQLException e) {
             System.out.println("Falha ao buscar produto metragem..." + sql);
             e.printStackTrace();
@@ -68,7 +79,7 @@ public class ProdutoCarretelDAO {
             st.setString(3, codEmbalagem.substring(3,7));            
             ResultSet res = st.executeQuery();
             return res.next();                                
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             erro.gravaErro(e);
         }

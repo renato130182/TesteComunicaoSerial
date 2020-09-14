@@ -24,22 +24,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class CriptoCode {
     private static final String KEYPRIVATE = "#Sistem@Condumig"; 
     private static final String IV = "CONDUMIGSISTEMAS";  // deve conter 16 caracteres
-    
-    public static byte [] encrypt(String dados){
-        try {
-            Cipher encripta = Cipher.getInstance("AES/CBC/PKCS5Padding","SunJCE");
-            SecretKeySpec key = new SecretKeySpec(KEYPRIVATE.getBytes("UTF-8"),"AES");
-            encripta.init(Cipher.ENCRYPT_MODE,key,new IvParameterSpec(IV.getBytes("UTF-8")));
-            return encripta.doFinal(dados.getBytes("UTF-8"));
-           
-        } catch (NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException | UnsupportedEncodingException | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
-            LogErro erro = new LogErro();
-            erro.gravaErro(ex);
-            
-        }
-        return null;       
-    }
-    
+        
     public static String decrypt(byte[] dados){
         Cipher decripta;
         try {

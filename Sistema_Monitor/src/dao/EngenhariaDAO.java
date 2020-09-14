@@ -67,5 +67,19 @@ public class EngenhariaDAO {
         }
         return null;
     } 
-    
+
+    public boolean verificaItemEngenharia(long codItementrando, long codigoItemProducao) {
+        try {
+            sql = "SELECT id FROM qlikview.cad_estrutura where `es-codigo` = ? and `it-codigo` = ?;";
+            PreparedStatement st = conec.prepareStatement(sql);            
+            st.setLong(1, codItementrando);
+            st.setLong(2, codigoItemProducao);            
+            ResultSet res = st.executeQuery();
+            return res.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            erro.gravaErro(e);
+        }
+        return false;
+    }    
 }
